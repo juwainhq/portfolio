@@ -15,7 +15,7 @@ export function Contact() {
   });
   const labelRef = useReveal();
   const titleRef = useReveal();
-  const formRef = useReveal();
+  const formRef = useRef<HTMLFormElement | null>(null);
   const socialsRef = useReveal();
 
   const handleSubmit = (e: React.FormEvent) => {

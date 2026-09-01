@@ -387,7 +387,7 @@ export default function AdminLinksPage() {
               key={i}
               link={link}
               onUpdate={(l) => updateNavLink(i, l)}
-              onDelete={() => deleteNavLink(i)}
+              onDelete={() => requestDeleteNav(i)}
               canDelete={config.navLinks.length > 1}
             />
           ))}

@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   Star,
   StarOff,
+  Trash2,
   Edit,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
