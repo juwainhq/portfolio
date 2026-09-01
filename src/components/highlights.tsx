@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useReveal } from "@/hooks/use-reveal";
 import { highlights } from "@/data/projects";
 
@@ -38,7 +39,7 @@ export function Highlights() {
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
-              <div className="grid grid-cols-12 gap-4 py-6 md:py-8 border-b border-border/50 transition-all duration-500">
+              <div className="grid grid-cols-12 gap-4 py-6 md:py-8 border-b border-border/50 transition-all duration-500 items-center">
                 {/* Number */}
                 <div className="col-span-2 md:col-span-1">
                   <span className="text-xs uppercase tracking-ultra-wide text-muted-foreground group-hover:text-foreground transition-colors duration-300">
@@ -67,11 +68,18 @@ export function Highlights() {
                   </p>
                 </div>
 
-                {/* Arrow */}
-                <div className="col-span-12 md:col-span-1 flex justify-end">
-                  <span
-                    className="text-sm opacity-0 group-hover:opacity-100 translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300"
-                  >
+                {/* Thumbnail + Arrow */}
+                <div className="col-span-12 md:col-span-1 flex items-center justify-end gap-4">
+                  <div className="relative w-12 h-12 overflow-hidden bg-foreground/5">
+                    <Image
+                      src={project.image}
+                      alt={project.title}
+                      fill
+                      sizes="48px"
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                  </div>
+                  <span className="text-sm opacity-0 group-hover:opacity-100 translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300">
                     →
                   </span>
                 </div>

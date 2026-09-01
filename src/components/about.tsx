@@ -9,40 +9,38 @@ export function About() {
   return (
     <section
       id="about"
-      className="py-24 md:py-32 lg:py-40 px-6 md:px-10 lg:px-16 border-t border-border/30"
+      className="py-28 md:py-40 lg:py-48 px-6 md:px-10 lg:px-16"
     >
       <div className="max-w-[1400px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-          {/* Label */}
-          <div
-            ref={sectionRef}
-            className="reveal lg:col-span-2"
-          >
-            <h2 className="text-xs uppercase tracking-ultra-wide font-medium">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
+          {/* Label column */}
+          <div ref={sectionRef} className="reveal lg:col-span-2">
+            <span className="text-[10px] uppercase tracking-[0.3em] font-medium">
               About
-            </h2>
+            </span>
           </div>
 
           {/* Content */}
           <div
             ref={contentRef}
-            className="reveal lg:col-span-7 lg:col-start-4"
+            className="reveal lg:col-span-8 lg:col-start-4"
           >
-            <p className="text-xl md:text-2xl lg:text-3xl font-display leading-relaxed tracking-tight mb-8">
-              I'm Juwain Haque, a graphic designer and business consultant focused
-              on creating strong visual identities and practical strategies that
-              help businesses communicate, position themselves, and grow.
+            <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] font-display leading-[1.15] tracking-tight mb-8 md:mb-10">
+              Graphic designer and business consultant focused on creating
+              strong visual identities and practical strategies.
+            </h2>
+
+            <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-[640px]">
+              I combine creative thinking with business strategy to transform
+              ideas into clear brands, compelling visuals, and useful solutions
+              that drive real results.
             </p>
 
-            <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-12">
-              I combine creative thinking with business strategy to turn ideas
-              into clear brands, compelling visuals, and useful solutions.
-            </p>
-
-            <div className="flex items-center gap-4 pt-8 border-t border-border/30">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="text-xs uppercase tracking-ultra-wide">
-                Currently available for select projects
+            {/* Availability indicator */}
+            <div className="flex items-center gap-3 mt-12 md:mt-14">
+              <span className="w-1 h-1 rounded-full bg-emerald-500" />
+              <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                Available for select projects in 2025
               </span>
             </div>
           </div>

@@ -36,69 +36,63 @@ export function Services() {
   const listRef = useReveal();
 
   return (
-    <section
-      id="services"
-      className="py-24 md:py-32 lg:py-40 px-6 md:px-10 lg:px-16 bg-secondary/30"
-    >
+    <section id="services" className="py-28 md:py-40 lg:py-48 px-6 md:px-10 lg:px-16">
       <div className="max-w-[1400px] mx-auto">
         {/* Header */}
-        <div className="mb-16 md:mb-24">
-          <h2
+        <div className="mb-16 md:mb-20 lg:mb-24">
+          <span
             ref={labelRef}
-            className="reveal text-xs uppercase tracking-ultra-wide font-medium"
+            className="reveal text-[10px] uppercase tracking-[0.3em] font-medium"
           >
             Services
-          </h2>
+          </span>
         </div>
 
         {/* Service List */}
-        <div
-          ref={listRef}
-          className="reveal"
-        >
+        <div ref={listRef} className="reveal">
           {services.map((service, index) => (
             <div
               key={service.number}
-              className={`group border-t border-border/50 transition-all duration-500 ${
-                hoveredIndex === index ? "bg-foreground/5" : ""
+              className={`group border-t border-foreground/10 py-8 md:py-10 transition-all duration-300 ${
+                hoveredIndex === index ? "border-foreground/20" : ""
               }`}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
-              <div className="grid grid-cols-12 gap-4 py-8 md:py-10 lg:py-12 items-baseline">
+              <div className="grid grid-cols-12 gap-4 items-baseline">
                 {/* Number */}
-                <div className="col-span-2 md:col-span-1">
-                  <span className="text-xs uppercase tracking-ultra-wide text-muted-foreground group-hover:text-foreground transition-colors duration-300">
+                <div className="col-span-3 md:col-span-1">
+                  <span className="text-[10px] md:text-[11px] tracking-[0.2em] text-muted-foreground font-medium group-hover:text-foreground/50 transition-colors duration-300">
                     {service.number}
                   </span>
                 </div>
 
                 {/* Title */}
-                <div className="col-span-7 md:col-span-4">
-                  <h3 className="text-xl md:text-2xl lg:text-3xl font-display tracking-tight group-hover:translate-x-2 transition-transform duration-500">
+                <div className="col-span-5 md:col-span-4">
+                  <h3 className="text-xl md:text-2xl lg:text-3xl font-display tracking-tight group-hover:translate-x-1 transition-transform duration-500">
                     {service.title}
                   </h3>
                 </div>
 
                 {/* Description */}
-                <div className="col-span-10 md:col-span-6 md:col-start-6 lg:col-span-5 lg:col-start-6">
-                  <p className="text-sm md:text-base text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">
+                <div className="col-span-4 md:col-span-5 md:col-start-7">
+                  <p className="text-sm md:text-base text-muted-foreground group-hover:text-foreground/60 transition-colors duration-300">
                     {service.description}
                   </p>
                 </div>
 
-                {/* Arrow */}
-                <div className="col-span-2 md:col-span-1 flex justify-end">
+                {/* Subtle indicator */}
+                <div className="col-span-12 md:col-span-2 md:col-start-11 flex justify-end">
                   <span
-                    className="text-lg opacity-0 group-hover:opacity-100 translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300"
+                    className="text-[10px] md:text-[11px] tracking-[0.15em] uppercase text-muted-foreground/0 group-hover:text-foreground/40 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0 opacity-0 group-hover:opacity-100"
                   >
-                    →
+                    View
                   </span>
                 </div>
               </div>
             </div>
           ))}
-          <div className="border-b border-border/50" />
+          <div className="border-b border-foreground/10" />
         </div>
       </div>
     </section>
