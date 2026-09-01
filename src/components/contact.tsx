@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { useReveal } from "@/hooks/use-reveal";
