@@ -61,6 +61,16 @@ function ProjectCard({
         </p>
       </div>
 
+      {/* Delete button with explicit label — always visible */}
+      <button
+        onClick={onDelete}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] uppercase tracking-[0.15em] text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-sm transition-colors duration-150 shrink-0"
+        title={`Delete "${project.title}"`}
+      >
+        <Trash2 size={11} />
+        <span>Delete</span>
+      </button>
+
       {/* Badges */}
       <div className="flex items-center gap-1 shrink-0">
         <span
@@ -84,7 +94,7 @@ function ProjectCard({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+      <div className="flex items-center gap-1 shrink-0">
         <button
           onClick={onToggleFeatured}
           className="p-1.5 hover:bg-foreground/5 rounded-sm transition-colors duration-150"
@@ -106,16 +116,9 @@ function ProjectCard({
         <button
           onClick={onEdit}
           className="p-1.5 hover:bg-foreground/5 rounded-sm transition-colors duration-150"
-          title="Edit project"
+          title={`Edit "${project.title}"`}
         >
           <Edit3 size={13} />
-        </button>
-        <button
-          onClick={onDelete}
-          className="p-1.5 hover:bg-foreground/5 rounded-sm transition-colors duration-150 text-muted-foreground hover:text-foreground"
-          title="Delete project"
-        >
-          <Trash2 size={13} />
         </button>
       </div>
     </div>
@@ -501,6 +504,11 @@ export default function AdminProjectsPage() {
   const { config, updateConfig } = useSiteConfig();
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<{
+    slug: string;
+    title: string;
+    image: string;
+  } | null>(null);
 
   const editingProject = editingSlug
     ? config.projects.find((p) => p.slug === editingSlug)
@@ -520,10 +528,23 @@ export default function AdminProjectsPage() {
     );
   };
 
-  const deleteProject = (slug: string) => {
-    if (!confirm(`Delete "${config.projects.find((p) => p.slug === slug)?.title}"?`)) return;
-    updateConfig({ projects: config.projects.filter((p) => p.slug !== slug) });
-    toast.success("Project deleted");
+  const requestDelete = (slug: string) => {
+    const project = config.projects.find((p) => p.slug === slug);
+    if (!project) return;
+    setConfirmDelete({
+      slug: project.slug,
+      title: project.title,
+      image: project.image,
+    });
+  };
+
+  const performDelete = () => {
+    if (!confirmDelete) return;
+    updateConfig({
+      projects: config.projects.filter((p) => p.slug !== confirmDelete.slug),
+    });
+    toast.success(`Deleted "${confirmDelete.title}"`);
+    setConfirmDelete(null);
   };
 
   const toggleFeatured = (slug: string) => {
@@ -577,7 +598,52 @@ export default function AdminProjectsPage() {
   }
 
   return (
-    <div className="flex h-full">
+    <>
+      {/* Delete Confirmation Modal */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setConfirmDelete(null)}
+          />
+
+          {/* Dialog */}
+          <div className="relative z-10 w-full max-w-md bg-background border border-border p-8">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-red-400 mb-3">
+              Delete Project
+            </p>
+            <h2 className="text-xl font-medium mb-2">
+              "{confirmDelete.title}"
+            </h2>
+            <p className="text-sm text-muted-foreground mb-1">
+              Number: {config.projects.find((p) => p.slug === confirmDelete.slug)?.number}
+            </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              Image: {confirmDelete.image}
+            </p>
+            <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
+              This will permanently remove this project and cannot be undone.
+            </p>
+            <div className="flex items-center justify-end gap-4">
+              <button
+                onClick={() => setConfirmDelete(null)}
+                className="text-[11px] uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground transition-colors duration-150"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={performDelete}
+                className="px-5 py-2 bg-red-500 hover:bg-red-600 text-white text-[11px] uppercase tracking-[0.15em] font-medium transition-colors duration-150"
+              >
+                Delete Project
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex h-full">
       {/* Project list */}
       <div className="w-80 shrink-0 border-r border-border flex flex-col">
         <div className="p-5 border-b border-border flex items-center justify-between">
@@ -625,7 +691,7 @@ export default function AdminProjectsPage() {
                 <ProjectCard
                   project={project}
                   onEdit={() => setEditingSlug(project.slug)}
-                  onDelete={() => deleteProject(project.slug)}
+                  onDelete={() => requestDelete(project.slug)}
                   onToggleFeatured={() => toggleFeatured(project.slug)}
                   onToggleHighlight={() => toggleHighlight(project.slug)}
                 />
@@ -667,5 +733,6 @@ export default function AdminProjectsPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

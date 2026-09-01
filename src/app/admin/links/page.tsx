@@ -150,19 +150,22 @@ function NavLinkRow({
           {link.href}
         </p>
       </div>
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+      <div className="flex items-center gap-1 shrink-0">
         <button
           onClick={() => setEditing(true)}
           className="p-1.5 hover:bg-foreground/5 rounded-sm transition-colors"
+          title={`Edit "${link.label}"`}
         >
           <Edit3 size={13} />
         </button>
         {canDelete && (
           <button
             onClick={onDelete}
-            className="p-1.5 hover:bg-foreground/5 rounded-sm transition-colors text-muted-foreground hover:text-foreground"
+            className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] uppercase tracking-[0.15em] text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-sm transition-colors duration-150"
+            title={`Delete "${link.label}"`}
           >
-            <Trash2 size={13} />
+            <Trash2 size={11} />
+            <span>Delete</span>
           </button>
         )}
       </div>
@@ -275,18 +278,21 @@ function SocialLinkRow({
           {social.href}
         </p>
       </div>
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+      <div className="flex items-center gap-1 shrink-0">
         <button
           onClick={() => setEditing(true)}
           className="p-1.5 hover:bg-foreground/5 rounded-sm transition-colors"
+          title={`Edit "${social.label}"`}
         >
           <Edit3 size={13} />
         </button>
         <button
           onClick={onDelete}
-          className="p-1.5 hover:bg-foreground/5 rounded-sm transition-colors text-muted-foreground hover:text-foreground"
+          className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] uppercase tracking-[0.15em] text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-sm transition-colors duration-150"
+          title={`Delete "${social.label}"`}
         >
-          <Trash2 size={13} />
+          <Trash2 size={11} />
+          <span>Delete</span>
         </button>
       </div>
     </div>
@@ -297,6 +303,14 @@ function SocialLinkRow({
 
 export default function AdminLinksPage() {
   const { config, updateConfig } = useSiteConfig();
+  const [confirmDeleteNav, setConfirmDeleteNav] = useState<{
+    index: number;
+    label: string;
+  } | null>(null);
+  const [confirmDeleteSocial, setConfirmDeleteSocial] = useState<{
+    index: number;
+    label: string;
+  } | null>(null);
 
   const updateNavLink = (index: number, updated: NavLink) => {
     const next = [...config.navLinks];
@@ -304,9 +318,16 @@ export default function AdminLinksPage() {
     updateConfig({ navLinks: next });
   };
 
-  const deleteNavLink = (index: number) => {
-    const next = config.navLinks.filter((_, i) => i !== index);
+  const requestDeleteNav = (index: number) => {
+    setConfirmDeleteNav({ index, label: config.navLinks[index].label });
+  };
+
+  const performDeleteNav = () => {
+    if (!confirmDeleteNav) return;
+    const next = config.navLinks.filter((_, i) => i !== confirmDeleteNav.index);
     updateConfig({ navLinks: next });
+    toast.success(`Deleted "${confirmDeleteNav.label}"`);
+    setConfirmDeleteNav(null);
   };
 
   const addNavLink = () => {
