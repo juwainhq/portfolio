@@ -1,13 +1,90 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useReveal } from "@/hooks/use-reveal";
-import { projects } from "@/data/projects";
+import { projects, type Project } from "@/data/projects";
+import { PortfolioImage } from "@/components/portfolio-image";
+
+type ColPolicy = {
+  imageColSpan: number;
+  imageColStart: number;
+  metaColSpan: number;
+  metaColStart: number;
+  metaSide: "top" | "bottom" | "side";
+  imageMaxWidth?: string;
+};
+
+const policies: Record<Project["layout"], ColPolicy> = {
+  featured: {
+    imageColSpan: 12,
+    imageColStart: 1,
+    metaColSpan: 10,
+    metaColStart: 2,
+    metaSide: "bottom",
+  },
+  portrait: {
+    imageColSpan: 5,
+    imageColStart: 1,
+    metaColSpan: 4,
+    metaColStart: 8,
+    metaSide: "side",
+    imageMaxWidth: "440px",
+  },
+  wide: {
+    imageColSpan: 9,
+    imageColStart: 4,
+    metaColSpan: 3,
+    metaColStart: 1,
+    metaSide: "side",
+  },
+  square: {
+    imageColSpan: 6,
+    imageColStart: 1,
+    metaColSpan: 4,
+    metaColStart: 9,
+    metaSide: "side",
+    imageMaxWidth: "560px",
+  },
+  "two-col": {
+    imageColSpan: 12,
+    imageColStart: 1,
+    metaColSpan: 12,
+    metaColStart: 1,
+    metaSide: "bottom",
+  },
+  gallery: {
+    imageColSpan: 12,
+    imageColStart: 1,
+    metaColSpan: 8,
+    metaColStart: 1,
+    metaSide: "bottom",
+  },
+};
+
+function policyFor(layout: Project["layout"], index: number): ColPolicy {
+  const p = policies[layout];
+  if (layout === "portrait" || layout === "square") {
+    const flip = index % 2 === 1;
+    if (flip) {
+      return {
+        ...p,
+        imageColStart: 13 - p.imageColSpan - p.metaColSpan,
+        metaColStart: 13 - p.metaColSpan,
+      };
+    }
+  }
+  return p;
+}
+
+// Helper: CSS Grid columns string for a given column span + start
+const colStyle = (
+  colSpan: number,
+  colStart: number
+): React.CSSProperties => ({
+  gridColumn: `${colStart} / span ${colSpan}`,
+});
 
 export function PortfolioGrid() {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const labelRef = useReveal();
   const indexRef = useReveal();
 
@@ -33,323 +110,161 @@ export function PortfolioGrid() {
           </span>
         </div>
 
-        {/* Editorial Portfolio Grid - composition-driven layout */}
-        <div className="space-y-28 md:space-y-40 lg:space-y-56">
-          {projects.map((project, index) => {
-            const layoutType = project.layout;
-
-            // Large Featured - centered with offset, generous aspect
-            if (layoutType === "large") {
-              return (
-                <div
-                  key={project.slug}
-                  className="reveal"
-                  style={{ transitionDelay: `${index * 80}ms` }}
-                >
-                  <Link
-                    href={`/work/${project.slug}`}
-                    className="group block"
-                    onMouseEnter={() => setHoveredIndex(index)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                  >
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12">
-                      <div className="lg:col-span-10 lg:col-start-2">
-                        <div className="relative aspect-[5/4] md:aspect-[16/10] overflow-hidden bg-secondary">
-                          <div
-                            className={`absolute inset-0 transition-transform duration-[1200ms] ease-out will-change-transform ${
-                              hoveredIndex === index
-                                ? "scale-[1.04]"
-                                : "scale-100"
-                            }`}
-                          >
-                            <Image
-                              src={project.image}
-                              alt={project.title}
-                              fill
-                              sizes="(min-width: 1024px) 83vw, 100vw"
-                              className="object-cover"
-                              priority={index < 2}
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="lg:col-span-8 lg:col-start-2 flex flex-col md:flex-row md:items-baseline md:justify-between gap-3 md:gap-6 mt-5">
-                        <div>
-                          <div className="flex items-baseline gap-3 mb-1.5">
-                            <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                              {project.number}
-                            </span>
-                            <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                              {project.category}
-                            </span>
-                          </div>
-                          <h3 className="text-2xl md:text-3xl lg:text-4xl font-display tracking-tight group-hover:translate-x-2 transition-transform duration-500">
-                            {project.title}
-                          </h3>
-                        </div>
-                        {project.description && (
-                          <p className="text-sm text-muted-foreground max-w-[380px] hidden lg:block">
-                            {project.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              );
-            }
-
-            // Full width - cinematic
-            if (layoutType === "full") {
-              return (
-                <div
-                  key={project.slug}
-                  className="reveal"
-                  style={{ transitionDelay: `${index * 80}ms` }}
-                >
-                  <Link
-                    href={`/work/${project.slug}`}
-                    className="group block"
-                    onMouseEnter={() => setHoveredIndex(index)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                  >
-                    <div className="relative aspect-[16/9] md:aspect-[2.4/1] overflow-hidden bg-secondary">
-                      <div
-                        className={`absolute inset-0 transition-transform duration-[1200ms] ease-out will-change-transform ${
-                          hoveredIndex === index
-                            ? "scale-[1.04]"
-                            : "scale-100"
-                        }`}
-                      >
-                        <Image
-                          src={project.image}
-                          alt={project.title}
-                          fill
-                          sizes="100vw"
-                          className="object-cover"
-                          priority={index < 2}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="mt-6 grid grid-cols-1 md:grid-cols-12 gap-4">
-                      <div className="md:col-span-5">
-                        <div className="flex items-baseline gap-3 mb-1.5">
-                          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                            {project.number}
-                          </span>
-                          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                            {project.category}
-                          </span>
-                        </div>
-                        <h3 className="text-2xl md:text-3xl lg:text-4xl font-display tracking-tight group-hover:translate-x-2 transition-transform duration-500">
-                          {project.title}
-                        </h3>
-                      </div>
-                      {project.description && (
-                        <div className="md:col-span-5 md:col-start-8 hidden md:block">
-                          <p className="text-sm text-muted-foreground max-w-[400px]">
-                            {project.description}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                </div>
-              );
-            }
-
-            // Two column - editorial side by side
-            if (layoutType === "two-col") {
-              return (
-                <div
-                  key={project.slug}
-                  className="reveal"
-                  style={{ transitionDelay: `${index * 80}ms` }}
-                >
-                  <Link
-                    href={`/work/${project.slug}`}
-                    className="group block"
-                    onMouseEnter={() => setHoveredIndex(index)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
-                      <div className="relative aspect-[4/5] md:aspect-[5/6] overflow-hidden bg-secondary">
-                        <div
-                          className={`absolute inset-0 transition-transform duration-[1200ms] ease-out will-change-transform ${
-                            hoveredIndex === index
-                              ? "scale-[1.04]"
-                              : "scale-100"
-                          }`}
-                        >
-                          <Image
-                            src={project.image}
-                            alt={project.title}
-                            fill
-                            sizes="(min-width: 768px) 50vw, 100vw"
-                            className="object-cover"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col justify-end pb-2">
-                        <div className="flex items-baseline gap-3 mb-1.5">
-                          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                            {project.number}
-                          </span>
-                          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                            {project.category}
-                          </span>
-                        </div>
-                        <h3 className="text-2xl md:text-3xl lg:text-4xl font-display tracking-tight mb-3 group-hover:translate-x-2 transition-transform duration-500">
-                          {project.title}
-                        </h3>
-                        {project.description && (
-                          <p className="text-sm text-muted-foreground max-w-[400px]">
-                            {project.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              );
-            }
-
-            // Portrait - alternating left/right composition
-            if (layoutType === "portrait") {
-              const isEven = index % 2 === 0;
-              return (
-                <div
-                  key={project.slug}
-                  className="reveal"
-                  style={{ transitionDelay: `${index * 80}ms` }}
-                >
-                  <Link
-                    href={`/work/${project.slug}`}
-                    className="group block"
-                    onMouseEnter={() => setHoveredIndex(index)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
-                      {/* Image */}
-                      <div
-                        className={`relative overflow-hidden bg-secondary aspect-[3/4] md:aspect-[4/5] ${
-                          isEven
-                            ? "md:col-span-5 md:col-start-2"
-                            : "md:col-span-5 md:col-start-7"
-                        }`}
-                      >
-                        <div
-                          className={`absolute inset-0 transition-transform duration-[1200ms] ease-out will-change-transform ${
-                            hoveredIndex === index
-                              ? "scale-[1.04]"
-                              : "scale-100"
-                          }`}
-                        >
-                          <Image
-                            src={project.image}
-                            alt={project.title}
-                            fill
-                            sizes="(min-width: 768px) 40vw, 100vw"
-                            className="object-cover"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Meta */}
-                      <div
-                        className={`${
-                          isEven
-                            ? "md:col-span-4 md:col-start-8"
-                            : "md:col-span-4 md:col-start-2 md:order-first"
-                        }`}
-                      >
-                        <div className="flex items-baseline gap-3 mb-2">
-                          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                            {project.number}
-                          </span>
-                          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                            {project.category}
-                          </span>
-                        </div>
-                        <h3 className="text-xl md:text-2xl lg:text-3xl font-display tracking-tight mb-3 group-hover:translate-x-2 transition-transform duration-500">
-                          {project.title}
-                        </h3>
-                        {project.description && (
-                          <p className="text-sm text-muted-foreground max-w-[400px]">
-                            {project.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              );
-            }
-
-            // Wide - landscape cinematic with metadata aside
-            return (
-              <div
-                key={project.slug}
-                className="reveal"
-                style={{ transitionDelay: `${index * 80}ms` }}
-              >
-                <Link
-                  href={`/work/${project.slug}`}
-                  className="group block"
-                  onMouseEnter={() => setHoveredIndex(index)}
-                  onMouseLeave={() => setHoveredIndex(null)}
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12">
-                    <div className="md:col-span-9">
-                      <div className="relative aspect-[16/9] md:aspect-[16/8] overflow-hidden bg-secondary">
-                        <div
-                          className={`absolute inset-0 transition-transform duration-[1200ms] ease-out will-change-transform ${
-                            hoveredIndex === index
-                              ? "scale-[1.04]"
-                              : "scale-100"
-                          }`}
-                        >
-                          <Image
-                            src={project.image}
-                            alt={project.title}
-                            fill
-                            sizes="(min-width: 768px) 75vw, 100vw"
-                            className="object-cover"
-                            priority={index < 2}
-                            unoptimized={project.image.endsWith(".gif")}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="md:col-span-3 flex flex-col justify-end">
-                      <div className="flex items-baseline gap-3 mb-1.5">
-                        <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                          {project.number}
-                        </span>
-                        <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                          {project.category}
-                        </span>
-                      </div>
-                      <h3 className="text-lg md:text-xl lg:text-2xl font-display tracking-tight mb-2 group-hover:translate-x-2 transition-transform duration-500">
-                        {project.title}
-                      </h3>
-                      {project.description && (
-                        <p className="text-sm text-muted-foreground max-w-[280px]">
-                          {project.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            );
-          })}
+        {/* Editorial Portfolio Grid */}
+        <div className="space-y-32 md:space-y-48 lg:space-y-56">
+          {projects.map((project, index) => (
+            <ProjectRow
+              key={project.slug}
+              project={project}
+              index={index}
+              policy={policyFor(project.layout, index)}
+            />
+          ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function ProjectRow({
+  project,
+  index,
+  policy,
+}: {
+  project: Project;
+  index: number;
+  policy: ColPolicy;
+}) {
+  return (
+    <article
+      className="reveal"
+      style={{ transitionDelay: `${index * 80}ms` }}
+    >
+      <Link
+        href={`/work/${project.slug}`}
+        className="group block"
+        aria-label={`${project.title} — ${project.category}`}
+      >
+        {/* Meta above image (e.g. featured) */}
+        {policy.metaSide === "top" && (
+          <div className="mb-8 md:mb-10">
+            <ProjectMeta project={project} />
+          </div>
+        )}
+
+        {/* Grid */}
+        <div
+          className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-x-12 md:gap-y-10 items-start"
+          style={
+            policy.metaSide === "side"
+              ? { alignItems: "center" }
+              : undefined
+          }
+        >
+          {/* Image block */}
+          <div
+            style={colStyle(policy.imageColSpan, policy.imageColStart)}
+          >
+            <div
+              style={policy.imageMaxWidth ? { maxWidth: policy.imageMaxWidth } : undefined}
+            >
+              <PortfolioImage
+                src={project.image}
+                alt={project.title}
+                fit={project.fit}
+                sizes={
+                  project.layout === "wide"
+                    ? "(min-width: 768px) 75vw, 100vw"
+                    : project.layout === "two-col"
+                    ? "(min-width: 768px) 58vw, 100vw"
+                    : project.layout === "featured" || project.layout === "gallery"
+                    ? "100vw"
+                    : "(min-width: 768px) 40vw, 100vw"
+                }
+                priority={index < 2}
+                unoptimized={project.image.endsWith(".gif")}
+                containerClassName="bg-secondary"
+              />
+            </div>
+          </div>
+
+          {/* Side meta */}
+          {policy.metaSide === "side" && (
+            <div style={colStyle(policy.metaColSpan, policy.metaColStart)}>
+              <ProjectMeta project={project} />
+            </div>
+          )}
+
+          {/* Two-col second image */}
+          {project.layout === "two-col" && project.gallery && (
+            <div style={colStyle(5, 8)}>
+              <div className="flex flex-col gap-8 md:gap-10">
+                {project.gallery.slice(0, 2).map((src, i) => (
+                  <PortfolioImage
+                    key={i}
+                    src={src}
+                    alt={`${project.title} — ${i + 2}`}
+                    fit={project.galleryFit ?? project.fit}
+                    sizes="(min-width: 768px) 40vw, 100vw"
+                    unoptimized={src.endsWith(".gif")}
+                    containerClassName="bg-secondary"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Gallery additional images */}
+          {project.layout === "gallery" && project.gallery && (
+            <div style={colStyle(10, 2)} className="mt-10 md:mt-14">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+                {project.gallery.map((src, i) => (
+                  <PortfolioImage
+                    key={i}
+                    src={src}
+                    alt={`${project.title} — ${i + 2}`}
+                    fit={project.galleryFit ?? project.fit}
+                    sizes="(min-width: 768px) 45vw, 100vw"
+                    unoptimized={src.endsWith(".gif")}
+                    containerClassName="bg-secondary"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Meta below image */}
+        {policy.metaSide === "bottom" && (
+          <div className="mt-8 md:mt-10 max-w-[640px]">
+            <ProjectMeta project={project} />
+          </div>
+        )}
+      </Link>
+    </article>
+  );
+}
+
+function ProjectMeta({ project }: { project: Project }) {
+  return (
+    <div className="group/meta">
+      <div className="flex items-baseline gap-3 mb-2.5">
+        <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+          {project.number}
+        </span>
+        <span className="h-px w-3 bg-foreground/30 shrink-0" aria-hidden="true" />
+        <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+          {project.category}
+        </span>
+      </div>
+      <h3 className="text-2xl md:text-3xl lg:text-4xl font-display tracking-tight transition-transform duration-500 group-hover:translate-x-2">
+        {project.title}
+      </h3>
+      {project.description && (
+        <p className="text-sm text-muted-foreground mt-3 max-w-[400px] leading-relaxed">
+          {project.description}
+        </p>
+      )}
+    </div>
   );
 }

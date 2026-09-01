@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { projects } from "@/data/projects";
 import { Footer } from "@/components/footer";
 import { Navigation } from "@/components/navigation";
+import { PortfolioImage } from "@/components/portfolio-image";
 
 export function generateStaticParams() {
   return projects.map((project) => ({
@@ -25,7 +25,10 @@ export default async function ProjectPage({
   }
 
   const hasMeta =
-    project.year || project.services.length > 0 || project.client || project.category;
+    project.year ||
+    project.services.length > 0 ||
+    project.client ||
+    project.category;
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,7 +36,7 @@ export default async function ProjectPage({
 
       <main className="pt-24 md:pt-32">
         {/* Project Header */}
-        <div className="px-6 md:px-10 lg:px-16 mb-12 md:mb-16">
+        <div className="px-6 md:px-10 lg:px-16 mb-10 md:mb-14">
           <div className="max-w-[1600px] mx-auto">
             {/* Back Link */}
             <Link
@@ -48,7 +51,7 @@ export default async function ProjectPage({
             </Link>
 
             {/* Project Number */}
-            <div className="mb-5">
+            <div className="mb-4">
               <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
                 {project.number}
               </span>
@@ -99,39 +102,34 @@ export default async function ProjectPage({
           </div>
         </div>
 
-        {/* Hero Image */}
+        {/* Hero Image — natural aspect ratio, no forced crop */}
         <div className="px-6 md:px-10 lg:px-16 mb-16 md:mb-24">
           <div className="max-w-[1600px] mx-auto">
-            <div className="relative aspect-[4/3] md:aspect-[16/9] overflow-hidden bg-secondary">
-              <Image
-                src={project.image}
-                alt={project.title}
-                fill
-                sizes="100vw"
-                className="object-cover"
-                priority
-                unoptimized={project.image.endsWith(".gif")}
-              />
-            </div>
+            <PortfolioImage
+              src={project.image}
+              alt={project.title}
+              fit={project.fit}
+              sizes="100vw"
+              priority
+              unoptimized={project.image.endsWith(".gif")}
+              containerClassName="bg-secondary"
+            />
           </div>
         </div>
 
-        {/* Gallery Images */}
+        {/* Gallery Images — each at its natural ratio, no fixed aspect boxes */}
         {project.gallery && project.gallery.length > 0 && (
-          <div className="px-6 md:px-10 lg:px-16 mb-24 md:mb-36 space-y-6 md:space-y-10">
-            <div className="max-w-[1600px] mx-auto">
-              {project.gallery.map((image, index) => (
-                <div
-                  key={index}
-                  className="relative aspect-[5/4] md:aspect-[16/10] overflow-hidden bg-secondary"
-                >
-                  <Image
-                    src={image}
-                    alt={`${project.title} - Image ${index + 2}`}
-                    fill
+          <div className="px-6 md:px-10 lg:px-16 mb-24 md:mb-36">
+            <div className="max-w-[1600px] mx-auto space-y-8 md:space-y-12">
+              {project.gallery.map((src, index) => (
+                <div key={index}>
+                  <PortfolioImage
+                    src={src}
+                    alt={`${project.title} — ${index + 2}`}
+                    fit={project.galleryFit ?? project.fit}
                     sizes="100vw"
-                    className="object-cover"
-                    unoptimized={image.endsWith(".gif")}
+                    unoptimized={src.endsWith(".gif")}
+                    containerClassName="bg-secondary"
                   />
                 </div>
               ))}

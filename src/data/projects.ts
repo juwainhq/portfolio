@@ -1,4 +1,4 @@
-import { StaticImageData } from "next/image";
+export type Fit = "contain" | "cover";
 
 export type Project = {
   slug: string;
@@ -9,19 +9,40 @@ export type Project = {
   year: string;
   client: string;
   services: string[];
-  layout: "full" | "large" | "two-col" | "small" | "portrait" | "wide";
+  /**
+   * Editorial placement of the piece in the grid.
+   * `featured` is a large centered hero shot, `portrait` is a tall piece,
+   * `wide` is a panoramic piece, `square` is a balanced cube, `two-col`
+   * is paired with a sibling, `gallery` is a multi-image work.
+   */
+  layout: "featured" | "portrait" | "wide" | "square" | "two-col" | "gallery";
+  /**
+   * How the image should be fitted inside its container.
+   * `contain` keeps the entire artwork visible (no cropping).
+   * `cover` fills the natural-ratio box edge-to-edge (safe for bleed art).
+   */
+  fit: Fit;
   featured?: boolean;
   highlight?: boolean;
   image: string;
   gallery?: string[];
+  galleryFit?: Fit;
   challenge?: string;
   approach?: string;
   solution?: string;
   result?: string;
 };
 
-// Your portfolio work - edit this array to update the entire site
-// Images are located in /public/work-{number}.{ext}
+/**
+ * Portfolio work.
+ *
+ * Each image is presented at its NATURAL aspect ratio — the layout below
+ * only describes where the piece sits on the page, not how the artwork
+ * is cropped. The `fit` field controls object-fit per image.
+ *
+ * Images on disk: /work-1.jpg, /work-3.jpg, /work-4.jpg,
+ *                 /work-8.jpg, /work-8.webp, /work-9.webp
+ */
 export const projects: Project[] = [
   {
     slug: "project-01",
@@ -32,11 +53,13 @@ export const projects: Project[] = [
     year: "2024",
     client: "",
     services: ["Photography Direction", "Visual Design"],
-    layout: "large",
+    layout: "featured",
+    fit: "contain",
     featured: true,
     highlight: true,
-    image: "/work-2.jpg",
-    gallery: ["/work-2.jpg", "/work-1.jpg"],
+    image: "/work-1.jpg",
+    gallery: ["/work-1.jpg", "/work-3.jpg"],
+    galleryFit: "contain",
   },
   {
     slug: "project-02",
@@ -48,6 +71,7 @@ export const projects: Project[] = [
     client: "",
     services: ["Creative Direction", "Visual Design"],
     layout: "portrait",
+    fit: "contain",
     featured: true,
     highlight: true,
     image: "/work-3.jpg",
@@ -55,46 +79,6 @@ export const projects: Project[] = [
   {
     slug: "project-03",
     number: "03",
-    title: "Motion Study",
-    category: "Animation",
-    description: "Animated visual exploration.",
-    year: "2024",
-    client: "",
-    services: ["Motion Design", "Animation"],
-    layout: "wide",
-    featured: true,
-    highlight: true,
-    image: "/work-6.gif",
-  },
-  {
-    slug: "project-04",
-    number: "04",
-    title: "Portrait",
-    category: "Visual Identity",
-    description: "A study in shadow and form.",
-    year: "2024",
-    client: "",
-    services: ["Visual Design"],
-    layout: "portrait",
-    featured: true,
-    image: "/work-5.jpg",
-  },
-  {
-    slug: "project-05",
-    number: "05",
-    title: "Editorial",
-    category: "Visual Identity",
-    description: "Editorial composition and typography.",
-    year: "2024",
-    client: "",
-    services: ["Editorial Design", "Visual Identity"],
-    layout: "large",
-    featured: true,
-    image: "/work-7.jpg",
-  },
-  {
-    slug: "project-06",
-    number: "06",
     title: "Identity",
     category: "Visual Identity",
     description: "Brand identity exploration.",
@@ -102,19 +86,64 @@ export const projects: Project[] = [
     client: "",
     services: ["Brand Identity", "Visual Design"],
     layout: "portrait",
+    fit: "contain",
     image: "/work-8.jpg",
   },
   {
-    slug: "project-07",
-    number: "07",
+    slug: "project-04",
+    number: "04",
+    title: "Editorial",
+    category: "Visual Identity",
+    description: "Editorial composition and typography.",
+    year: "2024",
+    client: "",
+    services: ["Editorial Design", "Visual Identity"],
+    layout: "wide",
+    fit: "contain",
+    featured: true,
+    image: "/work-4.jpg",
+  },
+  {
+    slug: "project-05",
+    number: "05",
+    title: "Portrait",
+    category: "Visual Identity",
+    description: "A study in shadow and form.",
+    year: "2024",
+    client: "",
+    services: ["Visual Design"],
+    layout: "portrait",
+    fit: "contain",
+    featured: true,
+    image: "/work-4.jpg",
+  },
+  {
+    slug: "project-06",
+    number: "06",
     title: "Portrait Study",
     category: "Visual Identity",
     description: "Exploring presence through light.",
     year: "2023",
     client: "",
     services: ["Visual Design"],
-    layout: "portrait",
+    layout: "square",
+    fit: "contain",
     image: "/work-9.webp",
+  },
+  {
+    slug: "project-07",
+    number: "07",
+    title: "Visual Archive",
+    category: "Visual Identity",
+    description: "A collection of visual studies.",
+    year: "2023",
+    client: "",
+    services: ["Visual Design", "Art Direction"],
+    layout: "gallery",
+    fit: "contain",
+    galleryFit: "contain",
+    image: "/work-8.jpg",
+    gallery: ["/work-8.jpg", "/work-9.webp"],
   },
 ];
 
