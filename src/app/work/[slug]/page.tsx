@@ -112,6 +112,7 @@ export default async function ProjectPage({
               sizes="100vw"
               priority
               unoptimized={project.image.endsWith(".gif")}
+              containerClassName="bg-secondary"
             />
           </div>
         </div>
@@ -128,6 +129,7 @@ export default async function ProjectPage({
                     fit={project.galleryFit ?? project.fit}
                     sizes="100vw"
                     unoptimized={src.endsWith(".gif")}
+                    containerClassName="bg-secondary"
                   />
                 </div>
               ))}
