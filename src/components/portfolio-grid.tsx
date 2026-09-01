@@ -183,7 +183,6 @@ function ProjectRow({
                 }
                 priority={index < 2}
                 unoptimized={project.image.endsWith(".gif")}
-                containerClassName="bg-secondary"
               />
             </div>
           </div>
@@ -207,7 +206,6 @@ function ProjectRow({
                     fit={project.galleryFit ?? project.fit}
                     sizes="(min-width: 768px) 40vw, 100vw"
                     unoptimized={src.endsWith(".gif")}
-                    containerClassName="bg-secondary"
                   />
                 ))}
               </div>
@@ -226,7 +224,6 @@ function ProjectRow({
                     fit={project.galleryFit ?? project.fit}
                     sizes="(min-width: 768px) 45vw, 100vw"
                     unoptimized={src.endsWith(".gif")}
-                    containerClassName="bg-secondary"
                   />
                 ))}
               </div>
