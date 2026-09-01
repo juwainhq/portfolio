@@ -1,8 +1,10 @@
 "use client";
 
 import { useReveal } from "@/hooks/use-reveal";
+import { useSiteConfig } from "@/context/site-config";
 
 export function About() {
+  const { config } = useSiteConfig();
   const sectionRef = useReveal();
   const contentRef = useReveal();
 
@@ -26,21 +28,18 @@ export function About() {
             className="reveal lg:col-span-8 lg:col-start-4"
           >
             <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] font-display leading-[1.15] tracking-tight mb-8 md:mb-10">
-              Graphic designer and business consultant focused on creating
-              strong visual identities and practical strategies.
+              {config.aboutHeading}
             </h2>
 
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-[640px]">
-              I combine creative thinking with business strategy to transform
-              ideas into clear brands, compelling visuals, and useful solutions
-              that drive real results.
+              {config.aboutBody}
             </p>
 
             {/* Availability indicator */}
             <div className="flex items-center gap-3 mt-12 md:mt-14">
               <span className="w-1 h-1 rounded-full bg-emerald-500" />
               <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                Available for select projects in 2025
+                {config.aboutStatusText}
               </span>
             </div>
           </div>

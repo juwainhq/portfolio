@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useReveal } from "@/hooks/use-reveal";
-import { projects, type Project } from "@/data/projects";
+import { useSiteConfig } from "@/context/site-config";
 import { PortfolioImage } from "@/components/portfolio-image";
+import type { Project } from "@/data/site-config";
+import type { CSSProperties } from "react";
 
 type ColPolicy = {
   imageColSpan: number;
@@ -80,13 +82,15 @@ function policyFor(layout: Project["layout"], index: number): ColPolicy {
 const colStyle = (
   colSpan: number,
   colStart: number
-): React.CSSProperties => ({
+): CSSProperties => ({
   gridColumn: `${colStart} / span ${colSpan}`,
 });
 
 export function PortfolioGrid() {
+  const { config } = useSiteConfig();
   const labelRef = useReveal();
   const indexRef = useReveal();
+  const projects = config.projects;
 
   return (
     <section
@@ -100,13 +104,13 @@ export function PortfolioGrid() {
             ref={labelRef}
             className="reveal text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-medium"
           >
-            Selected Work
+            {config.workHeading}
           </h2>
           <span
             ref={indexRef}
             className="reveal text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-muted-foreground"
           >
-            {String(projects.length).padStart(2, "0")} Projects / 2019 — 2025
+            {String(projects.length).padStart(2, "0")} {config.workFooterNote}
           </span>
         </div>
 
@@ -135,13 +139,15 @@ function ProjectRow({
   index: number;
   policy: ColPolicy;
 }) {
+  const projectHref = project.href ?? `/work/${project.slug}`;
+
   return (
     <article
       className="reveal"
       style={{ transitionDelay: `${index * 80}ms` }}
     >
       <Link
-        href={`/work/${project.slug}`}
+        href={projectHref}
         className="group block"
         aria-label={`${project.title} — ${project.category}`}
       >
@@ -191,24 +197,6 @@ function ProjectRow({
           {policy.metaSide === "side" && (
             <div style={colStyle(policy.metaColSpan, policy.metaColStart)}>
               <ProjectMeta project={project} />
-            </div>
-          )}
-
-          {/* Two-col second image */}
-          {project.layout === "two-col" && project.gallery && (
-            <div style={colStyle(5, 8)}>
-              <div className="flex flex-col gap-8 md:gap-10">
-                {project.gallery.slice(0, 2).map((src, i) => (
-                  <PortfolioImage
-                    key={i}
-                    src={src}
-                    alt={`${project.title} — ${i + 2}`}
-                    fit={project.galleryFit ?? project.fit}
-                    sizes="(min-width: 768px) 40vw, 100vw"
-                    unoptimized={src.endsWith(".gif")}
-                  />
-                ))}
-              </div>
             </div>
           )}
 

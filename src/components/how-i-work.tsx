@@ -1,28 +1,10 @@
 "use client";
 
 import { useReveal } from "@/hooks/use-reveal";
-
-const steps = [
-  {
-    number: "01",
-    title: "Understand",
-    description: "Understand the business, audience and problem.",
-  },
-  {
-    number: "02",
-    title: "Define",
-    description:
-      "Turn the problem into a clear strategy and visual direction.",
-  },
-  {
-    number: "03",
-    title: "Create",
-    description:
-      "Build a visual solution that looks strong and works for the business.",
-  },
-];
+import { useSiteConfig } from "@/context/site-config";
 
 export function HowIWork() {
+  const { config } = useSiteConfig();
   const labelRef = useReveal();
   const listRef = useReveal();
 
@@ -35,7 +17,7 @@ export function HowIWork() {
             ref={labelRef}
             className="reveal text-[10px] uppercase tracking-[0.3em] font-medium"
           >
-            How I Work
+            {config.howIWorkHeading}
           </h2>
         </div>
 
@@ -44,7 +26,7 @@ export function HowIWork() {
           ref={listRef}
           className="reveal grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 lg:gap-16"
         >
-          {steps.map((step, index) => (
+          {config.howIWorkSteps.map((step, index) => (
             <div
               key={step.number}
               className="group border-t border-foreground/10 pt-6 md:pt-8"

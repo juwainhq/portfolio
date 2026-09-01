@@ -2,35 +2,10 @@
 
 import { useState } from "react";
 import { useReveal } from "@/hooks/use-reveal";
-
-const services = [
-  {
-    number: "01",
-    title: "Graphic Design",
-    description:
-      "Brand identity, visual systems, marketing materials and creative direction.",
-  },
-  {
-    number: "02",
-    title: "Brand Strategy",
-    description:
-      "Positioning, messaging, visual direction and brand development.",
-  },
-  {
-    number: "03",
-    title: "Business Consulting",
-    description:
-      "Business strategy, customer experience, growth ideas and practical solutions.",
-  },
-  {
-    number: "04",
-    title: "Creative Direction",
-    description:
-      "Building cohesive visual concepts and creative campaigns.",
-  },
-];
+import { useSiteConfig } from "@/context/site-config";
 
 export function Services() {
+  const { config } = useSiteConfig();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const labelRef = useReveal();
   const listRef = useReveal();
@@ -44,13 +19,13 @@ export function Services() {
             ref={labelRef}
             className="reveal text-[10px] uppercase tracking-[0.3em] font-medium"
           >
-            Services
+            {config.servicesHeading}
           </span>
         </div>
 
         {/* Service List */}
         <div ref={listRef} className="reveal">
-          {services.map((service, index) => (
+          {config.services.map((service, index) => (
             <div
               key={service.number}
               className={`group border-t border-foreground/10 py-8 md:py-10 transition-all duration-300 ${

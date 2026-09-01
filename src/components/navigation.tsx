@@ -3,15 +3,10 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
-
-const navLinks = [
-  { label: "About", href: "#about" },
-  { label: "Work", href: "#work" },
-  { label: "Services", href: "#services" },
-  { label: "Contact", href: "#contact" },
-];
+import { useSiteConfig } from "@/context/site-config";
 
 export function Navigation() {
+  const { config } = useSiteConfig();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -39,6 +34,9 @@ export function Navigation() {
     setIsOpen(false);
   };
 
+  const navLinks = config.navLinks.filter((l) => l.showInNav);
+  const emailLink = config.socials.find((s) => s.platform === "email");
+
   return (
     <>
       <header
@@ -54,20 +52,26 @@ export function Navigation() {
             href="/"
             className="text-[12px] md:text-[13px] tracking-[0.15em] uppercase font-medium hover:opacity-40 transition-opacity duration-300"
           >
-            Juwain Haque
+            {config.name}
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8 lg:gap-10">
             {navLinks.map((link) => (
-              <Link
-                key={link.label}
+              <a
+                key={link.href}
                 href={link.href}
                 className="text-[11px] tracking-[0.2em] uppercase font-medium hover:opacity-40 transition-opacity duration-300"
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
+            <Link
+              href="/admin"
+              className="text-[10px] tracking-[0.2em] uppercase font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 border-l border-foreground/10 pl-6 ml-2"
+            >
+              Edit
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -91,13 +95,13 @@ export function Navigation() {
           <nav className="space-y-0.5">
             {navLinks.map((link, index) => (
               <div
-                key={link.label}
+                key={link.href}
                 className="overflow-hidden"
                 style={{
                   transitionDelay: isOpen ? `${index * 80}ms` : "0ms",
                 }}
               >
-                <Link
+                <a
                   href={link.href}
                   onClick={handleLinkClick}
                   className={`block text-5xl md:text-6xl font-display tracking-tight uppercase py-2.5 transform transition-all duration-500 ease-out ${
@@ -108,7 +112,7 @@ export function Navigation() {
                   style={{ transitionDelay: isOpen ? `${index * 80 + 150}ms` : "0ms" }}
                 >
                   {link.label}
-                </Link>
+                </a>
               </div>
             ))}
           </nav>
@@ -124,28 +128,27 @@ export function Navigation() {
               Connect
             </p>
             <div className="space-y-2">
-              <a
-                href="mailto:hello@juwainhaque.com"
-                className="block text-sm tracking-wide text-muted-foreground hover:text-foreground transition-colors duration-300"
-              >
-                Email
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block text-sm tracking-wide text-muted-foreground hover:text-foreground transition-colors duration-300"
-              >
-                Instagram
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block text-sm tracking-wide text-muted-foreground hover:text-foreground transition-colors duration-300"
-              >
-                LinkedIn
-              </a>
+              {emailLink && (
+                <a
+                  href={emailLink.href}
+                  className="block text-sm tracking-wide text-muted-foreground hover:text-foreground transition-colors duration-300"
+                >
+                  Email
+                </a>
+              )}
+              {config.socials
+                .filter((s) => s.platform !== "email")
+                .map((social) => (
+                  <a
+                    key={social.platform}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-sm tracking-wide text-muted-foreground hover:text-foreground transition-colors duration-300"
+                  >
+                    {social.label}
+                  </a>
+                ))}
             </div>
           </div>
         </div>

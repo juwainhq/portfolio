@@ -3,13 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useReveal } from "@/hooks/use-reveal";
-import { highlights } from "@/data/projects";
+import { useSiteConfig } from "@/context/site-config";
 
 export function Highlights() {
+  const { config } = useSiteConfig();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const labelRef = useReveal();
   const listRef = useReveal();
 
+  const highlights = config.projects.filter((p) => p.highlight);
   if (highlights.length === 0) return null;
 
   return (
@@ -21,7 +23,7 @@ export function Highlights() {
             ref={labelRef}
             className="reveal text-[10px] uppercase tracking-[0.3em] font-medium"
           >
-            Selected Highlights
+            {config.highlightsHeading}
           </h2>
         </div>
 
@@ -33,7 +35,7 @@ export function Highlights() {
           {highlights.map((project, index) => (
             <Link
               key={project.slug}
-              href={`/work/${project.slug}`}
+              href={project.href ?? `/work/${project.slug}`}
               className="group block"
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}

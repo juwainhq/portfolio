@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useSiteConfig } from "@/context/site-config";
 
 export function Hero() {
+  const { config } = useSiteConfig();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,6 +25,23 @@ export function Hero() {
     }
   };
 
+  const heroButtonHref =
+    config.heroButtonTarget?.href ??
+    (config.heroButtonTarget?.kind === "external"
+      ? config.heroButtonTarget.href
+      : config.heroButtonTarget?.href ?? "#work");
+
+  const scrollToHeroButton = () => {
+    if (config.heroButtonTarget?.kind === "external" || config.heroButtonTarget?.kind === "email") {
+      window.open(heroButtonHref, config.heroButtonTarget?.kind === "email" ? "_self" : "_blank");
+    } else {
+      const target = document.querySelector(heroButtonHref);
+      target?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const nameParts = config.name.split(" ");
+
   return (
     <section
       ref={containerRef}
@@ -36,7 +55,7 @@ export function Hero() {
         >
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-medium">
-            Available for Projects
+            {config.heroStatusText}
           </span>
         </div>
 
@@ -45,32 +64,26 @@ export function Hero() {
           style={{ opacity: 0, transitionDelay: "150ms" }}
         >
           <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-            Independent Practice
+            {config.heroTopRight[0]}
           </span>
           <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-            Est. 2019
+            {config.heroTopRight[1]}
           </span>
         </div>
       </div>
 
       {/* Center — the name */}
       <div className="relative z-10 flex-1 flex flex-col justify-center my-8 md:my-0">
-        <div className="overflow-hidden">
-          <h1
-            className="animate-in font-display text-[22vw] sm:text-[20vw] md:text-[16vw] lg:text-[14vw] xl:text-[12.5vw] leading-[0.82] tracking-[-0.055em] uppercase font-medium"
-            style={{ opacity: 0 }}
-          >
-            Juwain
-          </h1>
-        </div>
-        <div className="overflow-hidden">
-          <h1
-            className="animate-in font-display text-[22vw] sm:text-[20vw] md:text-[16vw] lg:text-[14vw] xl:text-[12.5vw] leading-[0.82] tracking-[-0.055em] uppercase font-medium"
-            style={{ opacity: 0, transitionDelay: "120ms" }}
-          >
-            Haque
-          </h1>
-        </div>
+        {nameParts.map((part, i) => (
+          <div key={i} className="overflow-hidden">
+            <h1
+              className="animate-in font-display text-[22vw] sm:text-[20vw] md:text-[16vw] lg:text-[14vw] xl:text-[12.5vw] leading-[0.82] tracking-[-0.055em] uppercase font-medium"
+              style={{ opacity: 0, transitionDelay: i === 0 ? "0ms" : "120ms" }}
+            >
+              {part}
+            </h1>
+          </div>
+        ))}
 
         {/* Subtitle row directly under the name */}
         <div
@@ -79,7 +92,7 @@ export function Hero() {
         >
           <span className="h-px w-8 md:w-12 bg-foreground/60" aria-hidden="true" />
           <p className="text-[11px] md:text-[12px] uppercase tracking-[0.3em] font-medium">
-            Graphic Designer <span className="text-muted-foreground mx-1">/</span> Business Consultant
+            {config.tagline}
           </p>
         </div>
       </div>
@@ -91,21 +104,21 @@ export function Hero() {
           style={{ opacity: 0, transitionDelay: "500ms" }}
         >
           <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-            Selected Work 2019 — 2025
+            {config.heroBottomLeft[0]}
           </span>
           <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-muted-foreground hidden md:block">
-            Based in Dhaka · Working Worldwide
+            {config.heroBottomLeft[1]}
           </span>
         </div>
 
         <button
-          onClick={scrollToWork}
+          onClick={scrollToHeroButton}
           className="animate-in group flex items-center gap-3 hover:opacity-60 transition-opacity duration-300"
           style={{ opacity: 0, transitionDelay: "550ms" }}
-          aria-label="Scroll to selected work"
+          aria-label={config.heroButtonText}
         >
           <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-medium">
-            View Work
+            {config.heroButtonText}
           </span>
           <span className="block w-8 md:w-12 h-px bg-foreground/60 group-hover:w-16 transition-all duration-500" aria-hidden="true" />
         </button>
