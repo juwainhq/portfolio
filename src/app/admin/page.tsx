@@ -467,12 +467,12 @@ export default function AdminSectionsPage() {
               </div>
               <div className="flex-1 overflow-y-auto">{renderEditor(activeSection)}</div>
             </>
-          ) : currentTab === 'links' ? (
+          ) : (currentTab === 'links' ? (
             <div className="flex flex-col items-center justify-center h-full px-6 text-center">
               <ArrowRight size={14} className="text-muted-foreground mb-2" />
               <p className="text-xs text-muted-foreground mb-3">Select a section to edit</p>
               <div className="space-y-1">
-          ) : null,
+          ) : null),
                 <a href="/admin/projects" className="block text-[10px] text-muted-foreground hover:text-foreground">→ Projects</a>
                 <a href="/admin/links" className="block text-[10px] text-muted-foreground hover:text-foreground">→ Links</a>
               </div>
