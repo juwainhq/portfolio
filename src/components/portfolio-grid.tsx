@@ -90,7 +90,7 @@ export function PortfolioGrid() {
   const { config } = useSiteConfig();
   const labelRef = useReveal();
   const indexRef = useReveal();
-  const projects = config.projects;
+  const projects = config.projects.filter((p) => !p.hidden);
 
   return (
     <section

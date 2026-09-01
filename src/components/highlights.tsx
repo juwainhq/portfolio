@@ -11,7 +11,7 @@ export function Highlights() {
   const labelRef = useReveal();
   const listRef = useReveal();
 
-  const highlights = config.projects.filter((p) => p.highlight);
+  const highlights = config.projects.filter((p) => p.highlight && !p.hidden);
   if (highlights.length === 0) return null;
 
   return (

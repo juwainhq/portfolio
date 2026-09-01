@@ -10,7 +10,7 @@ import { PortfolioImage } from "@/components/portfolio-image";
 
 export function ProjectPageClient({ slug }: { slug: string }) {
   const { config } = useSiteConfig();
-  const project = config.projects.find((p) => p.slug === slug);
+  const project = config.projects.find((p) => p.slug === slug && !p.hidden);
 
   if (!project) {
     notFound();

@@ -80,12 +80,14 @@ function ProjectCard({
   onDelete,
   onToggleFeatured,
   onToggleHighlight,
+  onToggleHidden,
 }: {
   project: Project;
   onEdit: () => void;
   onDelete: () => void;
   onToggleFeatured: () => void;
   onToggleHighlight: () => void;
+  onToggleHidden: () => void;
 }) {
   return (
     <div className="group flex items-center gap-2 px-3 py-2 border-b border-border cursor-pointer transition-colors duration-150 hover:bg-foreground/[0.02]">
@@ -128,6 +130,17 @@ function ProjectCard({
           title={project.highlight ? "Remove from highlights" : "Add to highlights"}
         >
           <span className="text-[9px] font-medium">HL</span>
+        </button>
+        <button
+          onClick={onToggleHidden}
+          className="p-1 hover:bg-foreground/5 rounded-sm transition-colors duration-150"
+          title={project.hidden ? "Show project" : "Hide project"}
+        >
+          {project.hidden ? (
+            <EyeOff size={13} className="text-muted-foreground" />
+          ) : (
+            <Eye size={13} className="text-muted-foreground" />
+          )}
         </button>
         <button
           onClick={onEdit}
@@ -431,6 +444,14 @@ export default function AdminProjectsPage() {
     setHasUnsavedChanges(true);
   };
 
+  const toggleHidden = (slug: string) => {
+    const next = config.projects.map((p) =>
+      p.slug === slug ? { ...p, hidden: !p.hidden } : p
+    );
+    updateConfig({ projects: next });
+    setHasUnsavedChanges(true);
+  };
+
   const handleSave = () => {
     toast(
       <div className="flex items-center gap-2">
@@ -511,6 +532,7 @@ export default function AdminProjectsPage() {
                   onDelete={() => deleteProject(project.slug)}
                   onToggleFeatured={() => toggleFeatured(project.slug)}
                   onToggleHighlight={() => toggleHighlight(project.slug)}
+                  onToggleHidden={() => toggleHidden(project.slug)}
                 />
               ))}
             </div>

@@ -23,6 +23,7 @@ export type Project = {
   fit: Fit;
   featured?: boolean;
   highlight?: boolean;
+  hidden?: boolean;
   image: string;
   gallery?: string[];
   galleryFit?: Fit;

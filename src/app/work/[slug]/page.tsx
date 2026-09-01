@@ -2,7 +2,7 @@ import { defaultConfig } from "@/data/site-config";
 import { ProjectPageClient } from "./ProjectPageClient";
 
 export function generateStaticParams() {
-  return defaultConfig.projects.map((project) => ({
+  return defaultConfig.projects.filter((p) => !p.hidden).map((project) => ({
     slug: project.slug,
   }));
 }
