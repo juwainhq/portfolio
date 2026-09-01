@@ -56,9 +56,17 @@ export default {
         none: "0",
       },
       letterSpacing: {
-        tightest: "-0.06em",
+        "ultra-tight": "-0.06em",
+        "mega-tight": "-0.04em",
         "ultra-wide": "0.25em",
-        "mega-wide": "0.4em",
+        "mega-wide": "0.35em",
+      },
+      lineHeight: {
+        tighter: "0.85",
+        tight: "1.1",
+        snug: "1.25",
+        normal: "1.5",
+        relaxed: "1.625",
       },
       keyframes: {
         marquee: {
@@ -70,7 +78,7 @@ export default {
           "100%": { opacity: "1" },
         },
         "slide-up": {
-          "0%": { transform: "translateY(40px)", opacity: "0" },
+          "0%": { transform: "translateY(30px)", opacity: "0" },
           "100%": { transform: "translateY(0)", opacity: "1" },
         },
         blink: {
@@ -83,6 +91,9 @@ export default {
         "fade-in": "fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "slide-up": "slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         blink: "blink 1.4s ease-in-out infinite",
+      },
+      transitionTimingFunction: {
+        "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
       },
     },
   },

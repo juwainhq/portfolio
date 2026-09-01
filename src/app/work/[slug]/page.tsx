@@ -38,33 +38,41 @@ export default async function ProjectPage({
             {/* Back Link */}
             <Link
               href="/#work"
-              className="group inline-flex items-center gap-3 text-xs uppercase tracking-ultra-wide hover:opacity-50 transition-opacity duration-300 mb-12 md:mb-16"
+              className="group inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.25em] hover:opacity-50 transition-opacity duration-300 mb-14 md:mb-16"
             >
               <ArrowLeft
-                size={14}
+                size={12}
                 className="group-hover:-translate-x-1 transition-transform duration-300"
               />
-              <span>Back to Work</span>
+              <span>Back</span>
             </Link>
 
             {/* Project Number */}
-            <div className="mb-6">
-              <span className="text-xs uppercase tracking-ultra-wide text-muted-foreground">
+            <div className="mb-5">
+              <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
                 {project.number}
               </span>
             </div>
 
             {/* Title */}
-            <h1 className="text-[15vw] md:text-[12vw] lg:text-[9vw] xl:text-[7.5vw] font-display leading-[0.85] tracking-tightest uppercase font-medium mb-8 md:mb-12">
+            <h1 className="text-[15vw] md:text-[11vw] lg:text-[8vw] xl:text-[6.5vw] font-display leading-[0.85] tracking-[-0.05em] uppercase font-medium mb-10 md:mb-12">
               {project.title}
             </h1>
 
-            {/* Project Meta - only render if data exists */}
+            {/* Project Meta */}
             {hasMeta && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 pt-8 border-t border-border/30">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 pt-8 border-t border-foreground/10">
+                {project.category && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">
+                      Category
+                    </p>
+                    <p className="text-sm">{project.category}</p>
+                  </div>
+                )}
                 {project.year && (
                   <div>
-                    <p className="text-xs uppercase tracking-ultra-wide text-muted-foreground mb-2">
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">
                       Year
                     </p>
                     <p className="text-sm">{project.year}</p>
@@ -72,7 +80,7 @@ export default async function ProjectPage({
                 )}
                 {project.services.length > 0 && (
                   <div>
-                    <p className="text-xs uppercase tracking-ultra-wide text-muted-foreground mb-2">
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">
                       Services
                     </p>
                     <p className="text-sm">{project.services.join(", ")}</p>
@@ -80,18 +88,10 @@ export default async function ProjectPage({
                 )}
                 {project.client && (
                   <div>
-                    <p className="text-xs uppercase tracking-ultra-wide text-muted-foreground mb-2">
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">
                       Client
                     </p>
                     <p className="text-sm">{project.client}</p>
-                  </div>
-                )}
-                {project.category && (
-                  <div>
-                    <p className="text-xs uppercase tracking-ultra-wide text-muted-foreground mb-2">
-                      Category
-                    </p>
-                    <p className="text-sm">{project.category}</p>
                   </div>
                 )}
               </div>
@@ -118,12 +118,12 @@ export default async function ProjectPage({
 
         {/* Gallery Images */}
         {project.gallery && project.gallery.length > 0 && (
-          <div className="px-6 md:px-10 lg:px-16 mb-20 md:mb-32 space-y-6 md:space-y-8">
+          <div className="px-6 md:px-10 lg:px-16 mb-24 md:mb-36 space-y-6 md:space-y-10">
             <div className="max-w-[1600px] mx-auto">
               {project.gallery.map((image, index) => (
                 <div
                   key={index}
-                  className="relative aspect-[4/3] md:aspect-[16/10] overflow-hidden bg-secondary"
+                  className="relative aspect-[5/4] md:aspect-[16/10] overflow-hidden bg-secondary"
                 >
                   <Image
                     src={image}
@@ -140,13 +140,13 @@ export default async function ProjectPage({
         )}
 
         {/* Back to All Work */}
-        <div className="px-6 md:px-10 lg:px-16 py-20 md:py-32 border-t border-border/30">
+        <div className="px-6 md:px-10 lg:px-16 py-24 md:py-36 border-t border-foreground/10">
           <div className="max-w-[1400px] mx-auto">
             <Link href="/#work" className="group block">
-              <p className="text-xs uppercase tracking-ultra-wide text-muted-foreground mb-4">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-4">
                 View All
               </p>
-              <h3 className="text-4xl md:text-6xl lg:text-8xl font-display tracking-tightest uppercase group-hover:translate-x-2 transition-transform duration-500">
+              <h3 className="text-4xl md:text-6xl lg:text-8xl font-display tracking-tight uppercase group-hover:translate-x-4 transition-transform duration-700">
                 All Work →
               </h3>
             </Link>

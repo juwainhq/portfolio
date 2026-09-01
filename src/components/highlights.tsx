@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useReveal } from "@/hooks/use-reveal";
 import { highlights } from "@/data/projects";
 
@@ -14,22 +13,22 @@ export function Highlights() {
   if (highlights.length === 0) return null;
 
   return (
-    <section className="py-24 md:py-32 lg:py-40 px-6 md:px-10 lg:px-16 bg-secondary/30">
+    <section className="py-28 md:py-40 lg:py-48 px-6 md:px-10 lg:px-16">
       <div className="max-w-[1400px] mx-auto">
         {/* Header */}
-        <div className="mb-16 md:mb-24">
+        <div className="mb-16 md:mb-20 lg:mb-24">
           <h2
             ref={labelRef}
-            className="reveal text-xs uppercase tracking-ultra-wide font-medium"
+            className="reveal text-[10px] uppercase tracking-[0.3em] font-medium"
           >
             Selected Highlights
           </h2>
         </div>
 
-        {/* Highlights List - Editorial */}
+        {/* Highlights List */}
         <div
           ref={listRef}
-          className="reveal space-y-0 border-t border-border/50"
+          className="reveal border-t border-foreground/10"
         >
           {highlights.map((project, index) => (
             <Link
@@ -39,10 +38,10 @@ export function Highlights() {
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
-              <div className="grid grid-cols-12 gap-4 py-6 md:py-8 border-b border-border/50 transition-all duration-500 items-center">
+              <div className="grid grid-cols-12 gap-4 py-5 md:py-6 border-b border-foreground/10 transition-all duration-300">
                 {/* Number */}
                 <div className="col-span-2 md:col-span-1">
-                  <span className="text-xs uppercase tracking-ultra-wide text-muted-foreground group-hover:text-foreground transition-colors duration-300">
+                  <span className="text-[10px] tracking-[0.2em] text-muted-foreground group-hover:text-foreground/50 transition-colors duration-300">
                     {project.number}
                   </span>
                 </div>
@@ -56,30 +55,23 @@ export function Highlights() {
 
                 {/* Category */}
                 <div className="col-span-8 md:col-span-3 hidden md:block">
-                  <p className="text-xs uppercase tracking-ultra-wide text-muted-foreground">
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
                     {project.category}
                   </p>
                 </div>
 
                 {/* Year */}
                 <div className="col-span-4 md:col-span-2 hidden md:block">
-                  <p className="text-xs uppercase tracking-ultra-wide text-muted-foreground text-right">
-                    {project.year}
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground text-right">
+                    {project.year || ""}
                   </p>
                 </div>
 
-                {/* Thumbnail + Arrow */}
-                <div className="col-span-12 md:col-span-1 flex items-center justify-end gap-4">
-                  <div className="relative w-12 h-12 overflow-hidden bg-foreground/5">
-                    <Image
-                      src={project.image}
-                      alt={project.title}
-                      fill
-                      sizes="48px"
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                  </div>
-                  <span className="text-sm opacity-0 group-hover:opacity-100 translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300">
+                {/* Arrow */}
+                <div className="col-span-12 md:col-span-1 flex justify-end">
+                  <span
+                    className="text-xs opacity-0 group-hover:opacity-100 translate-x-[-8px] group-hover:translate-x-0 transition-all duration-300"
+                  >
                     →
                   </span>
                 </div>
