@@ -115,7 +115,7 @@ export function PortfolioGrid() {
         </div>
 
         {/* Editorial Portfolio Grid */}
-        <div className="space-y-32 md:space-y-48 lg:space-y-56">
+        <div className="space-y-16 md:space-y-24 lg:space-y-32">
           {projects.map((project, index) => (
             <ProjectRow
               key={project.slug}
@@ -203,7 +203,7 @@ function ProjectRow({
           {/* Gallery additional images */}
           {project.layout === "gallery" && project.gallery && (
             <div style={colStyle(10, 2)} className="mt-10 md:mt-14">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 {project.gallery.map((src, i) => (
                   <PortfolioImage
                     key={i}
