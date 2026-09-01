@@ -76,7 +76,6 @@ function policyFor(layout: Project["layout"], index: number): ColPolicy {
   return p;
 }
 
-// Helper: CSS Grid columns string for a given column span + start
 const colStyle = (
   colSpan: number,
   colStart: number
@@ -145,7 +144,7 @@ function ProjectRow({
         className="group block"
         aria-label={`${project.title} — ${project.category}`}
       >
-        {/* Meta above image (e.g. featured) */}
+        {/* Meta above image */}
         {policy.metaSide === "top" && (
           <div className="mb-8 md:mb-10">
             <ProjectMeta project={project} />
@@ -157,16 +156,18 @@ function ProjectRow({
           className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-x-12 md:gap-y-10 items-start"
           style={
             policy.metaSide === "side"
-              ? { alignItems: "center" }
+              ? ({ alignItems: "center" } as React.CSSProperties)
               : undefined
           }
         >
-          {/* Image block */}
-          <div
-            style={colStyle(policy.imageColSpan, policy.imageColStart)}
-          >
+          {/* Image */}
+          <div style={colStyle(policy.imageColSpan, policy.imageColStart)}>
             <div
-              style={policy.imageMaxWidth ? { maxWidth: policy.imageMaxWidth } : undefined}
+              style={
+                policy.imageMaxWidth
+                  ? ({ maxWidth: policy.imageMaxWidth } as React.CSSProperties)
+                  : undefined
+              }
             >
               <PortfolioImage
                 src={project.image}
@@ -183,7 +184,6 @@ function ProjectRow({
                 }
                 priority={index < 2}
                 unoptimized={project.image.endsWith(".gif")}
-                containerClassName="bg-secondary"
               />
             </div>
           </div>
@@ -195,7 +195,7 @@ function ProjectRow({
             </div>
           )}
 
-          {/* Two-col second image */}
+          {/* Two-col second images */}
           {project.layout === "two-col" && project.gallery && (
             <div style={colStyle(5, 8)}>
               <div className="flex flex-col gap-8 md:gap-10">
@@ -207,7 +207,6 @@ function ProjectRow({
                     fit={project.galleryFit ?? project.fit}
                     sizes="(min-width: 768px) 40vw, 100vw"
                     unoptimized={src.endsWith(".gif")}
-                    containerClassName="bg-secondary"
                   />
                 ))}
               </div>
@@ -226,7 +225,6 @@ function ProjectRow({
                     fit={project.galleryFit ?? project.fit}
                     sizes="(min-width: 768px) 45vw, 100vw"
                     unoptimized={src.endsWith(".gif")}
-                    containerClassName="bg-secondary"
                   />
                 ))}
               </div>
@@ -252,7 +250,10 @@ function ProjectMeta({ project }: { project: Project }) {
         <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
           {project.number}
         </span>
-        <span className="h-px w-3 bg-foreground/30 shrink-0" aria-hidden="true" />
+        <span
+          className="h-px w-3 bg-foreground/20 shrink-0"
+          aria-hidden="true"
+        />
         <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
           {project.category}
         </span>

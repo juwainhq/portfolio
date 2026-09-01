@@ -9,18 +9,12 @@ type PortfolioImageProps = {
   src: string;
   alt: string;
   fit?: Fit;
-  /**
-   * Maximum width the image may occupy, as a CSS length.
-   * Useful for keeping small artwork from stretching into a thin column.
-   * Default: 100% of the parent column.
-   */
+  /** Maximum width the image may occupy, as a CSS length. */
   maxWidth?: string;
-  /**
-   * When the natural image is much smaller than its column, cap the rendered
-   * width to this fraction of the column (0-1). Default: 1.
-   */
+  /** When the natural image is much smaller than its column, cap the rendered
+   *  width to this fraction of the column (0-1). Default: 1. */
   maxWidthFraction?: number;
-  /** Background color shown behind contain-fit images. */
+  /** Extra class on the outer wrapper. */
   containerClassName?: string;
   /** Extra class on the <img>. */
   imgClassName?: string;
@@ -37,14 +31,12 @@ type PortfolioImageProps = {
  *
  * Renders an image at its NATURAL aspect ratio.
  *
- * 1. The container's aspect ratio is set from the image's intrinsic
- *    width/height (read once the image loads).
- * 2. Before that, a sensible default height is used so the page doesn't jump.
- * 3. `object-fit` defaults to `contain` so the entire artwork is always
- *    visible. `cover` is opt-in for compositions where edge-to-edge
- *    cropping is safe.
- * 4. The image is never stretched or distorted — only its container
- *    expands to the natural ratio.
+ * - The container's aspect ratio is set from the image's intrinsic
+ *   width/height, read once the image loads.
+ * - Default fit is `contain` so the entire artwork is always visible.
+ *   The container itself is transparent so the artwork blends directly
+ *   with the page background — no artificial gray frame is added.
+ * - The image is never stretched or distorted.
  */
 export function PortfolioImage({
   src,
@@ -67,10 +59,6 @@ export function PortfolioImage({
     null
   );
 
-  // Read natural dimensions once the underlying <img> is decoded.
-  // We use a probe <img> because Next/Image's DOM element only resolves to
-  // the actual image file after onLoad, and we want a stable, framework-
-  // agnostic way to learn the real size.
   useEffect(() => {
     const probe = new window.Image();
     probe.decoding = "async";
@@ -93,7 +81,6 @@ export function PortfolioImage({
   const widthCapStyle: React.CSSProperties = {};
   if (maxWidth) widthCapStyle.maxWidth = maxWidth;
   if (maxWidthFraction < 1) {
-    // limit by aspect ratio so a tall piece stays tall
     widthCapStyle.maxWidth = `min(${maxWidthFraction * 100}%, 720px)`;
   }
 
