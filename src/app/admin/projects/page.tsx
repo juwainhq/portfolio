@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   Star,
   StarOff,
+  Edit,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
@@ -132,7 +133,7 @@ function ProjectCard({
           className="p-1 hover:bg-foreground/5 rounded-sm transition-colors duration-150"
           title={`Edit "${project.title}"`}
         >
-          <Edit3 size={13} />
+          <Edit size={13} />
         </button>
         <button
           onClick={onDelete}

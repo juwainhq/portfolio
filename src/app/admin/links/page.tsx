@@ -2,7 +2,7 @@
 
 import { useSiteConfig } from "@/context/site-config";
 import { type NavLink, type SocialLink } from "@/data/site-config";
-import { Plus, Trash2, Edit3, Check, X, ExternalLink } from "lucide-react";
+import { Plus, Trash2, Edit, Check, X, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -156,7 +156,7 @@ function NavLinkRow({
           className="p-1.5 hover:bg-foreground/5 rounded-sm transition-colors"
           title={`Edit "${link.label}"`}
         >
-          <Edit3 size={13} />
+          <Edit size={13} />
         </button>
         {canDelete && (
           <button
@@ -284,7 +284,7 @@ function SocialLinkRow({
           className="p-1.5 hover:bg-foreground/5 rounded-sm transition-colors"
           title={`Edit "${social.label}"`}
         >
-          <Edit3 size={13} />
+          <Edit size={13} />
         </button>
         <button
           onClick={onDelete}
