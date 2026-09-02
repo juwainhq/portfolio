@@ -66,20 +66,48 @@ export default function AdminDashboard() {
   const { config, updateConfig, reset, hasUnsavedChanges, save } = useSiteConfig();
   const [activeTab, setActiveTab] = useState<"content" | "projects" | "links" | "sections">("content");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   // Check authentication on mount
   useEffect(() => {
-    const authCookie = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("admin_auth="))
-      ?.split("=")[1];
+    const checkAuth = () => {
+      const authCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("admin_auth="))
+        ?.split("=")[1];
 
-    if (authCookie !== "true") {
-      router.push("/admin/login");
-    } else {
-      setIsAuthenticated(true);
-    }
+      if (authCookie === "true") {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+      setIsCheckingAuth(false);
+    };
+
+    checkAuth();
+
+    // Also listen for cookie changes
+    const handleStorage = () => {
+      checkAuth();
+    };
+    window.addEventListener("storage", handleStorage);
+
+    return () => window.removeEventListener("storage", handleStorage);
   }, [router]);
+
+  if (isCheckingAuth) {
+    // Show a minimal loading state while checking auth
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading admin panel...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    router.push("/admin/login");
+    return null;
+  }
 
   const handleLogout = () => {
     document.cookie = "admin_auth=false; path=/; max-age=0";
@@ -100,10 +128,6 @@ export default function AdminDashboard() {
       toast.success("Reset to defaults");
     }
   };
-
-  if (!isAuthenticated) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-background">

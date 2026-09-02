@@ -1,39 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Check credentials
-            if (email === "Juwain.me@gmail.com" && password === "!23$Youju") {
-        // Set authentication cookie
+      if (email === "Juwain.me@gmail.com" && password === "!23$Youju") {
         document.cookie = "admin_auth=true; path=/; max-age=3600; SameSite=Strict";
-        
+
         toast.success("Login successful!", {
-          description: "Welcome to the admin panel."
+          description: "Welcome to the admin panel.",
         });
-        
-        // Redirect to admin dashboard
-        router.push("/admin");
+
+        window.location.href = "/admin";
       } else {
         toast.error("Invalid credentials", {
-          description: "Please check your email and password."
+          description: "Please check your email and password.",
         });
       }
     } catch (error) {
       toast.error("Login failed", {
-        description: "An error occurred. Please try again."
+        description: "An error occurred. Please try again.",
       });
     } finally {
       setIsLoading(false);
