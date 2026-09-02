@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const isProduction = process.env.NEXT_PUBLIC_BASE_PATH?.length > 0;
+const isProduction = Boolean(process.env.NEXT_PUBLIC_BASE_PATH);
 
 const nextConfig: NextConfig = {
   webpack: (config) => {
