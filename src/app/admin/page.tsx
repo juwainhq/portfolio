@@ -71,8 +71,8 @@ export default function AdminDashboard() {
   // Check authentication on mount
   useEffect(() => {
     const checkAuth = () => {
-      const cookies = document.cookie.split("; ");
-      const authCookie = cookies
+      const authCookie = document.cookie
+        .split("; ")
         .find((row) => row.startsWith("admin_auth="))
         ?.split("=")[1];
 
@@ -84,8 +84,6 @@ export default function AdminDashboard() {
       setIsCheckingAuth(false);
     };
 
-    // Small delay to ensure cookies are available after redirect
-    const timer = setTimeout(checkAuth, 100);
     checkAuth();
 
     // Also listen for cookie changes
@@ -94,10 +92,7 @@ export default function AdminDashboard() {
     };
     window.addEventListener("storage", handleStorage);
 
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("storage", handleStorage);
-    };
+    return () => window.removeEventListener("storage", handleStorage);
   }, [router]);
 
   if (isCheckingAuth) {

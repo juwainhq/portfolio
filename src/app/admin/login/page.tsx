@@ -20,9 +20,7 @@ export default function AdminLoginPage() {
           description: "Welcome to the admin panel.",
         });
 
-        setTimeout(() => {
-          window.location.href = "/admin";
-        }, 300);
+        window.location.href = "/admin";
       } else {
         toast.error("Invalid credentials", {
           description: "Please check your email and password.",
