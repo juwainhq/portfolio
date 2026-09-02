@@ -24,7 +24,7 @@ jobs:
       - name: Build for GitHub Pages
         run: npm run build
         env:
-          NEXT_PUBLIC_BASE_PATH: "/your-repo-name"
+          NEXT_PUBLIC_BASE_PATH: "/portfolio"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

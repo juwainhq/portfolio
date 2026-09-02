@@ -15,9 +15,9 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  // GitHub Pages base path - replace /your-repo-name with your repo name
-    basePath: process.env.NEXT_PUBLIC_BASE_PATH || "/your-repo-name",
-    assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || "/your-repo-name/",
+  // GitHub Pages base path
+    basePath: process.env.NEXT_PUBLIC_BASE_PATH || "/portfolio",
+    assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH ? `${process.env.NEXT_PUBLIC_BASE_PATH}/` : "/portfolio/",
     // Enable static export for GitHub Pages
     output: "export",
   };

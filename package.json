@@ -2,7 +2,7 @@
   "name": "next-template",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://your-username.github.io/your-repo-name",
+  "homepage": "https://your-username.github.io/portfolio",
   "scripts": {
       "dev": "next dev",
       "build": "next build",
