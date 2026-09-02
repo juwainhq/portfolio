@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   description:
     "Independent graphic designer and business consultant focused on creating strong visual identities and practical strategies that help businesses communicate, position themselves, and grow.",
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23000' width='100' height='100'/><text y='.9em' font-size='90' fill='%23fff' font-family='system-ui'>JH</text></svg>",
+    icon: "/favicon.ico",
   },
 };
 

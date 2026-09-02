@@ -68,31 +68,26 @@ export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Check authentication on mount
+  // Check authentication on mount via server-side session verification
   useEffect(() => {
-    const checkAuth = () => {
-      const authCookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("admin_auth="))
-        ?.split("=")[1];
-
-      if (authCookie === "true") {
-        setIsAuthenticated(true);
-      } else {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/verify");
+        if (res.ok) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+          router.push("/admin/login");
+        }
+      } catch {
         setIsAuthenticated(false);
+        router.push("/admin/login");
+      } finally {
+        setIsCheckingAuth(false);
       }
-      setIsCheckingAuth(false);
     };
 
     checkAuth();
-
-    // Also listen for cookie changes
-    const handleStorage = () => {
-      checkAuth();
-    };
-    window.addEventListener("storage", handleStorage);
-
-    return () => window.removeEventListener("storage", handleStorage);
   }, [router]);
 
   if (isCheckingAuth) {
@@ -105,14 +100,17 @@ export default function AdminDashboard() {
   }
 
   if (!isAuthenticated) {
-    router.push("/admin/login");
     return null;
   }
 
-  const handleLogout = () => {
-    document.cookie = "admin_auth=false; path=/; max-age=0";
-    toast.success("Logged out successfully");
-    router.push("/admin/login");
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      toast.success("Logged out successfully");
+      router.push("/admin/login");
+    } catch {
+      toast.error("Logout failed");
+    }
   };
 
   const handleSave = () => {

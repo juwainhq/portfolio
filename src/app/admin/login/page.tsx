@@ -12,14 +12,17 @@ export default function AdminLoginPage() {
 
   // If already authenticated, redirect to dashboard
   useEffect(() => {
-    const authCookie = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("admin_auth="))
-      ?.split("=")[1];
-
-    if (authCookie === "true") {
-      router.replace("/admin");
-    }
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/verify");
+        if (res.ok) {
+          router.replace("/admin");
+        }
+      } catch {
+        // Not authenticated, stay on login page
+      }
+    };
+    checkAuth();
   }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -27,25 +30,25 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      if (email === "Juwain.me@gmail.com" && password === "!23$Youju") {
-        // Set authentication cookie (expires in 1 hour)
-        document.cookie = "admin_auth=true; path=/; max-age=3600; SameSite=Strict";
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
+      if (res.ok) {
         toast.success("Login successful!", {
           description: "Welcome to the admin panel.",
         });
-
-        // Wait a brief moment so the cookie is set, then navigate
-        setTimeout(() => {
-          router.replace("/admin");
-        }, 100);
+        router.replace("/admin");
       } else {
+        const data = await res.json();
         toast.error("Invalid credentials", {
-          description: "Please check your email and password.",
+          description: data.error || "Please check your email and password.",
         });
         setIsLoading(false);
       }
-    } catch (error) {
+    } catch {
       toast.error("Login failed", {
         description: "An error occurred. Please try again.",
       });

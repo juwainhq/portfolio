@@ -18,14 +18,40 @@ export function Contact() {
   const formRef = useRef<HTMLFormElement | null>(null);
   const socialsRef = useReveal();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) {
       toast.error("Please fill in all fields.");
       return;
     }
-    toast.success(config.contactSuccessMessage);
-    setFormData({ name: "", email: "", message: "" });
+
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          recipient: config.contactFormRecipient,
+        }),
+      });
+
+      if (res.ok) {
+        toast.success(config.contactSuccessMessage);
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Failed to send message. Please try again.");
+      }
+    } catch {
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -118,9 +144,10 @@ export function Contact() {
 
             <button
               type="submit"
-              className="group inline-flex items-center gap-4 text-sm uppercase tracking-[0.2em] font-medium pt-6 hover:opacity-50 transition-opacity duration-300"
+              disabled={isSubmitting}
+              className="group inline-flex items-center gap-4 text-sm uppercase tracking-[0.2em] font-medium pt-6 hover:opacity-50 transition-opacity duration-300 disabled:opacity-50"
             >
-              <span>{config.contactSubmitText}</span>
+              <span>{isSubmitting ? "Sending..." : config.contactSubmitText}</span>
               <ArrowRight
                 size={16}
                 className="group-hover:translate-x-1 transition-transform duration-300"
