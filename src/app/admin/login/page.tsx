@@ -1,12 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  // If already authenticated, redirect to dashboard
+  useEffect(() => {
+    const authCookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("admin_auth="))
+      ?.split("=")[1];
+
+    if (authCookie === "true") {
+      router.replace("/admin");
+    }
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -14,23 +28,27 @@ export default function AdminLoginPage() {
 
     try {
       if (email === "Juwain.me@gmail.com" && password === "!23$Youju") {
+        // Set authentication cookie (expires in 1 hour)
         document.cookie = "admin_auth=true; path=/; max-age=3600; SameSite=Strict";
 
         toast.success("Login successful!", {
           description: "Welcome to the admin panel.",
         });
 
-        window.location.href = "/admin";
+        // Wait a brief moment so the cookie is set, then navigate
+        setTimeout(() => {
+          router.replace("/admin");
+        }, 100);
       } else {
         toast.error("Invalid credentials", {
           description: "Please check your email and password.",
         });
+        setIsLoading(false);
       }
     } catch (error) {
       toast.error("Login failed", {
         description: "An error occurred. Please try again.",
       });
-    } finally {
       setIsLoading(false);
     }
   };
