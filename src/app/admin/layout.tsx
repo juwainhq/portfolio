@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { LayoutDashboard, Layers, Link2, ChevronLeft, Save } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 const navItems = [
   {
@@ -27,6 +28,11 @@ const navItems = [
   },
 ];
 
+// Hard-block the admin UI in production builds (e.g. GitHub Pages).
+// `process.env.NODE_ENV` is inlined at build time, so this becomes `true`
+// in production and the entire admin tree renders nothing.
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
 export default function AdminLayout({
   children,
 }: {
@@ -34,6 +40,13 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const { save, hasUnsavedChanges, config, reset } = useSiteConfig();
+
+  // In production, redirect any visitor that lands on /admin/* back home.
+  useEffect(() => {
+    if (IS_PRODUCTION) {
+      window.location.replace("/");
+    }
+  }, []);
 
   const handleSave = () => {
     save();
@@ -48,6 +61,10 @@ export default function AdminLayout({
       toast.success("Reset to defaults");
     }
   };
+
+  if (IS_PRODUCTION) {
+    return null;
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-foreground">

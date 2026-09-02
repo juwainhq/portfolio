@@ -151,8 +151,8 @@ const defaultProjects: Project[] = [
     fit: "contain",
     featured: true,
     highlight: true,
-    image: "/images/work-1.jpg",
-        gallery: ["/images/work-4.jpg"],
+    image: "/work-1.jpg",
+    gallery: ["/work-4.jpg"],
     galleryFit: "contain",
   },
   {
@@ -168,7 +168,7 @@ const defaultProjects: Project[] = [
     fit: "contain",
     featured: true,
     highlight: true,
-    image: "/images/work-3.jpg",
+    image: "/work-3.jpg",
   },
   {
     slug: "project-03",
@@ -181,7 +181,7 @@ const defaultProjects: Project[] = [
     services: ["Brand Identity", "Visual Design"],
     layout: "portrait",
     fit: "contain",
-    image: "/images/work-8.jpg",
+    image: "/work-8.jpg",
   },
   {
     slug: "project-04",
@@ -195,7 +195,7 @@ const defaultProjects: Project[] = [
     layout: "wide",
     fit: "contain",
     featured: true,
-    image: "/images/work-4.jpg",
+    image: "/work-4.jpg",
   },
   {
     slug: "project-05",
@@ -208,7 +208,7 @@ const defaultProjects: Project[] = [
     services: ["Visual Design"],
     layout: "portrait",
     fit: "contain",
-    image: "/images/work-8.webp",
+    image: "/work-8.webp",
   },
   {
     slug: "project-06",
@@ -221,7 +221,7 @@ const defaultProjects: Project[] = [
     services: ["Visual Design"],
     layout: "square",
     fit: "contain",
-    image: "/images/work-9.webp",
+    image: "/work-9.webp",
   },
   {
     slug: "project-07",
@@ -235,8 +235,8 @@ const defaultProjects: Project[] = [
     layout: "gallery",
     fit: "contain",
     galleryFit: "contain",
-    image: "/images/work-1.jpg",
-        gallery: ["/images/work-3.jpg"],
+    image: "/work-1.jpg",
+    gallery: ["/work-3.jpg"],
   },
 ];
 
@@ -444,7 +444,7 @@ function mergeWithDefaults(partial: Partial<SiteConfig>): SiteConfig {
  * that share the same hero image are reassigned to an unused image.
  * Gallery images are intentionally left unconstrained (they can repeat).
  */
-const ALL_IMAGES = ["/images/work-1.jpg", "/images/work-3.jpg", "/images/work-4.jpg", "/images/work-8.jpg", "/images/work-8.webp", "/images/work-9.webp"];
+const ALL_IMAGES = ["/work-1.jpg", "/work-3.jpg", "/work-4.jpg", "/work-8.jpg", "/work-8.webp", "/work-9.webp"];
 
 function deduplicateProjectImages(projects: Project[]): Project[] {
   const usedHeroImages = new Set<string>();

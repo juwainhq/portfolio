@@ -66,12 +66,6 @@ export function Navigation() {
                 {link.label}
               </a>
             ))}
-            <Link
-              href="/admin"
-              className="text-[10px] tracking-[0.2em] uppercase font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 border-l border-foreground/10 pl-6 ml-2"
-            >
-              Edit
-            </Link>
           </div>
 
           {/* Mobile Menu Button */}

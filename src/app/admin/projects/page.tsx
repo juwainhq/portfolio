@@ -199,7 +199,7 @@ function ProjectEditor({
       fit: form.fit || "contain",
       featured: form.featured || false,
       highlight: form.highlight || false,
-      image: form.image || "/images/work-1.jpg",
+      image: form.image || "/work-1.jpg",
       gallery: form.gallery || [],
       galleryFit: form.galleryFit || "contain",
     };
@@ -207,7 +207,7 @@ function ProjectEditor({
     onSave(completeProject);
   };
 
-  const AVAILABLE_IMAGES = ["/images/work-1.jpg", "/images/work-3.jpg", "/images/work-4.jpg", "/images/work-8.jpg", "/images/work-8.webp", "/images/work-9.webp"];
+  const AVAILABLE_IMAGES = ["/work-1.jpg", "/work-3.jpg", "/work-4.jpg", "/work-8.jpg", "/work-8.webp", "/work-9.webp"];
 
   return (
     <div className="p-4 space-y-4">
@@ -301,7 +301,7 @@ function ProjectEditor({
         </label>
         <select
           className="w-full bg-transparent border-b border-border py-2 text-sm focus:outline-none focus:border-foreground transition-colors duration-200"
-          value={form.image || "/images/work-1.jpg"}
+          value={form.image || "/work-1.jpg"}
           onChange={(e) => set("image", e.target.value)}
         >
           {AVAILABLE_IMAGES.map((img) => {
@@ -316,7 +316,7 @@ function ProjectEditor({
           })}
         </select>
         <p className="text-[9px] text-muted-foreground mt-1">
-          Upload new images by adding files to the <code className="bg-foreground/5 px-1">public/images/</code> folder.
+          Upload new images by adding files to the <code className="bg-foreground/5 px-1">public/</code> folder.
         </p>
         {projects.find(
           (p) => p.slug !== form.slug && p.image === form.image

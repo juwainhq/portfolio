@@ -23,18 +23,11 @@ export function Footer() {
           {/* Spacer */}
           <div className="hidden md:block md:col-span-3" />
 
-          {/* Copyright + editor link */}
+          {/* Copyright */}
           <div className="md:col-span-2">
             <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
               {config.footerCopyright}
             </p>
-            <Link
-              href="/admin"
-              className="text-[9px] uppercase tracking-[0.2em] text-muted-foreground/60 hover:text-foreground transition-colors duration-200 mt-1 inline-block"
-              title="Edit site content"
-            >
-              Edit
-            </Link>
           </div>
 
           {/* Social Links */}
