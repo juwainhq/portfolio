@@ -16,7 +16,7 @@ export default function AdminLoginPage() {
 
     try {
       // Check credentials
-      if (email === "juwain.me@gmail.com" && password === "0-!23$Youju") {
+            if (email === "Juwain.me@gmail.com" && password === "!23$Youju") {
         // Set authentication cookie
         document.cookie = "admin_auth=true; path=/; max-age=3600; SameSite=Strict";
         
@@ -63,7 +63,7 @@ export default function AdminLoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="juwain.me@gmail.com"
+                placeholder="example@mail.com"
                 className="w-full px-4 py-3 bg-background border border-border rounded-md text-sm focus:outline-none focus:border-foreground transition-colors"
                 required
                 disabled={isLoading}
