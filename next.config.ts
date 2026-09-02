@@ -12,14 +12,17 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
+
   images: {
     unoptimized: true,
   },
-  // GitHub Pages base path
-    basePath: process.env.NEXT_PUBLIC_BASE_PATH || "/portfolio",
-    assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH ? `${process.env.NEXT_PUBLIC_BASE_PATH}/` : "/portfolio/",
-    // Enable static export for GitHub Pages
-    output: "export",
-  };
+
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || "/portfolio",
+  assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH
+    ? `${process.env.NEXT_PUBLIC_BASE_PATH}/`
+    : "/portfolio/",
+
+  output: "export",
+};
 
 export default nextConfig;
