@@ -60,7 +60,7 @@ export type NavLink = {
 };
 
 export type SocialLink = {
-  platform: "instagram" | "linkedin" | "behance" | "email" | "twitter" | "dribbble" | "business" | "custom";
+  platform: "instagram" | "linkedin" | "behance" | "email" | "twitter" | "dribbble" | "custom";
   label: string;
   href: string;
 };
