@@ -422,7 +422,10 @@ export async function loadSiteConfig(): Promise<SiteConfig> {
     const remote = await fetchSiteConfig();
     if (remote) {
       const merged = mergeWithDefaults(remote as Partial<SiteConfig>);
-      const cleaned = deduplicateProjectImages(merged);
+      const cleaned: SiteConfig = {
+        ...merged,
+        projects: deduplicateProjectImages(merged.projects),
+      };
       writeLocalCache(cleaned);
       return cleaned;
     }
@@ -442,7 +445,10 @@ export async function saveConfig(config: SiteConfig): Promise<{
   error?: string;
 }> {
   if (typeof window === "undefined") return { ok: true };
-  const cleaned = deduplicateProjectImages(config);
+  const cleaned: SiteConfig = {
+    ...config,
+    projects: deduplicateProjectImages(config.projects),
+  };
   writeLocalCache(cleaned);
   // Same-tab listeners (e.g. other editor tabs in the same browser).
   window.dispatchEvent(new CustomEvent("site-config:update", { detail: cleaned }));
