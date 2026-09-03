@@ -46,12 +46,13 @@ type SiteConfigContextValue = {
 const SiteConfigContext = createContext<SiteConfigContextValue | null>(null);
 
 export function SiteConfigProvider({ children }: { children: React.ReactNode }) {
-  // Start with the fastest available snapshot: local cache or bundled defaults.
-  const [config, setConfig] = useState<SiteConfig>(loadConfig);
+  // Start with bundled defaults to match server-rendered HTML during hydration.
+  // LocalStorage/Supabase data loads asynchronously afterward to avoid hydration mismatch.
+  const [config, setConfig] = useState<SiteConfig>(defaultConfig);
   const [isHydrated, setIsHydrated] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // 1. Hydrate from Supabase on mount (runs once).
+  // 1. Hydrate from Supabase on mount (runs once after hydration).
   useEffect(() => {
     let cancelled = false;
 
