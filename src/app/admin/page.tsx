@@ -7,6 +7,7 @@ import { type SiteConfig } from "@/data/site-config";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { FaviconUploader } from "@/components/admin/FaviconUploader";
 import {
   Save,
   RotateCcw,
@@ -268,6 +269,17 @@ function ContentEditor({ config, update }: { config: SiteConfig; update: (p: Par
             <TextField label="Established" value={config.established} onChange={(v) => update({ established: v })} />
             <TextField label="Location" value={config.location} onChange={(v) => update({ location: v })} />
           </div>
+        </div>
+      </section>
+
+      {/* Favicon */}
+      <section>
+        <h2 className="text-lg font-medium mb-4">Favicon</h2>
+        <div className="bg-card border border-border rounded-lg p-6 space-y-4">
+          <FaviconUploader
+            value={config.favicon}
+            onChange={(v) => update({ favicon: v })}
+          />
         </div>
       </section>
 
