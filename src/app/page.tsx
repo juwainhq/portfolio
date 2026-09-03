@@ -41,8 +41,8 @@ function PageContent() {
             }
           })}
 
-        {/* Home Page View All Works Button — Large CTA */}
-        <section className="reveal py-28 md:py-40 lg:py-48 px-6 md:px-10 lg:px-16">
+        {/* Home Page View All Works Button — Large CTA placed before Footer */}
+        <section className="reveal pt-20 pb-10 md:pt-28 md:pb-14 px-6 md:px-10 lg:px-16">
           <div className="max-w-[1600px] mx-auto">
             <Link
               href="/work"

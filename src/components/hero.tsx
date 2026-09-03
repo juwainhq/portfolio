@@ -18,26 +18,10 @@ export function Hero() {
     });
   }, []);
 
-  const scrollToWork = () => {
-    const workSection = document.getElementById("work");
-    if (workSection) {
-      workSection.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  const heroButtonHref =
-    config.heroButtonTarget?.href ??
-    (config.heroButtonTarget?.kind === "external"
-      ? config.heroButtonTarget.href
-      : config.heroButtonTarget?.href ?? "#work");
+  const heroButtonHref = "/work";
 
   const scrollToHeroButton = () => {
-    if (config.heroButtonTarget?.kind === "external" || config.heroButtonTarget?.kind === "email") {
-      window.open(heroButtonHref, config.heroButtonTarget?.kind === "email" ? "_self" : "_blank");
-    } else {
-      const target = document.querySelector(heroButtonHref);
-      target?.scrollIntoView({ behavior: "smooth" });
-    }
+    window.location.href = heroButtonHref;
   };
 
   const nameParts = config.name.split(" ");
