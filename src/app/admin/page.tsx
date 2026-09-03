@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSiteConfig } from "@/context/site-config";
 import { type SiteConfig } from "@/data/site-config";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Save,
   RotateCcw,
@@ -18,7 +19,6 @@ import {
   ArrowDown,
   Eye,
   EyeOff,
-  X,
 } from "lucide-react";
 
 function TextField({
@@ -68,30 +68,37 @@ export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Check authentication on mount via server-side session verification
+  // Check authentication on mount using the Supabase session.
   useEffect(() => {
     const checkAuth = async () => {
-      try {
-        const res = await fetch("/api/auth/verify");
-        if (res.ok) {
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
-          router.push("/admin/login");
-        }
-      } catch {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsAuthenticated(true);
+      } else {
         setIsAuthenticated(false);
         router.push("/admin/login");
-      } finally {
-        setIsCheckingAuth(false);
       }
+      setIsCheckingAuth(false);
     };
 
     checkAuth();
+
+    // React to live sign-in / sign-out events (e.g. from another tab).
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+        router.push("/admin/login");
+      }
+    });
+
+    return () => {
+      sub.subscription.unsubscribe();
+    };
   }, [router]);
 
   if (isCheckingAuth) {
-    // Show a minimal loading state while checking auth
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Loading admin panel...</p>
@@ -104,26 +111,36 @@ export default function AdminDashboard() {
   }
 
   const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      toast.success("Logged out successfully");
-      router.push("/admin/login");
-    } catch {
-      toast.error("Logout failed");
+    await supabase.auth.signOut();
+    toast.success("Logged out successfully");
+    router.push("/admin/login");
+  };
+
+  const handleSave = async () => {
+    const result = await save();
+    if (result.ok) {
+      toast.success("Changes saved", {
+        description: "Your changes have been saved to Supabase.",
+      });
+    } else {
+      toast.error("Save failed", {
+        description:
+          result.error ||
+          "You might not be signed in, or your changes were not written to the database.",
+      });
     }
   };
 
-  const handleSave = () => {
-    save();
-    toast.success("Changes saved", {
-      description: "Your changes have been saved to this browser.",
-    });
-  };
-
-  const handleReset = () => {
+  const handleReset = async () => {
     if (confirm("Reset all content to defaults? This cannot be undone.")) {
-      reset();
-      toast.success("Reset to defaults");
+      const result = await reset();
+      if (result.ok) {
+        toast.success("Reset to defaults");
+      } else {
+        toast.error("Reset failed", {
+          description: result.error || "Could not write defaults to Supabase.",
+        });
+      }
     }
   };
 

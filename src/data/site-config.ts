@@ -3,9 +3,12 @@
  *
  * Every editable string, link, image, project, and section order lives here.
  * The public site reads from this config (via SiteConfigProvider) and the
- * /admin editor writes to it. When localStorage has a saved version we use
- * that; otherwise we fall back to these defaults. This makes it trivial to
- * upgrade to a real database later — only the loader needs to change.
+ * /admin editor writes to it.
+ *
+ * Persistence: the canonical store is now the Supabase `site_config` table
+ * (see `src/integrations/supabase/site-config.ts`). This file is still the
+ * source of truth for the TypeScript shape, the defaults, and a defensive
+ * localStorage cache used to make the first paint instant.
  */
 
 export type Fit = "contain" | "cover";
@@ -358,72 +361,121 @@ export const defaultConfig: SiteConfig = {
 export const STORAGE_KEY = "site-config-v2";
 
 /* -------------------------------------------------------------------------- */
-/* Persistence helpers                                                        */
+/* Local cache (used to make first paint instant; Supabase is the source)     */
 /* -------------------------------------------------------------------------- */
 
-export function loadConfig(): SiteConfig {
-  if (typeof window === "undefined") return defaultConfig;
+function readLocalCache(): SiteConfig | null {
+  if (typeof window === "undefined") return null;
   try {
-    // Always read from the current key first.
+    // Prefer the current key; fall back to legacy v1 for one-time migration.
     let raw = window.localStorage.getItem(STORAGE_KEY);
-    let source = STORAGE_KEY;
-
-    // Migrate from legacy key if current key has no data.
-    if (!raw) {
-      const legacyKey = "site-config-v1";
-      const legacyRaw = window.localStorage.getItem(legacyKey);
-      if (legacyRaw) {
-        raw = legacyRaw;
-        source = legacyKey;
-      }
-    }
-
-    if (!raw) return defaultConfig;
-
-    const parsed = JSON.parse(raw) as Partial<SiteConfig>;
-
-    // Migrate to current key so future loads skip the legacy check.
-    if (source !== STORAGE_KEY) {
-      try {
-        window.localStorage.setItem(STORAGE_KEY, raw);
-        window.localStorage.removeItem(source);
-      } catch {
-        // Ignore quota errors
-      }
-    }
-
-    // Merge with defaults so newly-added fields don't break older saves.
-    const merged = mergeWithDefaults(parsed);
-
-    // Fix accidental duplicate hero images: if two different projects use the
-    // same hero image, keep the first occurrence and reassign the duplicate
-    // to the next unused image from the pool.
-    merged.projects = deduplicateProjectImages(merged.projects);
-
-    return merged;
+    if (!raw) raw = window.localStorage.getItem("site-config-v1");
+    if (!raw) return null;
+    return mergeWithDefaults(JSON.parse(raw) as Partial<SiteConfig>);
   } catch {
-    return defaultConfig;
+    return null;
   }
 }
 
-export function saveConfig(config: SiteConfig) {
+function writeLocalCache(config: SiteConfig) {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-    // Notify any same-tab listeners (the storage event doesn't fire in-tab).
-    window.dispatchEvent(new CustomEvent("site-config:update", { detail: config }));
   } catch {
     // Ignore quota / privacy errors
   }
 }
 
-export function resetConfig() {
+function clearLocalCache() {
   if (typeof window === "undefined") return;
-  // Clear both keys to handle migrations.
-  window.localStorage.removeItem(STORAGE_KEY);
-  window.localStorage.removeItem("site-config-v1");
-  window.dispatchEvent(new CustomEvent("site-config:update", { detail: defaultConfig }));
+  try {
+    window.localStorage.removeItem(STORAGE_KEY);
+    window.localStorage.removeItem("site-config-v1");
+  } catch {
+    // Ignore
+  }
 }
+
+/* -------------------------------------------------------------------------- */
+/* Public API                                                                 */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Synchronous accessor used for the very first render. Returns the most
+ * recently seen config (from local cache) or the bundled defaults.
+ *
+ * For the authoritative, latest-from-database config, use `loadSiteConfig`.
+ */
+export function loadConfig(): SiteConfig {
+  return readLocalCache() ?? defaultConfig;
+}
+
+/**
+ * Async loader. Reads the canonical `site_config` row from Supabase and
+ * updates the local cache. Falls back to the cache, then to defaults, on
+ * any network/permission error so the public site never goes blank.
+ */
+export async function loadSiteConfig(): Promise<SiteConfig> {
+  if (typeof window === "undefined") return defaultConfig;
+  try {
+    const { fetchSiteConfig } = await import("@/integrations/supabase/site-config");
+    const remote = await fetchSiteConfig();
+    if (remote) {
+      const merged = mergeWithDefaults(remote as Partial<SiteConfig>);
+      const cleaned = deduplicateProjectImages(merged);
+      writeLocalCache(cleaned);
+      return cleaned;
+    }
+  } catch (err) {
+    console.warn("[site-config] loadSiteConfig failed", err);
+  }
+  return readLocalCache() ?? defaultConfig;
+}
+
+/**
+ * Async saver. Writes through to Supabase and refreshes the local cache.
+ * Returns `{ ok: true }` on success, or `{ ok: false, error }` on failure
+ * so callers (the editor) can show a toast.
+ */
+export async function saveConfig(config: SiteConfig): Promise<{
+  ok: boolean;
+  error?: string;
+}> {
+  if (typeof window === "undefined") return { ok: true };
+  const cleaned = deduplicateProjectImages(config);
+  writeLocalCache(cleaned);
+  // Same-tab listeners (e.g. other editor tabs in the same browser).
+  window.dispatchEvent(new CustomEvent("site-config:update", { detail: cleaned }));
+  try {
+    const { upsertSiteConfig } = await import("@/integrations/supabase/site-config");
+    const result = await upsertSiteConfig(cleaned);
+    return result;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return { ok: false, error: message };
+  }
+}
+
+/**
+ * Resets to bundled defaults both locally and (if authenticated) remotely.
+ * The remote reset is best-effort: the editor will still show the local
+ * defaults if the network call fails.
+ */
+export async function resetConfig(): Promise<{ ok: boolean; error?: string }> {
+  clearLocalCache();
+  window.dispatchEvent(new CustomEvent("site-config:update", { detail: defaultConfig }));
+  try {
+    const { upsertSiteConfig } = await import("@/integrations/supabase/site-config");
+    return await upsertSiteConfig(defaultConfig);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return { ok: false, error: message };
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Internal helpers                                                           */
+/* -------------------------------------------------------------------------- */
 
 function mergeWithDefaults(partial: Partial<SiteConfig>): SiteConfig {
   return {
@@ -449,16 +501,13 @@ const ALL_IMAGES = ["/work-1.jpg", "/work-3.jpg", "/work-4.jpg", "/work-8.jpg", 
 function deduplicateProjectImages(projects: Project[]): Project[] {
   const usedHeroImages = new Set<string>();
   return projects.map((p) => {
-    // Skip if this project has no hero image.
     if (!p.image) return p;
-    // If this hero image hasn't been claimed yet, keep it.
     if (!usedHeroImages.has(p.image)) {
       usedHeroImages.add(p.image);
       return p;
     }
-    // Find the first unused image from the pool.
     const unused = ALL_IMAGES.find((img) => !usedHeroImages.has(img));
-    if (!unused) return p; // All images exhausted; keep original.
+    if (!unused) return p;
     usedHeroImages.add(unused);
     return { ...p, image: unused };
   });
