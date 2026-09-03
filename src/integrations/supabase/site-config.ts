@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
  *
  * RLS (enforced on the database side):
  *   - SELECT: public (anyone, including unauthenticated visitors, can read)
- *   - INSERT/UPDATE: only the authenticated admin user (juwain.me@gmail.com)
+ *   - INSERT/UPDATE: only the authenticated admin user (example@gmail.com)
  *
  * Because RLS is the security boundary, this client-side code only needs the
  * publishable/anon key. There is no service-role access in the browser.
