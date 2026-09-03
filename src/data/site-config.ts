@@ -291,7 +291,8 @@ const defaultHowIWork: HowIStep[] = [
 
 const defaultSocials: SocialLink[] = [
   { platform: "instagram", label: "@juwainhaque", href: "https://instagram.com" },
-  { platform: "business", label: "Vindeshi", href: "https://vindeshimart.shop/" },
+  { platform: "linkedin", label: "/in/juwainhaque", href: "https://linkedin.com" },
+  { platform: "behance", label: "/juwainhaque", href: "https://behance.net" },
   { platform: "email", label: "hello@juwainhaque.com", href: "mailto:hello@juwainhaque.com" },
 ];
 
