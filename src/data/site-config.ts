@@ -127,6 +127,8 @@ export type SiteConfig = {
   // Footer
   footerTagline: string;
   footerCopyright: string;
+  footerBusinessName: string;
+  footerBusinessLink: string;
 
   // Navigation + socials
   navLinks: NavLink[];
@@ -291,8 +293,6 @@ const defaultHowIWork: HowIStep[] = [
 
 const defaultSocials: SocialLink[] = [
   { platform: "instagram", label: "@juwainhaque", href: "https://instagram.com" },
-  { platform: "linkedin", label: "/in/juwainhaque", href: "https://linkedin.com" },
-  { platform: "behance", label: "/juwainhaque", href: "https://behance.net" },
   { platform: "email", label: "hello@juwainhaque.com", href: "mailto:hello@juwainhaque.com" },
 ];
 
@@ -343,6 +343,8 @@ export const defaultConfig: SiteConfig = {
 
   footerTagline: "Graphic Designer · Business Consultant",
   footerCopyright: "© 2025 All Rights Reserved",
+  footerBusinessName: "Juwain Haque",
+  footerBusinessLink: "https://juwainhaque.com",
 
   navLinks: [
     ...defaultNavLinks,
