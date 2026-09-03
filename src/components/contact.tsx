@@ -29,11 +29,16 @@ export function Contact() {
 
     setIsSubmitting(true);
     try {
+      // Use text/plain so the request is a CORS "simple request" — no preflight.
+      // Google Apps Script Web Apps do not handle OPTIONS preflight, and they
+      // do not return CORS headers for application/json POSTs, which causes
+      // the browser to block the request. Sending a JSON string as text/plain
+      // avoids that, and the Apps Script's doPost parses e.postData.contents.
       const res = await fetch(
         "https://script.google.com/macros/s/AKfycbyX7oSqfciSJCaJWqLxLi5f86x2pO3OaKL4dvZvMTwGV6K-F2-yGVaZ1Lgb8tNDTPj1bw/exec",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({
             name: formData.name,
             email: formData.email,
@@ -43,12 +48,21 @@ export function Contact() {
         }
       );
 
-      if (res.ok) {
+      // Read as text first — Apps Script responses may not always be
+      // parseable JSON from the browser's perspective (opaque/cors-restricted).
+      const text = await res.text();
+      let data: { ok?: boolean; error?: string } | null = null;
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch {
+        data = null;
+      }
+
+      if (res.ok && (!data || data.ok !== false)) {
         toast.success(config.contactSuccessMessage);
         setFormData({ name: "", email: "", message: "" });
       } else {
-        const data = await res.json();
-        toast.error(data.error || "Failed to send message. Please try again.");
+        toast.error(data?.error || "Failed to send message. Please try again.");
       }
     } catch {
       toast.error("Failed to send message. Please try again.");
