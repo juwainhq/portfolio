@@ -87,7 +87,6 @@ export type SiteConfig = {
   tagline: string;
   established: string;
   location: string;
-  favicon: string;
 
   // Hero
   heroStatusText: string;
@@ -310,7 +309,6 @@ export const defaultConfig: SiteConfig = {
   tagline: "Graphic Designer / Business Consultant",
   established: "Est. 2019",
   location: "Based in Dhaka · Working Worldwide",
-  favicon: "",
 
   heroStatusText: "Available for Projects",
   heroTopRight: ["Independent Practice", "Est. 2019"],
