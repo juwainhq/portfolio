@@ -29,16 +29,19 @@ export function Contact() {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          message: formData.message,
-          recipient: config.contactFormRecipient,
-        }),
-      });
+      const res = await fetch(
+        "https://script.google.com/macros/s/AKfycbyX7oSqfciSJCaJWqLxLi5f86x2pO3OaKL4dvZvMTwGV6K-F2-yGVaZ1Lgb8tNDTPj1bw/exec",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            message: formData.message,
+            recipient: config.contactFormRecipient,
+          }),
+        }
+      );
 
       if (res.ok) {
         toast.success(config.contactSuccessMessage);
