@@ -37,17 +37,20 @@ export default function AdminLoginPage() {
       });
 
       if (res.ok) {
-        toast.success("Login successful!", {
-          description: "Welcome to the admin panel.",
-        });
-        router.replace("/admin");
-      } else {
-        const data = await res.json();
-        toast.error("Invalid credentials", {
-          description: data.error || "Please check your email and password.",
-        });
-        setIsLoading(false);
-      }
+              toast.success("Login successful!", {
+                description: "Welcome to the admin panel.",
+              });
+              // Wait a brief moment so the cookie is set, then navigate
+              setTimeout(() => {
+                router.replace("/admin");
+              }, 100);
+            } else {
+              const data = await res.json();
+              toast.error("Invalid credentials", {
+                description: data.error || "Please check your email and password.",
+              });
+              setIsLoading(false);
+            }
     } catch {
       toast.error("Login failed", {
         description: "An error occurred. Please try again.",
