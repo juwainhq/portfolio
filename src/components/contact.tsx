@@ -23,7 +23,6 @@ export function Contact() {
   const labelRef = useReveal();
   const titleRef = useReveal();
   const formRef = useRef<HTMLFormElement | null>(null);
-  const socialsRef = useReveal();
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -179,27 +178,6 @@ export function Contact() {
             </button>
           </form>
 
-          {/* Social Links */}
-          <div
-            ref={socialsRef}
-            className="reveal lg:col-span-4 lg:col-start-9 space-y-10 pt-2"
-          >
-            {config.socials.map((social) => (
-              <div key={social.platform}>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-3">
-                  {social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
-                </p>
-                <a
-                  href={social.href}
-                  target={social.platform === "email" ? "_self" : "_blank"}
-                  rel="noopener noreferrer"
-                  className="text-base hover:opacity-50 transition-opacity duration-300"
-                >
-                  {social.label}
-                </a>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>
