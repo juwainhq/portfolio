@@ -6,6 +6,7 @@ import { useSiteConfig } from "@/context/site-config";
 import { type SiteConfig } from "@/data/site-config";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { ImageUploader } from "@/components/admin/ImageUploader";
 import {
   Save,
   RotateCcw,
@@ -358,7 +359,7 @@ function ProjectsEditor({ config, update }: { config: SiteConfig; update: (p: Pa
           </div>
           <TextField label="Description" value={project.description} onChange={(v) => update({ projects: config.projects.map((p, idx) => idx === i ? { ...p, description: v } : p) })} multiline />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <TextField label="Image" value={project.image} onChange={(v) => update({ projects: config.projects.map((p, idx) => idx === i ? { ...p, image: v } : p) })} />
+            <ImageUploader label="Image" value={project.image} onChange={(v) => update({ projects: config.projects.map((p, idx) => idx === i ? { ...p, image: v } : p) })} />
             <TextField label="Layout" value={project.layout} onChange={(v) => update({ projects: config.projects.map((p, idx) => idx === i ? { ...p, layout: v as any } : p) })} />
           </div>
         </div>
