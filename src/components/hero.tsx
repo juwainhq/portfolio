@@ -19,7 +19,7 @@ export function Hero() {
     });
   }, []);
 
-  const heroButtonHref = "/work";
+  const heroButtonHref = "/portfolio/work";
 
   const nameParts = config.name.split(" ");
 
