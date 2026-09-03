@@ -5,7 +5,7 @@ import { Navigation } from "@/components/navigation";
 import { Hero } from "@/components/hero";
 import { About } from "@/components/about";
 import { Services } from "@/components/services";
-import { PortfolioGrid } from "@/components/portfolio-grid";
+import { FeaturedWork } from "@/components/featured-work";
 import { Highlights } from "@/components/highlights";
 import { HowIWork } from "@/components/how-i-work";
 import { Contact } from "@/components/contact";
@@ -31,7 +31,7 @@ function PageContent() {
               case "services":
                 return <Services key={section.id} />;
               case "work":
-                return <PortfolioGrid key={section.id} />;
+                return <FeaturedWork key={section.id} />;
               case "highlights":
                 return <Highlights key={section.id} />;
               case "how-i-work":

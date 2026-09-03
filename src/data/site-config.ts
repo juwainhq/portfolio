@@ -344,7 +344,10 @@ export const defaultConfig: SiteConfig = {
   footerTagline: "Graphic Designer · Business Consultant",
   footerCopyright: "© 2025 All Rights Reserved",
 
-  navLinks: defaultNavLinks,
+  navLinks: [
+    ...defaultNavLinks,
+    { label: "Works", kind: "page", href: "/works", showInNav: true },
+  ],
   socials: defaultSocials,
 
   sections: [

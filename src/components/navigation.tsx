@@ -56,17 +56,17 @@ export function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8 lg:gap-10">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-[11px] tracking-[0.2em] uppercase font-medium hover:opacity-40 transition-opacity duration-300"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
+                    <div className="hidden md:flex items-center gap-8 lg:gap-10">
+                      {navLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className="text-[11px] tracking-[0.2em] uppercase font-medium hover:opacity-40 transition-opacity duration-300"
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </div>
 
           {/* Mobile Menu Button */}
           <button
@@ -95,7 +95,7 @@ export function Navigation() {
                   transitionDelay: isOpen ? `${index * 80}ms` : "0ms",
                 }}
               >
-                <a
+                <Link
                   href={link.href}
                   onClick={handleLinkClick}
                   className={`block text-5xl md:text-6xl font-display tracking-tight uppercase py-2.5 transform transition-all duration-500 ease-out ${
@@ -106,7 +106,7 @@ export function Navigation() {
                   style={{ transitionDelay: isOpen ? `${index * 80 + 150}ms` : "0ms" }}
                 >
                   {link.label}
-                </a>
+                </Link>
               </div>
             ))}
           </nav>
