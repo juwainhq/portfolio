@@ -1,25 +1,25 @@
 1:"$Sreact.fragment"
-2:I[2937,["177","static/chunks/app/layout-18040c34edc4011c.js"],"SiteConfigProvider"]
-3:I[809,[],""]
-4:I[5581,[],""]
-5:I[12,["12","static/chunks/12-39027b82713e00ff.js","345","static/chunks/app/not-found-854683e70e2104e7.js"],""]
-6:I[1376,[],"ClientPageRoot"]
-7:I[4805,["331","static/chunks/331-11f27a2e88d380de.js","364","static/chunks/364-c8bf4153255ee5a7.js","12","static/chunks/12-39027b82713e00ff.js","929","static/chunks/929-6ee7d23581bc8d5c.js","964","static/chunks/964-1534c6f573054082.js","974","static/chunks/app/page-02f6b04089b9ec91.js"],"default"]
-a:I[9228,[],"OutletBoundary"]
-c:I[6373,[],"AsyncMetadataOutlet"]
-e:I[9228,[],"ViewportBoundary"]
-10:I[9228,[],"MetadataBoundary"]
+2:I[4750,["177","static/chunks/app/layout-e7346ae6dcb36415.js"],"SiteConfigProvider"]
+3:I[3992,[],""]
+4:I[3758,[],""]
+5:I[9881,["881","static/chunks/881-604cb92fef7fc7fc.js","345","static/chunks/app/not-found-3f6c4cf6dfa7545b.js"],""]
+6:I[5909,[],"ClientPageRoot"]
+7:I[5907,["609","static/chunks/609-097dd28dfd2a57dd.js","939","static/chunks/939-02075fc087977891.js","881","static/chunks/881-604cb92fef7fc7fc.js","828","static/chunks/828-076e3c300b4086be.js","619","static/chunks/619-ea3dd769f1cde02a.js","974","static/chunks/app/page-932ae1bc0ae1a8a5.js"],"default"]
+a:I[8869,[],"OutletBoundary"]
+c:I[2608,[],"AsyncMetadataOutlet"]
+e:I[8869,[],"ViewportBoundary"]
+10:I[8869,[],"MetadataBoundary"]
 11:"$Sreact.suspense"
-13:I[7579,[],""]
+13:I[7700,[],""]
 :HL["/portfolio/_next/static/media/36966cca54120369-s.p.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
 :HL["/portfolio/_next/static/media/bb3ef058b751a6ad-s.p.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
 :HL["/portfolio/_next/static/media/e4af272ccee01ff0-s.p.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
 :HL["/portfolio/_next/static/css/b953d9b248276703.css","style"]
-0:{"P":null,"b":"ZQF28PBTGSM1sEQWD3zFe","p":"/portfolio","c":["",""],"i":false,"f":[[["",{"children":["__PAGE__",{}]},"$undefined","$undefined",true],["",["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/portfolio/_next/static/css/b953d9b248276703.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"__variable_f07e2c __variable_b211fe __variable_db99bd font-sans antialiased","children":["$","$L2",null,{"children":["$","$L3",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L4",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[["$","div",null,{"className":"min-h-screen bg-background flex items-center justify-center px-6 md:px-10 lg:px-16","children":["$","div",null,{"className":"text-center","children":[["$","h1",null,{"className":"text-[20vw] md:text-[15vw] font-display tracking-tight uppercase leading-[0.85] mb-6 md:mb-8","children":"404"}],["$","p",null,{"className":"text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-12","children":"Page not found"}],["$","$L5",null,{"href":"/","className":"group inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.25em] hover:opacity-50 transition-opacity duration-300","children":[["$","svg",null,{"ref":"$undefined","xmlns":"http://www.w3.org/2000/svg","width":12,"height":12,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-arrow-left group-hover:-translate-x-1 transition-transform duration-300","aria-hidden":"true","children":[["$","path","1l729n",{"d":"m12 19-7-7 7-7"}],["$","path","x3x0zl",{"d":"M19 12H5"}],"$undefined"]}],["$","span",null,{"children":"Back to Home"}]]}]]}]}],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]}]]}],{"children":["__PAGE__",["$","$1","c",{"children":[["$","$L6",null,{"Component":"$7","searchParams":{},"params":{},"promises":["$@8","$@9"]}],null,["$","$La",null,{"children":["$Lb",["$","$Lc",null,{"promise":"$@d"}]]}]]}],{},null,false]},null,false],["$","$1","h",{"children":[null,[["$","$Le",null,{"children":"$Lf"}],["$","meta",null,{"name":"next-size-adjust","content":""}]],["$","$L10",null,{"children":["$","div",null,{"hidden":true,"children":["$","$11",null,{"fallback":null,"children":"$L12"}]}]}]]}],false]],"m":"$undefined","G":["$13",[]],"s":false,"S":true}
+0:{"P":null,"b":"smLL9mzlufvanq_b_poSi","p":"/portfolio","c":["",""],"i":false,"f":[[["",{"children":["__PAGE__",{}]},"$undefined","$undefined",true],["",["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/portfolio/_next/static/css/b953d9b248276703.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"__variable_f07e2c __variable_b211fe __variable_db99bd font-sans antialiased","children":["$","$L2",null,{"children":["$","$L3",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L4",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[["$","div",null,{"className":"min-h-screen bg-background flex items-center justify-center px-6 md:px-10 lg:px-16","children":["$","div",null,{"className":"text-center","children":[["$","h1",null,{"className":"text-[20vw] md:text-[15vw] font-display tracking-tight uppercase leading-[0.85] mb-6 md:mb-8","children":"404"}],["$","p",null,{"className":"text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-12","children":"Page not found"}],["$","$L5",null,{"href":"/","className":"group inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.25em] hover:opacity-50 transition-opacity duration-300","children":[["$","svg",null,{"ref":"$undefined","xmlns":"http://www.w3.org/2000/svg","width":12,"height":12,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-arrow-left group-hover:-translate-x-1 transition-transform duration-300","aria-hidden":"true","children":[["$","path","1l729n",{"d":"m12 19-7-7 7-7"}],["$","path","x3x0zl",{"d":"M19 12H5"}],"$undefined"]}],["$","span",null,{"children":"Back to Home"}]]}]]}]}],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]}]]}],{"children":["__PAGE__",["$","$1","c",{"children":[["$","$L6",null,{"Component":"$7","searchParams":{},"params":{},"promises":["$@8","$@9"]}],null,["$","$La",null,{"children":["$Lb",["$","$Lc",null,{"promise":"$@d"}]]}]]}],{},null,false]},null,false],["$","$1","h",{"children":[null,[["$","$Le",null,{"children":"$Lf"}],["$","meta",null,{"name":"next-size-adjust","content":""}]],["$","$L10",null,{"children":["$","div",null,{"hidden":true,"children":["$","$11",null,{"fallback":null,"children":"$L12"}]}]}]]}],false]],"m":"$undefined","G":["$13",[]],"s":false,"S":true}
 8:{}
 9:"$0:f:0:1:2:children:1:props:children:0:props:params"
 f:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
 b:null
-14:I[6653,[],"IconMark"]
+14:I[9168,[],"IconMark"]
 d:{"metadata":[["$","title","0",{"children":"Juwain Haque — Graphic Designer & Business Consultant"}],["$","meta","1",{"name":"description","content":"Independent graphic designer and business consultant focused on creating strong visual identities and practical strategies that help businesses communicate, position themselves, and grow."}],["$","link","2",{"rel":"icon","href":"/favicon.ico"}],["$","$L14","3",{}]],"error":null,"digest":"$undefined"}
 12:"$d:metadata"
