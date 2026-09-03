@@ -354,7 +354,7 @@ export const defaultConfig: SiteConfig = {
     { id: "hero", label: "Hero", visible: true },
     { id: "about", label: "About", visible: true },
     { id: "services", label: "Services", visible: true },
-    { id: "work", label: "Selected Work", visible: false },
+    { id: "work", label: "Selected Work", visible: true },
     { id: "highlights", label: "Highlights", visible: true },
     { id: "how-i-work", label: "How I Work", visible: true },
     { id: "contact", label: "Contact", visible: true },
