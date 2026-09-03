@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useReveal } from "@/hooks/use-reveal";
 import { useSiteConfig } from "@/context/site-config";
 import { PortfolioImage } from "@/components/portfolio-image";
+import { ArrowUpRight } from "lucide-react";
 
 export function FeaturedWork() {
   const { config } = useSiteConfig();
@@ -95,16 +96,31 @@ export function FeaturedWork() {
           ))}
         </div>
 
-        {/* View All Works Button */}
-        <div className="reveal mt-20 md:mt-28 lg:mt-32 pt-12 md:pt-16 border-t border-foreground/10">
+        {/* View All Works — Large CTA */}
+        <div className="reveal mt-24 md:mt-32 lg:mt-40 pt-16 md:pt-20 lg:pt-24 border-t border-foreground/10">
           <Link
-            href="/works"
-            className="group inline-flex items-center gap-4 hover:opacity-50 transition-opacity duration-300"
+            href="/work"
+            className="group block"
+            aria-label="View all works"
           >
-            <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-              View All Works
-            </span>
-            <span className="block w-8 md:w-12 h-px bg-foreground/60 group-hover:w-16 transition-all duration-500" aria-hidden="true" />
+            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-6 md:mb-8">
+              Continue Exploring
+            </p>
+            <h2 className="flex items-center gap-4 md:gap-6 text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-display tracking-tight uppercase font-medium leading-[0.85] transition-all duration-700 ease-out group-hover:translate-x-3 md:group-hover:translate-x-6">
+              <span>View All Works</span>
+              <span
+                className="inline-block transition-transform duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2"
+                aria-hidden="true"
+              >
+                →
+              </span>
+            </h2>
+            <div className="mt-8 md:mt-10 flex items-center gap-4">
+              <span className="block h-px w-12 md:w-20 bg-foreground/40 transition-all duration-700 ease-out group-hover:w-24 md:group-hover:w-40" aria-hidden="true" />
+              <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-muted-foreground transition-colors duration-500 group-hover:text-foreground">
+                See the full archive
+              </span>
+            </div>
           </Link>
         </div>
       </div>

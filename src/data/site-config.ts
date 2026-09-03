@@ -346,7 +346,7 @@ export const defaultConfig: SiteConfig = {
 
   navLinks: [
     ...defaultNavLinks,
-    { label: "Works", kind: "page", href: "/works", showInNav: true },
+    { label: "Work", kind: "page", href: "/work", showInNav: true },
   ],
   socials: defaultSocials,
 
