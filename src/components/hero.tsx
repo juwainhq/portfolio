@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { useSiteConfig } from "@/context/site-config";
 
 export function Hero() {
@@ -19,10 +20,6 @@ export function Hero() {
   }, []);
 
   const heroButtonHref = "/work";
-
-  const scrollToHeroButton = () => {
-    window.location.href = heroButtonHref;
-  };
 
   const nameParts = config.name.split(" ");
 
@@ -95,8 +92,8 @@ export function Hero() {
           </span>
         </div>
 
-        <button
-          onClick={scrollToHeroButton}
+        <Link
+          href={heroButtonHref}
           className="animate-in group flex items-center gap-3 hover:opacity-60 transition-opacity duration-300"
           style={{ opacity: 0, transitionDelay: "550ms" }}
           aria-label={config.heroButtonText}
@@ -105,7 +102,7 @@ export function Hero() {
             {config.heroButtonText}
           </span>
           <span className="block w-8 md:w-12 h-px bg-foreground/60 group-hover:w-16 transition-all duration-500" aria-hidden="true" />
-        </button>
+        </Link>
       </div>
     </section>
   );
