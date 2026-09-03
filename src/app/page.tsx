@@ -42,7 +42,7 @@ function PageContent() {
           })}
 
         {/* Home Page View All Works Button — Large CTA */}
-        <div className="reveal px-6 md:px-10 lg:px-16 py-16 md:py-24 lg:py-32">
+        <section className="reveal py-28 md:py-40 lg:py-48 px-6 md:px-10 lg:px-16">
           <div className="max-w-[1600px] mx-auto">
             <Link
               href="/work"
@@ -69,7 +69,7 @@ function PageContent() {
               </div>
             </Link>
           </div>
-        </div>
+        </section>
       </main>
       <Footer />
       <Toaster />
