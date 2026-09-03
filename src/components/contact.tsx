@@ -6,6 +6,13 @@ import { toast } from "sonner";
 import { useReveal } from "@/hooks/use-reveal";
 import { useSiteConfig } from "@/context/site-config";
 
+// Google Apps Script Web App /exec endpoint. Posting via a native HTML form
+// (targeted at a hidden iframe) avoids CORS entirely — the browser performs
+// a real navigation submit, so the response is loaded into the iframe and
+// the main page is never navigated away or blocked by the browser.
+const APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbyX7oSqfciSJCaJWqLxLi5f86x2pO3OaKL4dvZvMTwGV6K-F2-yGVaZ1Lgb8tNDTPj1bw/exec";
+
 export function Contact() {
   const { config } = useSiteConfig();
   const [formData, setFormData] = useState({
@@ -17,56 +24,41 @@ export function Contact() {
   const titleRef = useReveal();
   const formRef = useRef<HTMLFormElement | null>(null);
   const socialsRef = useReveal();
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) {
       toast.error("Please fill in all fields.");
       return;
     }
 
+    const formEl = formRef.current;
+    if (!formEl) {
+      toast.error("Failed to send message. Please try again.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // Use text/plain so the request is a CORS "simple request" — no preflight.
-      // Google Apps Script Web Apps do not handle OPTIONS preflight, and they
-      // do not return CORS headers for application/json POSTs, which causes
-      // the browser to block the request. Sending a JSON string as text/plain
-      // avoids that, and the Apps Script's doPost parses e.postData.contents.
-      const res = await fetch(
-        "https://script.google.com/macros/s/AKfycbyX7oSqfciSJCaJWqLxLi5f86x2pO3OaKL4dvZvMTwGV6K-F2-yGVaZ1Lgb8tNDTPj1bw/exec",
-        {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            message: formData.message,
-            recipient: config.contactFormRecipient,
-          }),
-        }
-      );
-
-      // Read as text first — Apps Script responses may not always be
-      // parseable JSON from the browser's perspective (opaque/cors-restricted).
-      const text = await res.text();
-      let data: { ok?: boolean; error?: string } | null = null;
-      try {
-        data = text ? JSON.parse(text) : null;
-      } catch {
-        data = null;
-      }
-
-      if (res.ok && (!data || data.ok !== false)) {
+      // form.submit() bypasses React's onSubmit and performs a real native
+      // browser navigation submit. With target="contact_iframe", the response
+      // is loaded into the hidden iframe — the main page never navigates,
+      // and CORS is never triggered. Apps Script's doPost(e) executes
+      // server-side, reading fields from e.parameter.*.
+      formEl.submit();
+      // We can't reliably read the cross-origin iframe response, so we
+      // assume the native submit succeeded and reset state after a short
+      // delay so the UI feels responsive.
+      window.setTimeout(() => {
         toast.success(config.contactSuccessMessage);
         setFormData({ name: "", email: "", message: "" });
-      } else {
-        toast.error(data?.error || "Failed to send message. Please try again.");
-      }
+        setIsSubmitting(false);
+      }, 1500);
     } catch {
       toast.error("Failed to send message. Please try again.");
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -96,11 +88,23 @@ export function Contact() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-12">
+          {/* Hidden iframe — target of the form POST. Display:none keeps
+              the page from showing any response UI. */}
+          <iframe
+            ref={iframeRef}
+            name="contact_iframe"
+            title="contact submission target"
+            style={{ display: "none" }}
+          />
+
           {/* Form */}
           <form
             ref={formRef}
             className="reveal lg:col-span-7 space-y-8"
             onSubmit={handleSubmit}
+            action={APPS_SCRIPT_URL}
+            method="POST"
+            target="contact_iframe"
           >
             <div>
               <label
@@ -111,6 +115,7 @@ export function Contact() {
               </label>
               <input
                 id="name"
+                name="name"
                 type="text"
                 value={formData.name}
                 onChange={(e) =>
@@ -130,6 +135,7 @@ export function Contact() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) =>
@@ -149,6 +155,7 @@ export function Contact() {
               </label>
               <textarea
                 id="message"
+                name="message"
                 value={formData.message}
                 onChange={(e) =>
                   setFormData({ ...formData, message: e.target.value })
