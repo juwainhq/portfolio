@@ -4,6 +4,11 @@ import { useEffect } from "react";
 
 export function ScrollRevealProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
+    // Check if window and document are available
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      return;
+    }
+
     const handleScroll = () => {
       const reveals = document.querySelectorAll(".reveal, .stagger-children");
       reveals.forEach((reveal) => {

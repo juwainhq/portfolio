@@ -55,12 +55,20 @@ export function SiteConfigProvider({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     let cancelled = false;
 
-    loadSiteConfig().then((remote) => {
-      if (cancelled) return;
-      setConfig(remote);
-      setHasUnsavedChanges(false);
-      setIsHydrated(true);
-    });
+    loadSiteConfig()
+      .then((remote) => {
+        if (cancelled) return;
+        setConfig(remote);
+        setHasUnsavedChanges(false);
+      })
+      .catch((err) => {
+        // Already logged in loadSiteConfig; don't break the page.
+        console.warn("[site-config] hydrate failed", err);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setIsHydrated(true);
+      });
 
     return () => {
       cancelled = true;
@@ -76,6 +84,11 @@ export function SiteConfigProvider({ children }: { children: React.ReactNode }) 
 
   // 3. Listen for in-tab save events (e.g. same-browser admin tabs).
   useEffect(() => {
+    // Check if window is available
+    if (typeof window === "undefined") {
+      return;
+    }
+
     const handler = (e: Event) => {
       const incoming = (e as CustomEvent<SiteConfig>).detail;
       setConfig(incoming);

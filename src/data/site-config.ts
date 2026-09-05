@@ -372,7 +372,10 @@ export const STORAGE_KEY = "site-config-v2";
 /* -------------------------------------------------------------------------- */
 
 function readLocalCache(): SiteConfig | null {
-  if (typeof window === "undefined") return null;
+  // Check if we are in a browser and if localStorage is available
+  if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
+    return null;
+  }
   try {
     // Prefer the current key; fall back to legacy v1 for one-time migration.
     let raw = window.localStorage.getItem(STORAGE_KEY);
@@ -385,7 +388,9 @@ function readLocalCache(): SiteConfig | null {
 }
 
 function writeLocalCache(config: SiteConfig) {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
+    return;
+  }
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
   } catch {
@@ -394,7 +399,9 @@ function writeLocalCache(config: SiteConfig) {
 }
 
 function clearLocalCache() {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
+    return;
+  }
   try {
     window.localStorage.removeItem(STORAGE_KEY);
     window.localStorage.removeItem("site-config-v1");

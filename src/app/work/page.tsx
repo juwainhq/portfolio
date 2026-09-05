@@ -14,6 +14,10 @@ export default function WorksPage() {
   const allProjects = config.projects.filter((p) => !p.hidden);
 
   useEffect(() => {
+    // Check if document is available
+    if (typeof document === "undefined") {
+      return;
+    }
     // Force re-reveal on page load
     const elements = document.querySelectorAll(
       ".reveal:not(.active)"
