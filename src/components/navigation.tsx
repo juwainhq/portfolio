@@ -11,36 +11,22 @@ export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    // Check if window is available
-    if (typeof window === "undefined") {
-      return;
-    }
-
     const handleScroll = () => {
       setScrolled(window.scrollY > 80);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    // Set initial state based on current scroll position
-    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
-    // Check if document is available
-    if (typeof document === "undefined") {
-      return;
-    }
-
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
     return () => {
-      if (typeof document !== "undefined") {
-        document.body.style.overflow = "";
-      }
+      document.body.style.overflow = "";
     };
   }, [isOpen]);
 
@@ -70,17 +56,17 @@ export function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8 lg:gap-10">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-[11px] tracking-[0.2em] uppercase font-medium hover:opacity-40 transition-opacity duration-300"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+                    <div className="hidden md:flex items-center gap-8 lg:gap-10">
+                      {navLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className="text-[11px] tracking-[0.2em] uppercase font-medium hover:opacity-40 transition-opacity duration-300"
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </div>
 
           {/* Mobile Menu Button */}
           <button
@@ -128,9 +114,7 @@ export function Navigation() {
           {/* Mobile Footer Links */}
           <div
             className={`mt-20 pt-8 border-t border-foreground/10 transform transition-all duration-500 ease-out ${
-              isOpen
-                ? "translate-y-0 opacity-100"
-                : "translate-y-full opacity-0"
+              isOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
             }`}
             style={{ transitionDelay: isOpen ? "500ms" : "0ms" }}
           >

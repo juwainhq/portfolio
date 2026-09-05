@@ -7,28 +7,4 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_G3GxhiMtpaAPBKfdXb55pQ_204QXN2B
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-let supabase;
-try {
-  supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-} catch (error) {
-  console.error("[supabase] Failed to initialize supabase client", error);
-  // Create a dummy client that has the same shape but with methods that return null or error.
-  supabase = {
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          maybeSingle: () => Promise.resolve({ data: null, error: new Error("Supabase client not initialized") }),
-        }),
-      }),
-    }),
-    auth: {
-      getSession: () => Promise.resolve({ data: { session: null } }),
-      onAuthStateChange: () => ({ subscription: { unsubscribe: () => {} } }),
-    },
-    functions: {
-      invoke: () => Promise.resolve({ data: null, error: new Error("Supabase client not initialized") }),
-    },
-  } as any;
-}
-
-export { supabase };
+export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);

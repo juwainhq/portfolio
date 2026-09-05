@@ -9,12 +9,6 @@ export function useReveal() {
     const element = ref.current;
     if (!element) return;
 
-    // Check if IntersectionObserver is available
-    if (typeof IntersectionObserver === "undefined") {
-      // If not available, we cannot set up the observer, so we do nothing.
-      return;
-    }
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
