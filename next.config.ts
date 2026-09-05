@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isProduction = Boolean(process.env.NEXT_PUBLIC_BASE_PATH);
+
 const nextConfig: NextConfig = {
   webpack: (config) => {
     if (process.env.NODE_ENV === "development") {
@@ -17,9 +19,8 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
 
-  basePath: "/portfolio",
-  assetPrefix: "/portfolio/",
-  trailingSlash: true,
+  basePath: isProduction ? "/portfolio" : "",
+  assetPrefix: isProduction ? "/portfolio/" : "",
 
   output: "export",
 };
