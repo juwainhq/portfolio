@@ -8,10 +8,10 @@ import { Services } from "@/components/services";
 import { FeaturedWork } from "@/components/featured-work";
 import { Highlights } from "@/components/highlights";
 import { HowIWork } from "@/components/how-i-work";
-import { Contact } from "@/components/contact;
-import { Footer } from "@/components/footer;
-import { ScrollRevealProvider } from "@/components/scroll-reveal;
-import { useSiteConfig } from "@/context/site-config;
+import { Contact } from "@/components/contact";
+import { Footer } from "@/components/footer";
+import { ScrollRevealProvider } from "@/components/scroll-reveal";
+import { useSiteConfig } from "@/context/site-config";
 
 function PageContent() {
   const { config } = useSiteConfig();
