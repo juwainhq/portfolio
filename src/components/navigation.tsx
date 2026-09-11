@@ -11,31 +11,22 @@ export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
     const handleScroll = () => {
       setScrolled(window.scrollY > 80);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    // Set initial state based on current scroll position
-    handleScroll();
-
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
-    if (typeof document === 'undefined') return;
-
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
     return () => {
-      if (typeof document !== 'undefined') {
-        document.body.style.overflow = "";
-      }
+      document.body.style.overflow = "";
     };
   }, [isOpen]);
 
@@ -65,17 +56,17 @@ export function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8 lg:gap-10">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-[11px] tracking-[0.2em] uppercase font-medium hover:opacity-40 transition-opacity duration-300"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+                    <div className="hidden md:flex items-center gap-8 lg:gap-10">
+                      {navLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className="text-[11px] tracking-[0.2em] uppercase font-medium hover:opacity-40 transition-opacity duration-300"
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </div>
 
           {/* Mobile Menu Button */}
           <button

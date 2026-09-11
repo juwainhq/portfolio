@@ -55,22 +55,12 @@ export function SiteConfigProvider({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     let cancelled = false;
 
-    loadSiteConfig()
-      .then((remote) => {
-        if (cancelled) return;
-        setConfig(remote);
-        setHasUnsavedChanges(false);
-      })
-      .catch((err) => {
-        console.warn("Failed to load site config from Supabase:", err);
-        // Fallback to the current config (which is from loadConfig) is already set.
-        // We just mark as hydrated.
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setIsHydrated(true);
-        }
-      });
+    loadSiteConfig().then((remote) => {
+      if (cancelled) return;
+      setConfig(remote);
+      setHasUnsavedChanges(false);
+      setIsHydrated(true);
+    });
 
     return () => {
       cancelled = true;
@@ -86,14 +76,11 @@ export function SiteConfigProvider({ children }: { children: React.ReactNode }) 
 
   // 3. Listen for in-tab save events (e.g. same-browser admin tabs).
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
     const handler = (e: Event) => {
       const incoming = (e as CustomEvent<SiteConfig>).detail;
       setConfig(incoming);
       setHasUnsavedChanges(false);
     };
-
     window.addEventListener("site-config:update", handler);
     return () => window.removeEventListener("site-config:update", handler);
   }, []);

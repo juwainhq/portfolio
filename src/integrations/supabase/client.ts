@@ -7,16 +7,4 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_G3GxhiMtpaAPBKfdXb55pQ_204QXN2B
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-let supabase;
-
-try {
-  supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-} catch (error) {
-  // If we are in an environment where the Supabase client cannot be initialized (e.g., missing window.localStorage in some WebViews),
-  // we create a dummy client that will not throw errors but will not have real functionality.
-  // This is to allow the app to render in restricted environments.
-  console.warn('Failed to initialize Supabase client:', error);
-  supabase = null;
-}
-
-export { supabase };
+export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);

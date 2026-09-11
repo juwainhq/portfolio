@@ -31,18 +31,17 @@ function PageContent() {
               case "services":
                 return <Services key={section.id} />;
               case "work":
-                  return <FeaturedWork key={section.id} />;
-                case "highlights":
-                  return <Highlights key={section.id} />;
-                case "how-i-work":
-                  return <HowIWork key={section.id} />;
-                case "contact":
-                  return <Contact key={section.id} />;
-                default:
-                  return null;
-              }
-            })
-          }
+                return <FeaturedWork key={section.id} />;
+              case "highlights":
+                return <Highlights key={section.id} />;
+              case "how-i-work":
+                return <HowIWork key={section.id} />;
+              case "contact":
+                return <Contact key={section.id} />;
+              default:
+                return null;
+            }
+          })}
       </main>
       <Footer />
       <Toaster />
