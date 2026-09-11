@@ -1,12 +1,11 @@
-import type { NextConfig } from "next";
-
+/** @type {import('next').NextConfig} */
 const isProduction = Boolean(process.env.NEXT_PUBLIC_BASE_PATH);
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   webpack: (config) => {
     if (process.env.NODE_ENV === "development") {
       config.module.rules.push({
-        test: /\.(jsx|tsx)$/,
+        test: /\\.(jsx|tsx)$/,
         exclude: /node_modules/,
         enforce: "pre",
         use: "@dyad-sh/nextjs-webpack-component-tagger",

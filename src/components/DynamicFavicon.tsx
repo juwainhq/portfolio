@@ -14,6 +14,8 @@ export function DynamicFavicon() {
   const { config } = useSiteConfig();
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+
     if (!config.favicon) return;
 
     const faviconUrl = config.favicon.startsWith("/")

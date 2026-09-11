@@ -6,6 +6,13 @@ export function useReveal() {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Check if IntersectionObserver is available
+    if (typeof IntersectionObserver === 'undefined') {
+      // If not available, we cannot observe, so we return early.
+      // The element will never be marked as active, but that's acceptable for fallback.
+      return;
+    }
+
     const element = ref.current;
     if (!element) return;
 
