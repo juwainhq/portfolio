@@ -9,7 +9,7 @@ type PortfolioImageProps = {
   src: string;
   alt: string;
   fit?: Fit;
-  /**
+  /** 
    * Maximum width the image may occupy, as a CSS length.
    * Useful for keeping small artwork from stretching into a thin column.
    * Default: 100% of the parent column.
@@ -72,6 +72,8 @@ export function PortfolioImage({
   // the actual image file after onLoad, and we want a stable, framework-
   // agnostic way to learn the real size.
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const probe = new window.Image();
     probe.decoding = "async";
     probe.src = src;

@@ -23,35 +23,66 @@ export type SiteConfigRow = {
   updated_at: string | null;
 };
 
+/**
+ * Fetches the site config from Supabase.
+ * Returns null if the request fails or if Supabase is not available.
+ */
 export async function fetchSiteConfig(): Promise<unknown | null> {
-  const { data, error } = await supabase
-    .from("site_config")
-    .select("config")
-    .eq("id", SITE_CONFIG_ROW_ID)
-    .maybeSingle();
-
-  if (error) {
-    // Surface a single warning so we can debug without breaking the page.
-    console.warn("[supabase] fetchSiteConfig failed", error.message);
+  // If supabase is not available (e.g., due to initialization error in restricted environments),
+  // we cannot fetch from Supabase. Return null to fall back to cache/defaults.
+  if (!supabase) {
     return null;
   }
-  return data?.config ?? null;
+
+  try {
+    const { data, error } = await supabase
+      .from("site_config")
+      .select("config")
+      .eq("id", SITE_CONFIG_ROW_ID)
+      .maybeSingle();
+
+    if (error) {
+      // Surface a single warning so we can debug without breaking the page.
+      console.warn("[supabase] fetchSiteConfig failed", error.message);
+      return null;
+    }
+    return data?.config ?? null;
+  } catch (err) {
+    // Catch any unexpected errors (e.g., if supabase is null but we didn't check, or if the client is in a broken state)
+    console.warn("[supabase] fetchSiteConfig failed", err);
+    return null;
+  }
 }
 
+/**
+ * Upserts the site config to Supabase.
+ * Returns { ok: true } on success, or { ok: false, error } on failure.
+ * If supabase is not available, we treat it as a failure but we don't break the page.
+ */
 export async function upsertSiteConfig(config: unknown): Promise<{
   ok: boolean;
   error?: string;
 }> {
-  const { error } = await supabase
-    .from("site_config")
-    .upsert(
-      { id: SITE_CONFIG_ROW_ID, config },
-      { onConflict: "id" }
-    );
-
-  if (error) {
-    console.warn("[supabase] upsertSiteConfig failed", error.message);
-    return { ok: false, error: error.message };
+  // If supabase is not available, we cannot upsert.
+  if (!supabase) {
+    return { ok: false, error: "Supabase client not available" };
   }
-  return { ok: true };
+
+  try {
+    const { error } = await supabase
+      .from("site_config")
+      .upsert(
+        { id: SITE_CONFIG_ROW_ID, config },
+        { onConflict: "id" }
+      );
+
+    if (error) {
+      console.warn("[supabase] upsertSiteConfig failed", error.message);
+      return { ok: false, error: error.message };
+    }
+    return { ok: true };
+  } catch (err) {
+    console.warn("[supabase] upsertSiteConfig failed", err);
+    return { ok: false, error: "Unknown error" };
+  }
 }

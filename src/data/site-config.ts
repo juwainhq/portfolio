@@ -365,8 +365,6 @@ export const defaultConfig: SiteConfig = {
   ],
 };
 
-export const STORAGE_KEY = "site-config-v2";
-
 /* -------------------------------------------------------------------------- */
 /* Local cache (used to make first paint instant; Supabase is the source)     */
 /* -------------------------------------------------------------------------- */
