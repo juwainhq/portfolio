@@ -160,12 +160,12 @@ export default function AdminDashboard() {
           </div>
           <div className="flex items-center gap-2">
             <a
-                          href="/"
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-border rounded-md hover:bg-foreground/5 transition-colors"
-                        >
-                          <ExternalLink size={12} />
-                          View Site
-                        </a>
+              href="/portfolio"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-border rounded-md hover:bg-foreground/5 transition-colors"
+            >
+              <ExternalLink size={12} />
+              View Site
+            </a>
             <button
               onClick={handleSave}
               disabled={!hasUnsavedChanges}
