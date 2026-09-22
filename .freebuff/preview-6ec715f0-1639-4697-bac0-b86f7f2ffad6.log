@@ -1,0 +1,88 @@
+  ▲ Next.js 14.2.13
+  - Local:        http://localhost:9683
+
+ ✓ Starting...
+ ✓ Ready in 2.7s
+ ○ Compiling / ...
+ ✓ Compiled / in 5.7s (750 modules)
+ GET / 200 in 6175ms
+ ✓ Compiled in 511ms (355 modules)
+ GET / 200 in 60ms
+ GET / 200 in 54ms
+ ✓ Compiled /_not-found in 338ms (712 modules)
+ GET /work-1.jpg 404 in 436ms
+ GET /work-3.jpg 404 in 435ms
+ GET /work-4.jpg 404 in 38ms
+ GET /work-1.jpg 404 in 34ms
+ GET /work-3.jpg 404 in 34ms
+ ○ Compiling /work/[slug] ...
+ ✓ Compiled /work/[slug] in 853ms (773 modules)
+ GET /work/project-01 200 in 1250ms
+ GET /work-1.jpg 404 in 35ms
+ GET /work-4.jpg 404 in 19ms
+ GET /work-4.jpg 404 in 25ms
+ ✓ Compiled in 639ms (785 modules)
+ GET /work/project-01 200 in 93ms
+ ✓ Compiled /_not-found in 113ms (425 modules)
+ GET /work-1.jpg 404 in 203ms
+ GET /work-4.jpg 404 in 204ms
+ GET /work-4.jpg 404 in 81ms
+ GET /work/project-02 200 in 34ms
+ GET /work-3.jpg 404 in 22ms
+ GET / 200 in 75ms
+ GET /work-1.jpg 404 in 44ms
+ GET /work-3.jpg 404 in 43ms
+ GET /work-4.jpg 404 in 43ms
+ GET /work/project-01 200 in 43ms
+ GET /work-1.jpg 404 in 28ms
+ GET /work-4.jpg 404 in 28ms
+ GET /work-4.jpg 404 in 73ms
+ ✓ Compiled in 382ms (771 modules)
+ ✓ Compiled in 192ms (771 modules)
+ ✓ Compiled in 532ms (785 modules)
+ ✓ Compiled /_not-found in 113ms (425 modules)
+ GET /work-4.jpg 404 in 253ms
+ ✓ Compiled in 510ms (787 modules)
+ ✓ Compiled in 476ms (787 modules)
+ ✓ Compiled in 888ms (785 modules)
+ GET /work/project-01 200 in 98ms
+ ✓ Compiled /_not-found in 137ms (425 modules)
+ GET /work-1.jpg 404 in 219ms
+ GET /work-4.jpg 404 in 216ms
+ GET /work-4.jpg 404 in 89ms
+ GET /work/project-02 200 in 59ms
+ GET /work-3.jpg 404 in 39ms
+ GET / 200 in 95ms
+ GET /work-1.jpg 404 in 63ms
+ GET /work-4.jpg 404 in 60ms
+ GET /work-3.jpg 404 in 62ms
+ GET /work/project-01 200 in 39ms
+ GET /work-1.jpg 404 in 40ms
+ GET /work-4.jpg 404 in 38ms
+ GET /work-4.jpg 404 in 90ms
+ GET /work-4.jpg 404 in 40ms
+ ✓ Compiled in 572ms (785 modules)
+ ✓ Compiled in 276ms (362 modules)
+ ✓ Compiled in 411ms (785 modules)
+ ✓ Compiled in 401ms (785 modules)
+ ✓ Compiled /_not-found in 92ms (425 modules)
+ GET /work-4.jpg 404 in 210ms
+ ✓ Compiled in 971ms (787 modules)
+ ✓ Compiled /work in 393ms (779 modules)
+ GET /work-4.jpg 404 in 76ms
+ ✓ Compiled in 752ms (793 modules)
+ GET /work/project-01 200 in 54ms
+ GET /work-1.jpg 404 in 39ms
+ GET /work-4.jpg 404 in 38ms
+ GET /work-4.jpg 404 in 58ms
+ GET /work/project-02 200 in 39ms
+ GET /work-3.jpg 404 in 27ms
+ GET / 200 in 79ms
+ GET /work-1.jpg 404 in 54ms
+ GET /work-3.jpg 404 in 48ms
+ GET /work-4.jpg 404 in 48ms
+ GET /work/project-01 200 in 40ms
+ GET /work-1.jpg 404 in 34ms
+ GET /work-4.jpg 404 in 34ms
+ GET /work-4.jpg 404 in 78ms
+[?25h

@@ -134,6 +134,41 @@ img {
   }
 }
 
+/* -------------------------------------------------------------------------- */
+/* Dynamic project accent (project detail pages only)                          */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * Default values for the per-project theme, extracted at runtime from the
+ * project's hero image by src/lib/color-extraction.ts. Pages set the real
+ * values on [data-project-page] once extraction finishes; until then (or if
+ * extraction is impossible) this warm gold/bronze default applies.
+ *
+ * The theme is ambient, not a background block: a large very-low-opacity
+ * radial glow behind the whole page, plus small elegant details (hairline
+ * image borders, rules, hover states). Content stays black/white for
+ * readability. Scoped under [data-project-page] so the home page and
+ * general layout keep their neutral monochrome palette.
+ */
+[data-project-page] {
+  --project-accent: hsl(40 65% 58%); /* warm gold/bronze */
+  --project-ambient:
+    radial-gradient(1200px 600px at 18% 0%, rgba(218, 171, 78, 0.16), rgba(0, 0, 0, 0) 70%),
+    radial-gradient(1000px 700px at 85% 55%, rgba(218, 171, 78, 0.1), rgba(0, 0, 0, 0) 72%);
+  --project-border: rgba(218, 171, 78, 0.35);
+  --project-line: rgba(218, 171, 78, 0.55);
+}
+
+/*
+ * Navigation highlight: applied conditionally to nav links (desktop and
+ * mobile menu) in navigation.tsx when on a project detail page. The accent
+ * variable is inherited from the page root; other links — logo, socials —
+ * keep their neutral color.
+ */
+.project-accent-link {
+  color: var(--project-accent, currentColor);
+}
+
 /* Mobile-specific adjustments */
 @layer utilities {
   .safe-top {

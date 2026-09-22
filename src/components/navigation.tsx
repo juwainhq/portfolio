@@ -2,13 +2,19 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
 
 export function Navigation() {
   const { config } = useSiteConfig();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  // The dynamic per-project accent (CSS vars set on [data-project-page] by the
+  // project detail page) colors the active indicator; other pages stay neutral.
+  const isProjectPage = pathname?.startsWith("/work/") ?? false;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,7 +67,9 @@ export function Navigation() {
                         <Link
                           key={link.href}
                           href={link.href}
-                          className="text-[11px] tracking-[0.2em] uppercase font-medium hover:opacity-40 transition-opacity duration-300"
+                          className={`text-[11px] tracking-[0.2em] uppercase font-medium hover:opacity-40 transition-[opacity,color] duration-300 ${
+                            isProjectPage ? "project-accent-link" : ""
+                          }`}
                         >
                           {link.label}
                         </Link>
@@ -99,6 +107,8 @@ export function Navigation() {
                   href={link.href}
                   onClick={handleLinkClick}
                   className={`block text-5xl md:text-6xl font-display tracking-tight uppercase py-2.5 transform transition-all duration-500 ease-out ${
+                    isProjectPage ? "project-accent-link" : ""
+                  } ${
                     isOpen
                       ? "translate-y-0 opacity-100"
                       : "translate-y-full opacity-0"
