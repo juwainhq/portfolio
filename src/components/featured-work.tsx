@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useReveal } from "@/hooks/use-reveal";
 import { useSiteConfig } from "@/context/site-config";
-import { PortfolioImage } from "@/components/portfolio-image";
 
 export function FeaturedWork() {
   const { config } = useSiteConfig();
@@ -52,14 +51,10 @@ export function FeaturedWork() {
               >
                 {/* Fixed-height image container so every card is identical */}
                 <div className="relative w-full aspect-[4/5] overflow-hidden bg-muted">
-                  <PortfolioImage
+                  <img
                     src={project.image}
                     alt={project.title}
-                    fit="cover"
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    priority={index < 2}
-                    unoptimized={project.image.endsWith(".gif")}
-                    noZoom
+                    className="w-full h-full object-cover"
                   />
                 </div>
 

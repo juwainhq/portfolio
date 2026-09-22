@@ -6,7 +6,6 @@ import { ArrowLeft } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
 import { Footer } from "@/components/footer";
 import { Navigation } from "@/components/navigation";
-import { PortfolioImage } from "@/components/portfolio-image";
 import { useProjectAccent } from "@/hooks/use-project-accent";
 import { hslToRgb, type HSL } from "@/lib/color-extraction";
 
@@ -156,13 +155,12 @@ export function ProjectPageClient({ slug }: { slug: string }) {
         <div className="px-6 md:px-10 lg:px-16 mb-16 md:mb-24">
           <div className="max-w-[1600px] mx-auto">
             <div className="border border-[color:var(--project-border)]">
-              <PortfolioImage
+              <img
                 src={project.image}
                 alt={project.title}
-                fit={project.fit}
-                sizes="100vw"
-                priority
-                unoptimized={project.image.endsWith(".gif")}
+                className={`w-full h-auto ${
+                  project.fit === "cover" ? "object-cover" : "object-contain"
+                }`}
               />
             </div>
           </div>
@@ -172,17 +170,20 @@ export function ProjectPageClient({ slug }: { slug: string }) {
         {project.gallery && project.gallery.length > 0 && (
           <div className="px-6 md:px-10 lg:px-16 mb-24 md:mb-36">
             <div className="max-w-[1600px] mx-auto space-y-8 md:space-y-12">
-              {project.gallery.map((src, index) => (
-                <div key={index} className="border border-[color:var(--project-border)]">
-                  <PortfolioImage
-                    src={src}
-                    alt={`${project.title} — ${index + 2}`}
-                    fit={project.galleryFit ?? project.fit}
-                    sizes="100vw"
-                    unoptimized={src.endsWith(".gif")}
-                  />
-                </div>
-              ))}
+              {project.gallery.map((src, index) => {
+                const fit = project.galleryFit ?? project.fit;
+                return (
+                  <div key={index} className="border border-[color:var(--project-border)]">
+                    <img
+                      src={src}
+                      alt={`${project.title} — ${index + 2}`}
+                      className={`w-full h-auto ${
+                        fit === "cover" ? "object-cover" : "object-contain"
+                      }`}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

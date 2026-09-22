@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
+import { useEffect } from "react";
 import { useSiteConfig } from "@/context/site-config";
 import { useReveal } from "@/hooks/use-reveal";
-import { PortfolioImage } from "@/components/portfolio-image";
 
 export default function WorksPage() {
   const { config } = useSiteConfig();
@@ -63,13 +62,12 @@ export default function WorksPage() {
                         gridColumn: "1 / span 7",
                       }}
                     >
-                      <PortfolioImage
+                      <img
                         src={project.image}
                         alt={project.title}
-                        fit={project.fit}
-                        sizes="(min-width: 768px) 70vw, 100vw"
-                        priority={index < 2}
-                        unoptimized={project.image.endsWith(".gif")}
+                        className={`w-full h-auto ${
+                          project.fit === "cover" ? "object-cover" : "object-contain"
+                        }`}
                       />
                     </div>
                   </div>

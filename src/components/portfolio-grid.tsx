@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useReveal } from "@/hooks/use-reveal";
 import { useSiteConfig } from "@/context/site-config";
-import { PortfolioImage } from "@/components/portfolio-image";
 import type { Project } from "@/data/site-config";
 import type { CSSProperties } from "react";
 
@@ -174,21 +173,12 @@ function ProjectRow({
             <div
               style={policy.imageMaxWidth ? { maxWidth: policy.imageMaxWidth } : undefined}
             >
-              <PortfolioImage
+              <img
                 src={project.image}
                 alt={project.title}
-                fit={project.fit}
-                sizes={
-                  project.layout === "wide"
-                    ? "(min-width: 768px) 75vw, 100vw"
-                    : project.layout === "two-col"
-                    ? "(min-width: 768px) 58vw, 100vw"
-                    : project.layout === "featured" || project.layout === "gallery"
-                    ? "100vw"
-                    : "(min-width: 768px) 40vw, 100vw"
-                }
-                priority={index < 2}
-                unoptimized={project.image.endsWith(".gif")}
+                className={`w-full h-auto ${
+                  project.fit === "cover" ? "object-cover" : "object-contain"
+                }`}
               />
             </div>
           </div>
@@ -204,16 +194,19 @@ function ProjectRow({
           {project.layout === "gallery" && project.gallery && (
             <div style={colStyle(10, 2)} className="mt-10 md:mt-14">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                {project.gallery.map((src, i) => (
-                  <PortfolioImage
-                    key={i}
-                    src={src}
-                    alt={`${project.title} — ${i + 2}`}
-                    fit={project.galleryFit ?? project.fit}
-                    sizes="(min-width: 768px) 45vw, 100vw"
-                    unoptimized={src.endsWith(".gif")}
-                  />
-                ))}
+                {project.gallery.map((src, i) => {
+                  const fit = project.galleryFit ?? project.fit;
+                  return (
+                    <img
+                      key={i}
+                      src={src}
+                      alt={`${project.title} — ${i + 2}`}
+                      className={`w-full h-auto ${
+                        fit === "cover" ? "object-cover" : "object-contain"
+                      }`}
+                    />
+                  );
+                })}
               </div>
             </div>
           )}
