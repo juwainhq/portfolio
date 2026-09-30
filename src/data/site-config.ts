@@ -95,6 +95,13 @@ export type SiteConfig = {
   heroBottomLeft: [string, string];
   heroButtonText: string;
   heroButtonTarget: NavLink;
+  /**
+   * Optional second CTA in the hero's bottom-right corner (e.g. a sister
+   * site like Film Lab). Empty text hides the button. External targets
+   * open in a new tab with an ↗ indicator.
+   */
+  heroSecondaryButtonText: string;
+  heroSecondaryButtonTarget: NavLink;
 
   // About
   aboutHeading: string;
@@ -317,6 +324,12 @@ export const defaultConfig: SiteConfig = {
   heroBottomLeft: ["Selected Work 2019 — 2025", "Based in Dhaka · Working Worldwide"],
   heroButtonText: "View Work",
   heroButtonTarget: { label: "Work", kind: "section", href: "#work" },
+  heroSecondaryButtonText: "Visit Film Lab",
+  heroSecondaryButtonTarget: {
+    label: "Film Lab",
+    kind: "external",
+    href: "https://juwainhq.github.io/film-lab/",
+  },
 
   aboutHeading:
     "Graphic designer and business consultant focused on creating strong visual identities and practical strategies.",
@@ -500,6 +513,12 @@ function mergeWithDefaults(partial: Partial<SiteConfig>): SiteConfig {
     projects: partial.projects ?? defaultConfig.projects,
     howIWorkSteps: partial.howIWorkSteps ?? defaultConfig.howIWorkSteps,
     sections: partial.sections ?? defaultConfig.sections,
+    // Field added after some configs were saved — merge defensively so a
+    // partial remote object can't drop the label/kind/href of the target.
+    heroSecondaryButtonTarget: {
+      ...defaultConfig.heroSecondaryButtonTarget,
+      ...(partial.heroSecondaryButtonTarget ?? {}),
+    },
   };
 }
 

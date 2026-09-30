@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
 
 export function Hero() {
@@ -22,6 +23,13 @@ export function Hero() {
   const heroButtonHref = "/work";
 
   const nameParts = config.name.split(" ");
+
+  // Optional second CTA (e.g. the Film Lab sister site). Empty text hides it.
+  const secondaryTarget = config.heroSecondaryButtonTarget;
+  const secondaryHref = secondaryTarget?.href ?? "";
+  const secondaryVisible = Boolean(config.heroSecondaryButtonText) && Boolean(secondaryHref);
+  const secondaryIsExternal =
+    secondaryTarget?.kind === "external" || /^https?:\/\//i.test(secondaryHref);
 
   return (
     <section
@@ -92,17 +100,64 @@ export function Hero() {
           </span>
         </div>
 
-        <Link
-          href={heroButtonHref}
-          className="animate-in group flex items-center gap-3 hover:opacity-60 transition-opacity duration-300"
-          style={{ opacity: 0, transitionDelay: "550ms" }}
-          aria-label={config.heroButtonText}
+        <div
+          className="animate-in flex flex-col items-end gap-4 md:flex-row md:items-center md:justify-end md:gap-8"
+          style={{ opacity: 0, transitionDelay: "500ms" }}
         >
-          <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-medium">
-            {config.heroButtonText}
-          </span>
-          <span className="block w-8 md:w-12 h-px bg-foreground/60 group-hover:w-16 transition-all duration-500" aria-hidden="true" />
-        </Link>
+          <Link
+            href={heroButtonHref}
+            className="group flex items-center gap-3 hover:opacity-60 transition-opacity duration-300"
+            aria-label={config.heroButtonText}
+          >
+            <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-medium">
+              {config.heroButtonText}
+            </span>
+            <span
+              className="block w-8 md:w-12 h-px bg-foreground/60 group-hover:w-16 transition-all duration-500"
+              aria-hidden="true"
+            />
+          </Link>
+
+          {/* Secondary CTA — external targets open in a new tab */}
+          {secondaryVisible &&
+            (secondaryIsExternal ? (
+              <a
+                href={secondaryHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-3 hover:opacity-60 transition-opacity duration-300"
+                aria-label={`${config.heroSecondaryButtonText} (opens in a new tab)`}
+              >
+                <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-medium">
+                  {config.heroSecondaryButtonText}
+                </span>
+                <ArrowUpRight
+                  size={12}
+                  strokeWidth={1.5}
+                  className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300"
+                  aria-hidden="true"
+                />
+                <span
+                  className="block w-8 md:w-12 h-px bg-foreground/60 group-hover:w-16 transition-all duration-500"
+                  aria-hidden="true"
+                />
+              </a>
+            ) : (
+              <Link
+                href={secondaryHref}
+                className="group flex items-center gap-3 hover:opacity-60 transition-opacity duration-300"
+                aria-label={config.heroSecondaryButtonText}
+              >
+                <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-medium">
+                  {config.heroSecondaryButtonText}
+                </span>
+                <span
+                  className="block w-8 md:w-12 h-px bg-foreground/60 group-hover:w-16 transition-all duration-500"
+                  aria-hidden="true"
+                />
+              </Link>
+            ))}
+        </div>
       </div>
     </section>
   );

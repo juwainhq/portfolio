@@ -292,6 +292,24 @@ function ContentEditor({ config, update }: { config: SiteConfig; update: (p: Par
             <TextField label="Button" value={config.heroButtonText} onChange={(v) => update({ heroButtonText: v })} />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TextField
+              label="Secondary Button"
+              value={config.heroSecondaryButtonText}
+              onChange={(v) => update({ heroSecondaryButtonText: v })}
+              placeholder="Leave empty to hide"
+            />
+            <TextField
+              label="Secondary Button URL"
+              value={config.heroSecondaryButtonTarget.href}
+              onChange={(v) =>
+                update({
+                  heroSecondaryButtonTarget: { ...config.heroSecondaryButtonTarget, href: v },
+                })
+              }
+              placeholder="https://…"
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <TextField label="Top Right L1" value={config.heroTopRight[0]} onChange={(v) => update({ heroTopRight: [v, config.heroTopRight[1]] })} />
             <TextField label="Top Right L2" value={config.heroTopRight[1]} onChange={(v) => update({ heroTopRight: [config.heroTopRight[0], v] })} />
           </div>
