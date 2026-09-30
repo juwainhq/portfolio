@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Navigation() {
   const { config } = useSiteConfig();
@@ -62,28 +63,32 @@ export function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center gap-8 lg:gap-10">
-                      {navLinks.map((link) => (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className={`text-[11px] tracking-[0.2em] uppercase font-medium hover:opacity-40 transition-[opacity,color] duration-300 ${
-                            isProjectPage ? "project-accent-link" : ""
-                          }`}
-                        >
-                          {link.label}
-                        </Link>
-                      ))}
-                    </div>
+          <div className="hidden md:flex items-center gap-8 lg:gap-10">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-[11px] tracking-[0.2em] uppercase font-medium hover:opacity-40 transition-[opacity,color] duration-300 ${
+                  isProjectPage ? "project-accent-link" : ""
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <ThemeToggle className="-mr-1.5" />
+          </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-1.5 -mr-1.5 hover:opacity-50 transition-opacity duration-300"
-            aria-label={isOpen ? "Close menu" : "Open menu"}
-          >
-            {isOpen ? <X size={18} strokeWidth={1.5} /> : <Menu size={18} strokeWidth={1.5} />}
-          </button>
+          {/* Mobile Menu Button + Theme Toggle */}
+          <div className="flex md:hidden items-center gap-3">
+            <ThemeToggle />
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-1.5 -mr-1.5 hover:opacity-50 transition-opacity duration-300"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+            >
+              {isOpen ? <X size={18} strokeWidth={1.5} /> : <Menu size={18} strokeWidth={1.5} />}
+            </button>
+          </div>
         </nav>
       </header>
 

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import { SiteConfigProvider } from "@/context/site-config";
 import { DynamicFavicon } from "@/components/DynamicFavicon";
+import { CursorEffects } from "@/components/cursor-effects";
+import { RouteProgress } from "@/components/route-progress";
 import "./globals.css";
 
 const inter = Inter({
@@ -37,14 +40,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
-        <SiteConfigProvider>
-          <DynamicFavicon />
-          {children}
-        </SiteConfigProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+        >
+          <SiteConfigProvider>
+            <DynamicFavicon />
+            <RouteProgress />
+            <CursorEffects />
+            {children}
+          </SiteConfigProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

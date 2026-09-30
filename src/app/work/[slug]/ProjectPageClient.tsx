@@ -3,6 +3,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useSiteConfig } from "@/context/site-config";
 import { Footer } from "@/components/footer";
 import { Navigation } from "@/components/navigation";
@@ -18,22 +19,33 @@ function hslString({ h, s, l }: HSL): string {
  * The color stays ambient: a large very-low-opacity radial glow behind the
  * whole page plus small elegant details. The hero section itself stays
  * transparent — the glow shows through from the page root behind it.
+ *
+ * Extraction is tuned to read well on the black palette, so on the light
+ * palette the accent is deepened for contrast and the glows/rules are
+ * re-weighted (mirrors the static light-mode defaults in globals.css).
  */
-function accentToCssVars(accent: HSL): React.CSSProperties {
-  const { r, g, b } = hslToRgb(accent);
+function accentToCssVars(accent: HSL, isLight: boolean): React.CSSProperties {
+  const tuned: HSL = isLight
+    ? { ...accent, s: Math.min(0.9, accent.s + 0.1), l: Math.min(accent.l, 0.38) }
+    : accent;
+  const { r, g, b } = hslToRgb(tuned);
   const to255 = (v: number) => Math.round(v * 255);
   const rgb = (alpha: number) =>
     `rgba(${to255(r)}, ${to255(g)}, ${to255(b)}, ${alpha})`;
+  const glowA = isLight ? 0.1 : 0.16;
+  const glowB = isLight ? 0.06 : 0.1;
+  const borderA = isLight ? 0.45 : 0.35;
+  const lineA = isLight ? 0.6 : 0.55;
   return {
-    "--project-accent": hslString(accent),
+    "--project-accent": hslString(tuned),
     // Atmospheric glow: cool bloom high on the page, warm counter-glow lower,
-    // both blending into the black body — the page's only color fields.
+    // both blending into the body — the page's only color fields.
     "--project-ambient":
-      `radial-gradient(1200px 600px at 18% 0%, ${rgb(0.16)}, rgba(0, 0, 0, 0) 70%), ` +
-      `radial-gradient(1000px 700px at 85% 55%, ${rgb(0.10)}, rgba(0, 0, 0, 0) 72%)`,
+      `radial-gradient(1200px 600px at 18% 0%, ${rgb(glowA)}, rgba(0, 0, 0, 0) 70%), ` +
+      `radial-gradient(1000px 700px at 85% 55%, ${rgb(glowB)}, rgba(0, 0, 0, 0) 72%)`,
     // Hairline border for project images/cards, and soft rules/underlines.
-    "--project-border": rgb(0.35),
-    "--project-line": rgb(0.55),
+    "--project-border": rgb(borderA),
+    "--project-line": rgb(lineA),
   } as React.CSSProperties;
 }
 
@@ -44,6 +56,8 @@ export function ProjectPageClient({ slug }: { slug: string }) {
   // Dynamic per-project accent, extracted from the hero image in the browser.
   // Null until extraction finishes; CSS defaults keep the page gold/bronze.
   const accent = useProjectAccent(project?.image);
+  const { resolvedTheme } = useTheme();
+  const isLight = resolvedTheme === "light";
 
   if (!project) {
     notFound();
@@ -63,7 +77,7 @@ export function ProjectPageClient({ slug }: { slug: string }) {
         // Full-page ambient glow: default (bronze) on first paint, extracted
         // color once the accent resolves. Scrolls with the content.
         backgroundImage: "var(--project-ambient)",
-        ...(accent ? accentToCssVars(accent) : {}),
+        ...(accent ? accentToCssVars(accent, isLight) : {}),
       }}
     >
       <Navigation />
