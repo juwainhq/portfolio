@@ -5,9 +5,16 @@ name: Deploy to GitHub Pages
 # - Can be run manually on any branch (Actions → this workflow → Run workflow)
 #   to preview a branch live before merging.
 #
-# Pages must be configured with source "GitHub Actions" (build_type=workflow);
-# do NOT point the Pages settings at a source branch — a Next.js source branch
-# has no index.html, so GitHub would render the README instead of the site.
+# Dual-mode deployment (detected automatically at run time):
+#   - Pages source = "Deploy from a branch" (legacy)  → publishes ./out to the
+#     gh-pages branch, which the Pages builder then serves.
+#   - Pages source = "GitHub Actions"                 → publishes via the
+#     official artifact deployment (actions/deploy-pages).
+#
+# WARNING: never point the Pages branch source at a *source* branch (main,
+# feature branches). A Next.js source branch has no index.html, so GitHub
+# renders the README instead of the site. Branch source must stay gh-pages,
+# or switch entirely to "GitHub Actions".
 
 on:
   push:
@@ -16,9 +23,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write # push the gh-pages branch (legacy branch source)
+  pages: write # artifact deployment (Actions source)
+  id-token: write # artifact deployment (Actions source)
 
 concurrency:
   group: "pages"
@@ -27,6 +34,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.pages.outputs.mode }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -51,21 +60,45 @@ jobs:
         env:
           NEXT_PUBLIC_BASE_PATH: "/portfolio"
 
-      # Safety net: skip Jekyll processing if the site is ever rebuilt from
-      # a branch instead of this artifact (protects the _next/ directory).
+      # Safety net: skip Jekyll processing when served from a branch
+      # (protects the _next/ directory). Harmless for artifact deploys.
       - name: Add .nojekyll
         run: touch out/.nojekyll
 
+      - name: Detect Pages deployment mode
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          build_type="$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.build_type' 2>/dev/null || true)"
+          if [ "$build_type" = "workflow" ]; then
+            echo "mode=artifact" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=branch" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Pages
+        if: steps.pages.outputs.mode == 'artifact'
         uses: actions/configure-pages@v5
 
-      - name: Upload artifact
+      - name: Upload Pages artifact
+        if: steps.pages.outputs.mode == 'artifact'
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
 
+      - name: Publish to gh-pages branch
+        if: steps.pages.outputs.mode == 'branch'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          publish_branch: gh-pages
+          keep_files: false
+
   deploy:
     needs: build
+    if: needs.build.outputs.mode == 'artifact'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
