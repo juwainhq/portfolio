@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useReveal } from "@/hooks/use-reveal";
 import { useSiteConfig } from "@/context/site-config";
+import { withBasePath } from "@/lib/utils";
 
 export function FeaturedWork() {
   const { config } = useSiteConfig();
@@ -52,7 +53,7 @@ export function FeaturedWork() {
                 {/* Fixed-height image container so every card is identical */}
                 <div className="relative w-full aspect-[4/5] overflow-hidden bg-muted">
                   <img
-                    src={project.image}
+                    src={withBasePath(project.image)}
                     alt={project.title}
                     className="w-full h-full object-cover"
                   />

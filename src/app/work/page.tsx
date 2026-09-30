@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useSiteConfig } from "@/context/site-config";
 import { useReveal } from "@/hooks/use-reveal";
+import { withBasePath } from "@/lib/utils";
 
 export default function WorksPage() {
   const { config } = useSiteConfig();
@@ -63,7 +64,7 @@ export default function WorksPage() {
                       }}
                     >
                       <img
-                        src={project.image}
+                        src={withBasePath(project.image)}
                         alt={project.title}
                         className={`w-full h-auto ${
                           project.fit === "cover" ? "object-cover" : "object-contain"

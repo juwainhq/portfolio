@@ -30,7 +30,9 @@ export const metadata: Metadata = {
   description:
     "Independent graphic designer and business consultant focused on creating strong visual identities and practical strategies that help businesses communicate, position themselves, and grow.",
   icons: {
-    icon: "/favicon.ico",
+    // Metadata icon paths are not basePath-aware — prefix manually so the
+    // favicon resolves on GitHub Pages (/portfolio) as well as locally.
+    icon: `${(process.env.NEXT_PUBLIC_BASE_PATH ?? "").replace(/\/$/, "")}/favicon.ico`,
   },
 };
 

@@ -9,6 +9,7 @@ import { Footer } from "@/components/footer";
 import { Navigation } from "@/components/navigation";
 import { useProjectAccent } from "@/hooks/use-project-accent";
 import { hslToRgb, type HSL } from "@/lib/color-extraction";
+import { withBasePath } from "@/lib/utils";
 
 function hslString({ h, s, l }: HSL): string {
   return `hsl(${Math.round(h)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%)`;
@@ -170,7 +171,7 @@ export function ProjectPageClient({ slug }: { slug: string }) {
           <div className="max-w-[1600px] mx-auto">
             <div className="border border-[color:var(--project-border)]">
               <img
-                src={project.image}
+                src={withBasePath(project.image)}
                 alt={project.title}
                 className={`w-full h-auto ${
                   project.fit === "cover" ? "object-cover" : "object-contain"
@@ -189,7 +190,7 @@ export function ProjectPageClient({ slug }: { slug: string }) {
                 return (
                   <div key={index} className="border border-[color:var(--project-border)]">
                     <img
-                      src={src}
+                      src={withBasePath(src)}
                       alt={`${project.title} — ${index + 2}`}
                       className={`w-full h-auto ${
                         fit === "cover" ? "object-cover" : "object-contain"
