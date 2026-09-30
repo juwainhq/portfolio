@@ -20,6 +20,7 @@ on:
   push:
     branches:
       - main
+      - arena/01a0f284-portfolio
   workflow_dispatch:
 
 permissions:
