@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 @layer base {
+  /*
+   * Default palette = dark (the site's signature look). next-themes sets
+   * class="dark" or class="light" on <html>; .light overrides the tokens
+   * below while .dark / no class keeps these values.
+   */
   :root {
     --background: 0 0% 0%;
     --foreground: 0 0% 98%;
@@ -25,6 +30,29 @@
     --ring: 0 0% 98%;
     --radius: 0px;
   }
+
+  /* Light palette — monochrome "paper" that mirrors the dark aesthetic. */
+  .light {
+    --background: 0 0% 98%;
+    --foreground: 0 0% 7%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 7%;
+    --primary: 0 0% 7%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 94%;
+    --secondary-foreground: 0 0% 7%;
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 0 0% 94%;
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 87%;
+    --input: 0 0% 87%;
+    --ring: 0 0% 7%;
+  }
 }
 
 @layer base {
@@ -45,6 +73,143 @@
 
   ::selection {
     @apply bg-foreground text-background;
+  }
+}
+
+/*
+ * Theme toggle transition: the ThemeToggle adds html.theme-anim for ~500ms
+ * so every color cross-fades instead of snapping between palettes.
+ */
+html.theme-anim,
+html.theme-anim *,
+html.theme-anim *::before,
+html.theme-anim *::after {
+  transition: background-color 450ms ease, border-color 450ms ease,
+    color 450ms ease, fill 450ms ease, stroke 450ms ease,
+    outline-color 450ms ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-anim,
+  html.theme-anim *,
+  html.theme-anim *::before,
+  html.theme-anim *::after {
+    transition: none !important;
+  }
+}
+
+/* Page transition — plays once per navigation (template.tsx remounts).
+   Opacity only: transforms here would break the fixed header/nav inside. */
+.page-enter {
+  animation: page-enter 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Route progress hairline — shown while an internal navigation settles. */
+.route-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 100;
+  transform-origin: left center;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--foreground) / 0.05),
+    hsl(var(--foreground) / 0.9)
+  );
+  animation: route-progress 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  pointer-events: none;
+}
+
+.route-progress.is-done {
+  animation: route-progress-out 0.35s ease-out both;
+}
+
+@keyframes route-progress {
+  0% {
+    transform: scaleX(0);
+    opacity: 1;
+  }
+  65% {
+    transform: scaleX(0.82);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes route-progress-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Custom cursor ring + dot (fine pointers, motion allowed only) */
+.cursor-fx {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  border-radius: 9999px;
+  mix-blend-mode: difference;
+  will-change: transform;
+}
+
+.cursor-fx-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: #fff;
+  transition: opacity 0.3s ease;
+}
+
+.cursor-fx-ring {
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  transition: opacity 0.3s ease, width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    margin 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.cursor-fx-ring.is-hover {
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  border-color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.cursor-fx-ring.is-down {
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+  .route-progress {
+    animation-duration: 0.01s;
   }
 }
 
@@ -167,6 +332,17 @@ img {
  */
 .project-accent-link {
   color: var(--project-accent, currentColor);
+}
+
+/* In light mode the extracted/default accent needs more depth to stay
+   readable on paper-white; glows ease off so they don't muddy the page. */
+html.light [data-project-page] {
+  --project-accent: hsl(35 70% 40%);
+  --project-ambient:
+    radial-gradient(1200px 600px at 18% 0%, rgba(190, 140, 50, 0.14), rgba(0, 0, 0, 0) 70%),
+    radial-gradient(1000px 700px at 85% 55%, rgba(190, 140, 50, 0.09), rgba(0, 0, 0, 0) 72%);
+  --project-border: rgba(160, 110, 30, 0.4);
+  --project-line: rgba(160, 110, 30, 0.6);
 }
 
 /* Mobile-specific adjustments */

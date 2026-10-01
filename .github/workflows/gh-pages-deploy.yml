@@ -1,31 +1,56 @@
 name: Deploy to GitHub Pages
 
+# Deploys the static Next.js export to GitHub Pages (site: /portfolio).
+# - Auto-deploys on push to main
+# - Can be run manually on any branch (Actions → this workflow → Run workflow)
+#   to preview a branch live before merging.
+#
+# Dual-mode deployment (detected automatically at run time):
+#   - Pages source = "Deploy from a branch" (legacy)  → publishes ./out to the
+#     gh-pages branch, which the Pages builder then serves.
+#   - Pages source = "GitHub Actions"                 → publishes via the
+#     official artifact deployment (actions/deploy-pages).
+#
+# WARNING: never point the Pages branch source at a *source* branch (main,
+# feature branches). A Next.js source branch has no index.html, so GitHub
+# renders the README instead of the site. Branch source must stay gh-pages,
+# or switch entirely to "GitHub Actions".
+
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: write # push the gh-pages branch (legacy branch source)
+  pages: write # artifact deployment (Actions source)
+  id-token: write # artifact deployment (Actions source)
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-
+    outputs:
+      mode: ${{ steps.pages.outputs.mode }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
           run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -35,10 +60,50 @@ jobs:
         env:
           NEXT_PUBLIC_BASE_PATH: "/portfolio"
 
-      - name: Deploy to GitHub Pages
+      # Safety net: skip Jekyll processing when served from a branch
+      # (protects the _next/ directory). Harmless for artifact deploys.
+      - name: Add .nojekyll
+        run: touch out/.nojekyll
+
+      - name: Detect Pages deployment mode
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          build_type="$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.build_type' 2>/dev/null || true)"
+          if [ "$build_type" = "workflow" ]; then
+            echo "mode=artifact" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=branch" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Pages
+        if: steps.pages.outputs.mode == 'artifact'
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        if: steps.pages.outputs.mode == 'artifact'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+      - name: Publish to gh-pages branch
+        if: steps.pages.outputs.mode == 'branch'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./out
           publish_branch: gh-pages
           keep_files: false
+
+  deploy:
+    needs: build
+    if: needs.build.outputs.mode == 'artifact'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

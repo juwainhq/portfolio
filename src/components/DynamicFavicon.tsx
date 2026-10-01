@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useSiteConfig } from "@/context/site-config";
+import { withBasePath } from "@/lib/utils";
 
 /**
  * Client component that updates the browser's favicon whenever the
@@ -16,9 +17,9 @@ export function DynamicFavicon() {
   useEffect(() => {
     if (!config.favicon) return;
 
-    const faviconUrl = config.favicon.startsWith("/")
-      ? config.favicon
-      : `/${config.favicon}`;
+    const faviconUrl = withBasePath(
+      config.favicon.startsWith("/") ? config.favicon : `/${config.favicon}`
+    );
 
     // Try to find an existing icon link (any type)
     let link = document.querySelector<HTMLLinkElement>(

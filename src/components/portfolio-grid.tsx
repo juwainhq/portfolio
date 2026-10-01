@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useReveal } from "@/hooks/use-reveal";
 import { useSiteConfig } from "@/context/site-config";
 import type { Project } from "@/data/site-config";
+import { withBasePath } from "@/lib/utils";
 import type { CSSProperties } from "react";
 
 type ColPolicy = {
@@ -174,7 +175,7 @@ function ProjectRow({
               style={policy.imageMaxWidth ? { maxWidth: policy.imageMaxWidth } : undefined}
             >
               <img
-                src={project.image}
+                src={withBasePath(project.image)}
                 alt={project.title}
                 className={`w-full h-auto ${
                   project.fit === "cover" ? "object-cover" : "object-contain"
@@ -199,7 +200,7 @@ function ProjectRow({
                   return (
                     <img
                       key={i}
-                      src={src}
+                      src={withBasePath(src)}
                       alt={`${project.title} — ${i + 2}`}
                       className={`w-full h-auto ${
                         fit === "cover" ? "object-cover" : "object-contain"

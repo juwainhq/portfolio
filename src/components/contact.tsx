@@ -121,7 +121,7 @@ export function Contact() {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="w-full bg-transparent border-b border-foreground/20 py-3 text-base focus:outline-none focus:border-foreground transition-colors duration-300 placeholder:text-white/50"
+                className="w-full bg-transparent border-b border-foreground/20 py-3 text-base focus:outline-none focus:border-foreground transition-colors duration-300 placeholder:text-foreground/50"
                 placeholder="Your name"
               />
             </div>
@@ -141,7 +141,7 @@ export function Contact() {
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                className="w-full bg-transparent border-b border-foreground/20 py-3 text-base focus:outline-none focus:border-foreground transition-colors duration-300 placeholder:text-white/50"
+                className="w-full bg-transparent border-b border-foreground/20 py-3 text-base focus:outline-none focus:border-foreground transition-colors duration-300 placeholder:text-foreground/50"
                 placeholder="you@email.com"
               />
             </div>
@@ -161,7 +161,7 @@ export function Contact() {
                   setFormData({ ...formData, message: e.target.value })
                 }
                 rows={5}
-                className="w-full bg-transparent border-b border-foreground/20 py-3 text-base focus:outline-none focus:border-foreground transition-colors duration-300 resize-none placeholder:text-white/50"
+                className="w-full bg-transparent border-b border-foreground/20 py-3 text-base focus:outline-none focus:border-foreground transition-colors duration-300 resize-none placeholder:text-foreground/50"
                 placeholder="Tell me about your project"
               />
             </div>

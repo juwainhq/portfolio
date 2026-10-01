@@ -95,6 +95,13 @@ export type SiteConfig = {
   heroBottomLeft: [string, string];
   heroButtonText: string;
   heroButtonTarget: NavLink;
+  /**
+   * Optional second CTA in the hero's bottom-right corner (e.g. a sister
+   * site like Film Lab). Empty text hides the button. External targets
+   * open in a new tab with an ↗ indicator.
+   */
+  heroSecondaryButtonText: string;
+  heroSecondaryButtonTarget: NavLink;
 
   // About
   aboutHeading: string;
@@ -157,8 +164,8 @@ const defaultProjects: Project[] = [
     fit: "contain",
     featured: true,
     highlight: true,
-    image: "/work-1.jpg",
-    gallery: ["/work-4.jpg"],
+    image: "/images/work-1.jpg",
+    gallery: ["/images/work-4.jpg"],
     galleryFit: "contain",
   },
   {
@@ -174,7 +181,7 @@ const defaultProjects: Project[] = [
     fit: "contain",
     featured: true,
     highlight: true,
-    image: "/work-3.jpg",
+    image: "/images/work-3.jpg",
   },
   {
     slug: "project-03",
@@ -187,7 +194,7 @@ const defaultProjects: Project[] = [
     services: ["Brand Identity", "Visual Design"],
     layout: "portrait",
     fit: "contain",
-    image: "/work-8.jpg",
+    image: "/images/work-8.jpg",
   },
   {
     slug: "project-04",
@@ -201,7 +208,7 @@ const defaultProjects: Project[] = [
     layout: "wide",
     fit: "contain",
     featured: true,
-    image: "/work-4.jpg",
+    image: "/images/work-4.jpg",
   },
   {
     slug: "project-05",
@@ -214,7 +221,7 @@ const defaultProjects: Project[] = [
     services: ["Visual Design"],
     layout: "portrait",
     fit: "contain",
-    image: "/work-8.webp",
+    image: "/images/work-8.webp",
   },
   {
     slug: "project-06",
@@ -227,7 +234,7 @@ const defaultProjects: Project[] = [
     services: ["Visual Design"],
     layout: "square",
     fit: "contain",
-    image: "/work-9.webp",
+    image: "/images/work-9.webp",
   },
   {
     slug: "project-07",
@@ -241,8 +248,8 @@ const defaultProjects: Project[] = [
     layout: "gallery",
     fit: "contain",
     galleryFit: "contain",
-    image: "/work-1.jpg",
-    gallery: ["/work-3.jpg"],
+    image: "/images/work-1.jpg",
+    gallery: ["/images/work-3.jpg"],
   },
 ];
 
@@ -310,13 +317,19 @@ export const defaultConfig: SiteConfig = {
   tagline: "Graphic Designer / Business Consultant",
   established: "Est. 2019",
   location: "Based in Dhaka · Working Worldwide",
-  favicon: "",
+  favicon: "/favicon.png",
 
   heroStatusText: "Available for Projects",
   heroTopRight: ["Independent Practice", "Est. 2019"],
   heroBottomLeft: ["Selected Work 2019 — 2025", "Based in Dhaka · Working Worldwide"],
   heroButtonText: "View Work",
   heroButtonTarget: { label: "Work", kind: "section", href: "#work" },
+  heroSecondaryButtonText: "Visit Film Lab",
+  heroSecondaryButtonTarget: {
+    label: "Film Lab",
+    kind: "external",
+    href: "https://juwainhq.github.io/film-lab/",
+  },
 
   aboutHeading:
     "Graphic designer and business consultant focused on creating strong visual identities and practical strategies.",
@@ -378,7 +391,7 @@ function readLocalCache(): SiteConfig | null {
     let raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) raw = window.localStorage.getItem("site-config-v1");
     if (!raw) return null;
-    return mergeWithDefaults(JSON.parse(raw) as Partial<SiteConfig>);
+    return migrateLegacyImagePaths(mergeWithDefaults(JSON.parse(raw) as Partial<SiteConfig>));
   } catch {
     return null;
   }
@@ -428,7 +441,7 @@ export async function loadSiteConfig(): Promise<SiteConfig> {
     const { fetchSiteConfig } = await import("@/integrations/supabase/site-config");
     const remote = await fetchSiteConfig();
     if (remote) {
-      const merged = mergeWithDefaults(remote as Partial<SiteConfig>);
+      const merged = migrateLegacyImagePaths(mergeWithDefaults(remote as Partial<SiteConfig>));
       const cleaned: SiteConfig = {
         ...merged,
         projects: deduplicateProjectImages(merged.projects),
@@ -500,6 +513,44 @@ function mergeWithDefaults(partial: Partial<SiteConfig>): SiteConfig {
     projects: partial.projects ?? defaultConfig.projects,
     howIWorkSteps: partial.howIWorkSteps ?? defaultConfig.howIWorkSteps,
     sections: partial.sections ?? defaultConfig.sections,
+    // Field added after some configs were saved — merge defensively so a
+    // partial remote object can't drop the label/kind/href of the target.
+    heroSecondaryButtonTarget: {
+      ...defaultConfig.heroSecondaryButtonTarget,
+      ...(partial.heroSecondaryButtonTarget ?? {}),
+    },
+  };
+}
+
+/**
+ * The bundled images moved from the public root to /images/. Configs that
+ * predate the move (a Supabase row or a cached copy) may still point at the
+ * old root paths, which 404 on current deploys — remap them on every load.
+ */
+const LEGACY_IMAGE_PATHS = [
+  "/work-1.jpg",
+  "/work-3.jpg",
+  "/work-4.jpg",
+  "/work-8.jpg",
+  "/work-8.webp",
+  "/work-9.webp",
+];
+
+function migrateLegacyImagePaths(config: SiteConfig): SiteConfig {
+  if (!LEGACY_IMAGE_PATHS.some((p) => config.projects.some(
+    (proj) => proj.image === p || proj.gallery?.includes(p)
+  ))) {
+    return config;
+  }
+  const mapPath = (p: string) =>
+    LEGACY_IMAGE_PATHS.includes(p) ? `/images${p}` : p;
+  return {
+    ...config,
+    projects: config.projects.map((proj) => ({
+      ...proj,
+      image: mapPath(proj.image),
+      gallery: proj.gallery?.map(mapPath),
+    })),
   };
 }
 
@@ -509,7 +560,7 @@ function mergeWithDefaults(partial: Partial<SiteConfig>): SiteConfig {
  * that share the same hero image are reassigned to an unused image.
  * Gallery images are intentionally left unconstrained (they can repeat).
  */
-const ALL_IMAGES = ["/work-1.jpg", "/work-3.jpg", "/work-4.jpg", "/work-8.jpg", "/work-8.webp", "/work-9.webp"];
+const ALL_IMAGES = ["/images/work-1.jpg", "/images/work-3.jpg", "/images/work-4.jpg", "/images/work-8.jpg", "/images/work-8.webp", "/images/work-9.webp"];
 
 function deduplicateProjectImages(projects: Project[]): Project[] {
   const usedHeroImages = new Set<string>();
