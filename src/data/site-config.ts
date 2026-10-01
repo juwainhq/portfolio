@@ -317,7 +317,7 @@ export const defaultConfig: SiteConfig = {
   tagline: "Graphic Designer / Business Consultant",
   established: "Est. 2019",
   location: "Based in Dhaka · Working Worldwide",
-  favicon: "",
+  favicon: "/favicon.png",
 
   heroStatusText: "Available for Projects",
   heroTopRight: ["Independent Practice", "Est. 2019"],

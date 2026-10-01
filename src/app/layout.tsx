@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   icons: {
     // Metadata icon paths are not basePath-aware — prefix manually so the
     // favicon resolves on GitHub Pages (/portfolio) as well as locally.
-    icon: `${(process.env.NEXT_PUBLIC_BASE_PATH ?? "").replace(/\/$/, "")}/favicon.ico`,
+    icon: `${(process.env.NEXT_PUBLIC_BASE_PATH ?? "").replace(/\/$/, "")}/favicon.png`,
   },
 };
 
