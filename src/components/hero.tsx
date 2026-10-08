@@ -1,108 +1,155 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
+import { DitherField } from "@/components/dither-field";
 
+/**
+ * Hero.
+ *
+ * A live ordered-dither colour field fills the section; the name sits on a
+ * fixed "print plate" (paper + ink, identical in both themes) so the type
+ * keeps 16:1 contrast while the moving dither stays the loudest thing on
+ * screen. The plate carries two print details — a colour bar of the five
+ * accents and a registration cross.
+ */
 export function Hero() {
   const { config } = useSiteConfig();
-  const containerRef = useRef<HTMLDivElement>(null);
+  const secondary = config.heroSecondaryButtonTarget;
+  const words = config.name.split(" ").filter(Boolean);
 
-  useEffect(() => {
-    const elements = containerRef.current?.querySelectorAll(".animate-in");
-    if (!elements) return;
-
-    elements.forEach((el, index) => {
-      setTimeout(() => {
-        el.classList.add("active");
-      }, 200 + index * 180);
-    });
-  }, []);
-
-  const heroButtonHref = "/work";
-
-  const nameParts = config.name.split(" ");
+  const primaryHref = config.heroButtonTarget?.href || "#work";
+  const primaryLabel = config.heroButtonText || "View Work";
+  const [bottomA, bottomB] = config.heroBottomLeft;
 
   return (
     <section
-      ref={containerRef}
-      className="relative min-h-[100svh] flex flex-col justify-between px-6 md:px-10 lg:px-16 pt-28 md:pt-32 pb-8 md:pb-10 overflow-hidden"
+      id="hero"
+      aria-labelledby="hero-name"
+      className="relative isolate flex min-h-[100svh] flex-col overflow-hidden px-4 pb-6 pt-20 sm:px-6 md:px-10 md:pb-8 md:pt-24 lg:px-16"
     >
-      {/* Top meta row */}
-      <div className="relative z-10 flex items-start justify-between gap-6">
-        <div
-          className="animate-in flex items-center gap-3"
-          style={{ opacity: 0, transitionDelay: "100ms" }}
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-medium">
-            {config.heroStatusText}
-          </span>
-        </div>
-
-        <div
-          className="animate-in hidden md:flex flex-col items-end gap-1"
-          style={{ opacity: 0, transitionDelay: "150ms" }}
-        >
-          <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-            {config.heroTopRight[0]}
-          </span>
-          <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-            {config.heroTopRight[1]}
-          </span>
-        </div>
+      <div className="absolute inset-0" aria-hidden="true" data-hero-dither="">
+        <DitherField
+          accents={[5, 3, 2]}
+          cell={7}
+          maxCols={200}
+          speed={0.75}
+          shaping={1.2}
+          contrast={1.5}
+          bias={0.12}
+        />
       </div>
 
-      {/* Center — the name */}
-      <div className="relative z-10 flex-1 flex flex-col justify-center my-8 md:my-0">
-        {nameParts.map((part, i) => (
-          <div key={i} className="overflow-hidden">
-            <h1
-              className="animate-in font-display text-[22vw] sm:text-[20vw] md:text-[16vw] lg:text-[14vw] xl:text-[12.5vw] leading-[0.82] tracking-[-0.055em] uppercase font-medium"
-              style={{ opacity: 0, transitionDelay: i === 0 ? "0ms" : "120ms" }}
-            >
-              {part}
-            </h1>
+      {/* Top label row — solid print chips, legible over any dot. */}
+      <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
+        <span
+          className="chip-print animate-in"
+          style={{ "--reveal-delay": "60ms" } as React.CSSProperties}
+        >
+          <span
+            aria-hidden="true"
+            className="h-1.5 w-1.5 bg-[hsl(var(--vivid-3))]"
+          />
+          {config.heroStatusText}
+        </span>
+
+        <span
+          className="chip-print animate-in"
+          style={{ "--reveal-delay": "120ms" } as React.CSSProperties}
+        >
+          {config.heroTopRight[0]}
+          <span aria-hidden="true" className="opacity-40">
+            /
+          </span>
+          {config.heroTopRight[1]}
+        </span>
+      </div>
+
+      {/* The plate */}
+      <div className="relative z-10 flex flex-1 items-center py-7 md:py-10">
+        {/* The plate is never animated in: it holds the LCP element, so it
+            paints with the first frame and the reveals happen around it. */}
+        <div className="plate-print w-full p-5 sm:p-8 md:p-11 lg:p-14">
+          {/* colour bar + registration cross */}
+          <div className="flex items-start justify-between">
+            <span aria-hidden="true" className="flex items-center gap-1.5">
+              {[1, 2, 3, 4, 5].map((accent) => (
+                <span
+                  key={accent}
+                  className="h-2 w-2"
+                  style={{ background: `hsl(var(--vivid-${accent}))` }}
+                />
+              ))}
+            </span>
+            <span
+              aria-hidden="true"
+              className="h-3.5 w-3.5 opacity-45"
+              style={{
+                backgroundImage:
+                  "linear-gradient(hsl(var(--print-ink)) 0 0), linear-gradient(hsl(var(--print-ink)) 0 0)",
+                backgroundSize: "100% 1px, 1px 100%",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }}
+            />
           </div>
-        ))}
 
-        {/* Subtitle row directly under the name */}
-        <div
-          className="animate-in mt-8 md:mt-10 flex items-center gap-4 md:gap-6"
-          style={{ opacity: 0, transitionDelay: "320ms" }}
-        >
-          <span className="h-px w-8 md:w-12 bg-foreground/60" aria-hidden="true" />
-          <p className="text-[11px] md:text-[12px] uppercase tracking-[0.3em] font-medium">
-            {config.tagline}
-          </p>
+          <h1 id="hero-name" className="display mt-6 md:mt-9">
+            {words.map((word, index) => (
+              <span key={`${word}-${index}`} className="block">
+                {/* No reveal gate: the name is the LCP element, so it must
+                    paint with the first frame instead of after hydration. */}
+                <span className="block text-[clamp(2.9rem,15.5vw,9.5rem)]">
+                  {word}
+                </span>
+              </span>
+            ))}
+          </h1>
+
+          <div
+            className="animate-in mt-6 flex items-center gap-3.5 md:mt-8"
+            style={{ "--reveal-delay": "240ms" } as React.CSSProperties}
+          >
+            <span
+              aria-hidden="true"
+              className="h-2 w-2 shrink-0 bg-[hsl(var(--vivid-3))]"
+            />
+            <p className="eyebrow opacity-70">{config.tagline}</p>
+          </div>
+
+          <div className="rule-print mt-7 flex flex-wrap items-end justify-between gap-x-8 gap-y-5 pt-5 md:mt-10 md:pt-6">
+            <div
+              className="animate-in flex flex-col gap-1.5"
+              style={{ "--reveal-delay": "320ms" } as React.CSSProperties}
+            >
+              <span className="eyebrow opacity-65">{bottomA}</span>
+              <span className="eyebrow opacity-65">{bottomB}</span>
+            </div>
+
+            <div
+              className="animate-in flex flex-wrap items-center gap-3"
+              style={{ "--reveal-delay": "380ms" } as React.CSSProperties}
+            >
+              <Link href={primaryHref} className="btn-print">
+                <ArrowDown size={13} aria-hidden="true" />
+                {primaryLabel}
+              </Link>
+
+              {secondary?.href ? (
+                <a
+                  href={secondary.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-print-ghost"
+                >
+                  {config.heroSecondaryButtonText}
+                  <ArrowUpRight size={13} aria-hidden="true" />
+                </a>
+              ) : null}
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Bottom row — meta + scroll cue */}
-      <div className="relative z-10 flex items-end justify-between gap-6">
-        <div
-          className="animate-in flex flex-col gap-1"
-          style={{ opacity: 0, transitionDelay: "500ms" }}
-        >
-          <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-            {config.heroBottomLeft[0]}
-          </span>
-          <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-muted-foreground hidden md:block">
-            {config.heroBottomLeft[1]}
-          </span>
-        </div>
-
-        <Link
-          href={heroButtonHref}
-          className="animate-in group flex items-center gap-3 hover:opacity-60 transition-opacity duration-300"
-          style={{ opacity: 0, transitionDelay: "550ms" }}
-          aria-label={config.heroButtonText}
-        >
-          <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-medium">
-            {config.heroButtonText}
-          </span>
-          <span className="block w-8 md:w-12 h-px bg-foreground/60 group-hover:w-16 transition-all duration-500" aria-hidden="true" />
-        </Link>
       </div>
     </section>
   );

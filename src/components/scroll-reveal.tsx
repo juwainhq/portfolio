@@ -1,27 +1,62 @@
 "use client";
 
 import { useEffect } from "react";
+import { prefersReducedMotion } from "@/lib/dither";
 
-export function ScrollRevealProvider({ children }: { children: React.ReactNode }) {
+/**
+ * Reveal-on-scroll.
+ *
+ * Progressive enhancement: the `reveal-ready` class (which is what actually
+ * hides `.reveal` elements) is only added from JS, so a no-JS visitor — or a
+ * reduced-motion visitor — always sees the full page.
+ */
+export function ScrollRevealProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   useEffect(() => {
-    const handleScroll = () => {
-      const reveals = document.querySelectorAll(".reveal, .stagger-children");
-      reveals.forEach((reveal) => {
-        const rect = reveal.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        const revealTop = rect.top;
-        const revealPoint = 100;
+    if (prefersReducedMotion()) return;
 
-        if (revealTop < windowHeight - revealPoint) {
-          reveal.classList.add("active");
-        }
-      });
+    const root = document.documentElement;
+    root.classList.add("reveal-ready");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.05, rootMargin: "0px 0px -8% 0px" }
+    );
+
+    let frame = 0;
+    const scan = () => {
+      document
+        .querySelectorAll(".reveal:not(.active), .animate-in:not(.active)")
+        .forEach((el) => observer.observe(el));
+    };
+    const scheduleScan = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(scan);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // Initial check
+    scan();
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    // Sections/links can appear after hydration (config loads from Supabase),
+    // so keep watching for new nodes rather than scanning once.
+    const mutations = new MutationObserver(scheduleScan);
+    mutations.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      cancelAnimationFrame(frame);
+      mutations.disconnect();
+      observer.disconnect();
+      root.classList.remove("reveal-ready");
+    };
   }, []);
 
   return <>{children}</>;

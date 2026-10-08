@@ -1,73 +1,67 @@
 "use client";
 
-import { useState } from "react";
-import { useReveal } from "@/hooks/use-reveal";
 import { useSiteConfig } from "@/context/site-config";
+import { useReveal } from "@/hooks/use-reveal";
 
+const ACCENTS = [1, 2, 3, 4, 5];
+
+/**
+ * Services.
+ *
+ * An editorial index: each discipline is a hairline row with its ordinal on
+ * the left and the title + summary stacked on the right, so the entries fill
+ * the measure instead of leaving a lonely right column.
+ */
 export function Services() {
   const { config } = useSiteConfig();
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const labelRef = useReveal();
-  const listRef = useReveal();
+  const listRef = useReveal<HTMLDivElement>();
 
   return (
-    <section id="services" className="py-28 md:py-40 lg:py-48 px-6 md:px-10 lg:px-16">
-      <div className="max-w-[1400px] mx-auto">
-        {/* Header */}
-        <div className="mb-16 md:mb-20 lg:mb-24">
-          <span
-            ref={labelRef}
-            className="reveal text-[10px] uppercase tracking-[0.3em] font-medium"
-          >
+    <section
+      id="services"
+      aria-labelledby="services-heading"
+      className="px-5 py-[var(--section-y)] sm:px-6 md:px-10 lg:px-16"
+    >
+      <div className="mx-auto max-w-[1400px]">
+        <div className="rule mb-8 flex items-baseline justify-between gap-6 pt-5 md:mb-12">
+          <h2 id="services-heading" ref={labelRef} className="reveal eyebrow">
             {config.servicesHeading}
+          </h2>
+          <span className="eyebrow text-muted-foreground">
+            {String(config.services.length).padStart(2, "0")} disciplines
           </span>
         </div>
 
-        {/* Service List */}
         <div ref={listRef} className="reveal">
-          {config.services.map((service, index) => (
-            <div
-              key={service.number}
-              className={`group border-t border-foreground/10 py-8 md:py-10 transition-all duration-300 ${
-                hoveredIndex === index ? "border-foreground/20" : ""
-              }`}
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            >
-              <div className="grid grid-cols-12 gap-4 items-baseline">
-                {/* Number */}
-                <div className="col-span-3 md:col-span-1">
-                  <span className="text-[10px] md:text-[11px] tracking-[0.2em] text-muted-foreground font-medium group-hover:text-foreground/50 transition-colors duration-300">
-                    {service.number}
-                  </span>
-                </div>
+          {config.services.map((service, index) => {
+            const accent = ACCENTS[index % ACCENTS.length];
+            return (
+              <div
+                key={`${service.number}-${service.title}`}
+                className="group row-rule grid grid-cols-12 gap-x-4 py-7 hover:bg-card/60 md:gap-x-6 md:py-9"
+              >
+                <span className="meta col-span-2 flex items-start gap-2.5 pt-1 tabular-nums md:col-span-1 md:pt-1.5">
+                  <span
+                    aria-hidden="true"
+                    className="mt-1 h-1.5 w-1.5 shrink-0 transition-transform duration-500 ease-out-expo group-hover:scale-[1.9]"
+                    style={{ background: `hsl(var(--vivid-${accent}))` }}
+                  />
+                  {service.number}
+                </span>
 
-                {/* Title */}
-                <div className="col-span-5 md:col-span-4">
-                  <h3 className="text-xl md:text-2xl lg:text-3xl font-display tracking-tight group-hover:translate-x-1 transition-transform duration-500">
+                <div className="col-span-10 md:col-span-11">
+                  <h3 className="display text-[clamp(1.5rem,3.2vw,2.4rem)] leading-[1.02] transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5">
                     {service.title}
                   </h3>
-                </div>
-
-                {/* Description */}
-                <div className="col-span-4 md:col-span-5 md:col-start-7">
-                  <p className="text-sm md:text-base text-muted-foreground group-hover:text-foreground/60 transition-colors duration-300">
+                  <p className="mt-3 max-w-[62ch] text-sm leading-relaxed text-muted-foreground transition-colors duration-300 group-hover:text-foreground/85 md:mt-4 md:text-base">
                     {service.description}
                   </p>
                 </div>
-
-                {/* Subtle indicator */}
-                <div className="col-span-12 md:col-span-2 md:col-start-11 flex justify-end">
-                  <span
-                    className="text-[10px] md:text-[11px] tracking-[0.15em] uppercase text-muted-foreground/0 group-hover:text-foreground/40 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0 opacity-0 group-hover:opacity-100"
-                  >
-                    View
-                  </span>
-                </div>
               </div>
-            </div>
-          ))}
-          <div className="border-b border-foreground/10" />
+            );
+          })}
+          <div className="[border-bottom:var(--hairline)_solid_hsl(var(--border))]" />
         </div>
       </div>
     </section>

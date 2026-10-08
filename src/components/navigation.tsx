@@ -1,154 +1,222 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
+import { ThemeToggle } from "@/components/theme-toggle";
+import type { NavLink } from "@/data/site-config";
+
+const SECTION_OFFSET = 130; // px below the top where a section counts as "current"
+
+function hrefFor(link: NavLink, isHome: boolean): string {
+  if (link.kind === "section" && !isHome) return `/${link.href}`; // "#about" -> "/#about"
+  return link.href;
+}
 
 export function Navigation() {
   const { config } = useSiteConfig();
   const pathname = usePathname();
+  const isHome = pathname === "/";
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeId, setActiveId] = useState("");
 
-  // The dynamic per-project accent (CSS vars set on [data-project-page] by the
-  // project detail page) colors the active indicator; other pages stay neutral.
-  const isProjectPage = pathname?.startsWith("/work/") ?? false;
+  const navLinks = config.navLinks.filter((link) => link.showInNav);
+  const emailLink = config.socials.find((social) => social.platform === "email");
 
+  /* --- sticky state + current-section highlighting --------------------- */
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 80);
+    const sectionIds = navLinks
+      .filter((link) => link.kind === "section")
+      .map((link) => link.href.replace(/^.*#/, ""));
+
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      setScrolled(window.scrollY > 24);
+
+      if (!isHome) return;
+      // Pick the section whose top is closest to (but above) the offset line.
+      // Iterating nav order would let a section further up the page win.
+      let current = "";
+      let bestTop = -Infinity;
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const top = el.getBoundingClientRect().top;
+        if (top <= SECTION_OFFSET && top > bestTop) {
+          bestTop = top;
+          current = id;
+        }
+      }
+      // At the very bottom of the page the last section stays highlighted even
+      // if its top never crosses the offset line.
+      if (
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 4
+      ) {
+        current = sectionIds[sectionIds.length - 1] ?? current;
+      }
+      setActiveId(current);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
 
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHome, config.navLinks]);
+
+  /* --- mobile menu ------------------------------------------------------ */
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
+      document.removeEventListener("keydown", onKey);
     };
   }, [isOpen]);
 
-  const handleLinkClick = () => {
-    setIsOpen(false);
-  };
-
-  const navLinks = config.navLinks.filter((l) => l.showInNav);
-  const emailLink = config.socials.find((s) => s.platform === "email");
+  const close = useCallback(() => setIsOpen(false), []);
 
   return (
     <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
-          scrolled
-            ? "bg-background/95 backdrop-blur-sm border-b border-foreground/5"
-            : "bg-transparent"
-        }`}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:[border:var(--hairline-strong)_solid_hsl(var(--foreground))] focus:bg-background focus:px-4 focus:py-2 focus:text-xs focus:uppercase focus:tracking-[0.2em]"
       >
-        <nav className="flex items-center justify-between px-6 md:px-10 lg:px-16 py-4">
-          {/* Logo */}
+        Skip to content
+      </a>
+
+      <header
+        className="site-nav nav-glass fixed inset-x-0 top-0 z-50"
+        data-scrolled={scrolled}
+        data-open={isOpen}
+      >
+        <nav
+          aria-label="Primary"
+          className="mx-auto flex h-[var(--nav-h)] max-w-[1600px] items-center justify-between gap-4 px-5 sm:px-6 md:px-10 lg:px-16"
+        >
           <Link
             href="/"
-            className="text-[12px] md:text-[13px] tracking-[0.15em] uppercase font-medium hover:opacity-40 transition-opacity duration-300"
+            className="display shrink-0 text-[15px] tracking-[-0.02em] text-foreground transition-colors duration-200 hover:text-ink-2 md:text-[17px]"
+            onClick={close}
           >
             {config.name}
           </Link>
 
-          {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center gap-8 lg:gap-10">
-                      {navLinks.map((link) => (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className={`text-[11px] tracking-[0.2em] uppercase font-medium hover:opacity-40 transition-[opacity,color] duration-300 ${
-                            isProjectPage ? "project-accent-link" : ""
-                          }`}
-                        >
-                          {link.label}
-                        </Link>
-                      ))}
-                    </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-1.5 -mr-1.5 hover:opacity-50 transition-opacity duration-300"
-            aria-label={isOpen ? "Close menu" : "Open menu"}
-          >
-            {isOpen ? <X size={18} strokeWidth={1.5} /> : <Menu size={18} strokeWidth={1.5} />}
-          </button>
-        </nav>
-      </header>
-
-      {/* Mobile Menu Overlay */}
-      <div
-        className={`fixed inset-0 z-40 bg-background transition-all duration-500 md:hidden ${
-          isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
-        }`}
-      >
-        <div className="flex flex-col justify-center h-full px-8 py-24">
-          <nav className="space-y-0.5">
-            {navLinks.map((link, index) => (
-              <div
-                key={link.href}
-                className="overflow-hidden"
-                style={{
-                  transitionDelay: isOpen ? `${index * 80}ms` : "0ms",
-                }}
-              >
+          <div className="hidden items-center gap-8 md:flex lg:gap-10">
+            {navLinks.map((link) => {
+              const href = hrefFor(link, isHome);
+              const id = link.href.replace(/^.*#/, "");
+              const isCurrent = link.kind === "section" && activeId === id;
+              const external = /^https?:/.test(href);
+              return (
                 <Link
-                  href={link.href}
-                  onClick={handleLinkClick}
-                  className={`block text-5xl md:text-6xl font-display tracking-tight uppercase py-2.5 transform transition-all duration-500 ease-out ${
-                    isProjectPage ? "project-accent-link" : ""
-                  } ${
-                    isOpen
-                      ? "translate-y-0 opacity-100"
-                      : "translate-y-full opacity-0"
-                  }`}
-                  style={{ transitionDelay: isOpen ? `${index * 80 + 150}ms` : "0ms" }}
+                  key={`${link.label}-${link.href}`}
+                  href={href}
+                  aria-current={isCurrent ? "location" : undefined}
+                  target={external ? "_blank" : undefined}
+                  rel={external ? "noopener noreferrer" : undefined}
+                  className="nav-link text-[11px] font-medium uppercase tracking-[0.2em]"
                 >
                   {link.label}
                 </Link>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <ThemeToggle data-theme-toggle="desktop" />
+            <button
+              type="button"
+              onClick={() => setIsOpen((open) => !open)}
+              className="-mr-1 inline-flex h-9 w-9 items-center justify-center text-foreground [border:var(--hairline)_solid_hsl(var(--border))] transition-colors duration-200 hover:border-ink-2 hover:text-ink-2 md:hidden"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
+            >
+              {isOpen ? (
+                <X size={16} aria-hidden="true" />
+              ) : (
+                <Menu size={16} aria-hidden="true" />
+              )}
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      {/* Mobile menu — only mounted while open so nothing inside is focusable
+          when it is closed. */}
+      {isOpen ? (
+      <div
+        id="mobile-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
+        className="fixed inset-0 z-40 bg-background md:hidden"
+      >
+        <div className="flex h-full flex-col justify-between overflow-y-auto px-6 pb-10 pt-[calc(var(--nav-h)+2rem)]">
+          <nav aria-label="Sections" className="flex flex-col">
+            {navLinks.map((link, index) => {
+              const href = hrefFor(link, isHome);
+              const id = link.href.replace(/^.*#/, "");
+              const isCurrent = link.kind === "section" && activeId === id;
+              return (
+                <Link
+                  key={`m-${link.label}-${link.href}`}
+                  href={href}
+                  onClick={close}
+                  aria-current={isCurrent ? "location" : undefined}
+                  style={{ "--reveal-delay": `${index * 60}ms` } as React.CSSProperties}
+                  className={`display animate-in flex items-baseline justify-between py-4 [border-bottom:var(--hairline)_solid_hsl(var(--border))] text-[13vw] leading-[0.95] text-foreground transition-colors duration-200 active:text-ink-2 ${
+                    isCurrent ? "text-ink-2" : ""
+                  }`}
+                >
+                  {link.label}
+                  <ArrowUpRight
+                    size={20}
+                    aria-hidden="true"
+                    className="shrink-0 opacity-40"
+                  />
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Mobile Footer Links */}
-          <div
-            className={`mt-20 pt-8 border-t border-foreground/10 transform transition-all duration-500 ease-out ${
-              isOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
-            }`}
-            style={{ transitionDelay: isOpen ? "500ms" : "0ms" }}
-          >
-            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-4">
-              Connect
-            </p>
-            <div className="space-y-2">
-              {emailLink && (
+          <div className="mt-12 space-y-3">
+            <p className="eyebrow text-muted-foreground">Connect</p>
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              {emailLink ? (
                 <a
                   href={emailLink.href}
-                  className="block text-sm tracking-wide text-muted-foreground hover:text-foreground transition-colors duration-300"
+                  className="link-underline text-sm text-foreground"
                 >
-                  Email
+                  {emailLink.label}
                 </a>
-              )}
+              ) : null}
               {config.socials
-                .filter((s) => s.platform !== "email")
+                .filter((social) => social.platform !== "email")
                 .map((social) => (
                   <a
                     key={social.platform}
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block text-sm tracking-wide text-muted-foreground hover:text-foreground transition-colors duration-300"
+                    className="link-underline text-sm text-foreground"
                   >
                     {social.label}
                   </a>
@@ -157,6 +225,7 @@ export function Navigation() {
           </div>
         </div>
       </div>
+      ) : null}
     </>
   );
 }

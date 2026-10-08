@@ -1,57 +1,80 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import { ArrowUp } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
 
+/**
+ * Footer.
+ *
+ * Closes the page like a print colophon: the practice name big, the socials
+ * listed on a hairline column, a back-to-top item, and the copyright line
+ * (year filled in on the client so it never goes stale).
+ */
 export function Footer() {
   const { config } = useSiteConfig();
+  const [year, setYear] = useState("");
+
+  // Rendered empty on the server (no build-time year to go stale) and filled
+  // in on the client, so the notice always shows the current year.
+  useEffect(() => {
+    setYear(String(new Date().getFullYear()));
+  }, []);
+
+  const rest = config.footerCopyright.replace(/©\s*\d{4}\s*/g, "").trim();
 
   return (
-    <footer className="py-12 md:py-14 px-6 md:px-10 lg:px-16 border-t border-foreground/10">
-      <div className="max-w-[1400px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-baseline">
-          {/* Business */}
-          <div className="md:col-span-4">
-            <h3 className="text-base md:text-lg font-display tracking-tight uppercase">
+    <footer className="relative [border-top:var(--hairline)_solid_hsl(var(--border))]">
+      <div className="mx-auto max-w-[1400px] px-5 pb-10 pt-[calc(var(--section-y)*0.7)] sm:px-6 md:px-10 lg:px-16">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-8">
+          <div className="md:col-span-6">
+            <h2 className="display text-[clamp(2rem,5.5vw,3.5rem)]">
               {config.footerBusinessName}
-            </h3>
-            <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-2">
+            </h2>
+            <p className="eyebrow mt-4 text-muted-foreground">
               {config.footerTagline}
             </p>
           </div>
 
-          {/* Spacer */}
-          <div className="hidden md:block md:col-span-3" />
+          <nav
+            aria-label="Social"
+            className="flex flex-col gap-3 md:col-span-3 md:col-start-8"
+          >
+            <p className="meta">Elsewhere</p>
+            {config.socials.map((social) => (
+              <a
+                key={social.platform}
+                href={social.href}
+                target={social.platform === "email" ? undefined : "_blank"}
+                rel={social.platform === "email" ? undefined : "noopener noreferrer"}
+                className="link-underline self-start text-sm uppercase tracking-[0.18em]"
+              >
+                {social.platform}
+              </a>
+            ))}
+          </nav>
 
-          {/* Copyright */}
-          <div className="md:col-span-2">
-            <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-              {config.footerCopyright}
-            </p>
+          <div className="flex flex-col gap-3 md:col-span-2 md:col-start-11 md:items-end">
+            <p className="meta">Back to top</p>
+            <a
+              href="#hero"
+              className="group inline-flex items-center gap-2 text-sm uppercase tracking-[0.18em]"
+            >
+              Top
+              <ArrowUp
+                size={14}
+                aria-hidden="true"
+                className="transition-transform duration-500 ease-out-expo group-hover:-translate-y-1"
+              />
+            </a>
           </div>
+        </div>
 
-          {/* Social Links */}
-          <div className="md:col-span-3 flex flex-row md:justify-end gap-6">
-            {config.socials
-              .filter(
-                (s) =>
-                  s.platform !== "email" &&
-                  s.platform !== "linkedin" &&
-                  s.platform !== "behance"
-              )
-              .map((social) => (
-                <a
-                  key={social.platform}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[10px] uppercase tracking-[0.25em] hover:opacity-50 transition-opacity duration-300"
-                >
-                  {social.platform.charAt(0).toUpperCase() +
-                    social.platform.slice(1)}
-                </a>
-              ))}
-          </div>
+        <div className="rule mt-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 pt-5 md:mt-16">
+          <p className="meta">
+            © {year} {rest || "All rights reserved"}
+          </p>
+          <p className="meta hidden sm:block">{config.footerBusinessLink.replace(/^https?:\/\//, "")}</p>
         </div>
       </div>
     </footer>

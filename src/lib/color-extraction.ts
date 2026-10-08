@@ -1,3 +1,5 @@
+
+import { withBasePath } from "@/lib/utils";
 /**
  * Dominant vibrant color extraction from images.
  *
@@ -155,17 +157,6 @@ async function loadImagePixels(
   ctx.drawImage(image, 0, 0, width, height);
   const imageData = ctx.getImageData(0, 0, width, height);
   return { data: imageData.data, width, height };
-}
-
-/**
- * next/image prepends the configured basePath automatically (the site exports
- * to `/portfolio` in production); a plain <img> does not. Apply the same
- * convention so the probe hits the same URL the visible image uses.
- */
-function withBasePath(src: string): string {
-  const base = process.env.NEXT_PUBLIC_BASE_PATH;
-  if (!base || !src.startsWith("/")) return src;
-  return `${base.replace(/\/$/, "")}${src}`;
 }
 
 /** Load an image, resolving `null` on error/timeout instead of throwing. */

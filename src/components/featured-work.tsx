@@ -1,108 +1,128 @@
 "use client";
 
 import Link from "next/link";
-import { useReveal } from "@/hooks/use-reveal";
+import { ArrowRight } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
+import { useReveal } from "@/hooks/use-reveal";
+import { DitherImage } from "@/components/dither-image";
 
+/**
+ * Selected Work.
+ *
+ * Numbering is positional (01, 02, 03) so it always matches the "03 Projects"
+ * counter in the header, and this section holds the page's only link to the
+ * full archive.
+ */
 export function FeaturedWork() {
   const { config } = useSiteConfig();
-  const labelRef = useReveal();
+  const headingRef = useReveal();
   const gridRef = useReveal();
+  const ctaRef = useReveal();
 
   const featured = config.projects.filter(
-    (p) => p.featured && !p.hidden
+    (project) => project.featured && !project.hidden
   );
-
   if (featured.length === 0) return null;
+
+  const count = String(featured.length).padStart(2, "0");
 
   return (
     <section
       id="work"
-      className="py-20 md:py-28 lg:py-32 px-6 md:px-10 lg:px-16"
+      aria-labelledby="work-heading"
+      className="px-5 py-[var(--section-y)] sm:px-6 md:px-10 lg:px-16"
     >
-      <div className="max-w-[1600px] mx-auto">
-        {/* Header */}
-        <div className="mb-12 md:mb-16 lg:mb-20 flex items-end justify-between gap-6">
-          <h2
-            ref={labelRef}
-            className="reveal text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-medium"
-          >
+      <div className="mx-auto max-w-[1600px]">
+        <div className="rule flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3 pt-5">
+          <h2 id="work-heading" ref={headingRef} className="reveal eyebrow">
             {config.workHeading}
           </h2>
-          <span
-            ref={gridRef}
-            className="reveal text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-muted-foreground"
-          >
-            {String(featured.length).padStart(2, "0")} {config.workFooterNote}
+          <span ref={gridRef} className="reveal eyebrow text-muted-foreground">
+            {count} {config.workFooterNote}
           </span>
         </div>
 
-        {/* Featured Projects Grid — uniform card sizing */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <ul className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 md:mt-12 lg:grid-cols-3 lg:gap-10">
           {featured.map((project, index) => (
-            <Link
+            <li
               key={project.slug}
-              href={project.href ?? `/work/${project.slug}`}
-              className="block group"
+              className="reveal"
+              style={{ "--reveal-delay": `${index * 90}ms` } as React.CSSProperties}
             >
-              <article
-                className="reveal flex flex-col h-full"
-                style={{ transitionDelay: `${index * 80}ms` }}
+              <Link
+                href={project.href ?? `/work/${project.slug}`}
+                className="card-stamp group flex h-full flex-col"
               >
-                {/* Fixed-height image container so every card is identical */}
-                <div className="relative w-full aspect-[4/5] overflow-hidden bg-muted">
-                  <img
+                <div className="overflow-hidden">
+                  <DitherImage
                     src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover"
+                    alt={`${project.title} — ${project.category} project by Juwain Haque`}
+                    fit="cover"
+                    cell={3}
+                    maxPixels={400}
+                    className="aspect-[4/5] w-full transition-transform duration-700 ease-out-expo group-hover:scale-[1.02]"
+                    sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
                   />
                 </div>
 
-                {/* Meta — same height per card via min-height */}
-                <div className="pt-5 md:pt-6 flex flex-col">
-                  <div className="flex items-baseline gap-3 mb-2">
-                    <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                      {project.number}
+                <div className="flex flex-1 flex-col gap-3 p-5 md:p-6">
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-[11px] font-medium tabular-nums tracking-[0.24em] text-muted-foreground">
+                      {String(index + 1).padStart(2, "0")}
                     </span>
-                    <span className="h-px w-3 bg-foreground/30 shrink-0" aria-hidden="true" />
-                    <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground truncate">
+                    <span
+                      aria-hidden="true"
+                      className="h-px w-4 shrink-0 bg-border"
+                    />
+                    <span className="truncate text-[11px] font-medium uppercase tracking-[0.24em] text-muted-foreground">
                       {project.category}
                     </span>
                   </div>
-                  <h3 className="text-lg md:text-xl font-display tracking-tight transition-transform duration-500 group-hover:translate-x-1">
+
+                  <h3 className="display text-[clamp(1.2rem,2.2vw,1.65rem)] transition-transform duration-500 ease-out-expo group-hover:translate-x-1">
                     {project.title}
                   </h3>
-                </div>
-              </article>
-            </Link>
-          ))}
-        </div>
 
-        {/* View All Works — Large CTA inside the section */}
-        <div className="reveal mt-16 md:mt-20 lg:mt-24 pt-10 md:pt-12 border-t border-foreground/10">
-          <Link
-            href="/work"
-            className="group block"
-            aria-label="View all works"
-          >
-            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-4 md:mb-6">
-              Continue Exploring
-            </p>
-            <h2 className="flex items-center gap-3 md:gap-5 text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-display tracking-tight uppercase font-medium leading-[0.85] transition-all duration-700 ease-out group-hover:translate-x-3 md:group-hover:translate-x-6">
-              <span>View All Works</span>
-              <span
-                className="inline-block transition-transform duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2"
+                  {project.description ? (
+                    <p className="max-w-[38ch] text-sm leading-relaxed text-muted-foreground">
+                      {project.description}
+                    </p>
+                  ) : null}
+
+                  <span className="mt-auto inline-flex items-center gap-2 pt-3 text-[10px] font-medium uppercase tracking-[0.24em] text-muted-foreground transition-colors duration-300 group-hover:text-foreground">
+                    View project
+                    <ArrowRight
+                      size={13}
+                      aria-hidden="true"
+                      className="transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5"
+                    />
+                  </span>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        {/* The one and only link to the full archive. */}
+        <div ref={ctaRef} className="reveal rule mt-14 pt-10 md:mt-20 md:pt-12">
+          <Link href="/work" className="group inline-flex flex-col gap-5">
+            <span className="eyebrow text-muted-foreground">
+              The full archive
+            </span>
+            <span className="display flex flex-wrap items-baseline gap-x-5 gap-y-2 text-[clamp(2rem,6.5vw,4.25rem)]">
+              <span className="relative">
+                View all work
+                <span
+                  aria-hidden="true"
+                  className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-foreground transition-transform duration-700 ease-out-expo group-hover:scale-x-100"
+                />
+              </span>
+              <ArrowRight
+                size={40}
                 aria-hidden="true"
-              >
-                →
-              </span>
-            </h2>
-            <div className="mt-6 md:mt-8 flex items-center gap-4">
-              <span className="block h-px w-10 md:w-16 bg-foreground/40 transition-all duration-700 ease-out group-hover:w-20 md:group-hover:w-32" aria-hidden="true" />
-              <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-muted-foreground transition-colors duration-500 group-hover:text-foreground">
-                See the full archive
-              </span>
-            </div>
+                className="h-[0.6em] w-[0.6em] shrink-0 transition-transform duration-500 ease-out-expo group-hover:translate-x-3"
+              />
+            </span>
           </Link>
         </div>
       </div>

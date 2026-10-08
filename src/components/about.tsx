@@ -1,46 +1,64 @@
 "use client";
 
-import { useReveal } from "@/hooks/use-reveal";
 import { useSiteConfig } from "@/context/site-config";
+import { useReveal } from "@/hooks/use-reveal";
 
+/**
+ * About.
+ *
+ * Typographic band: the statement runs wide on the left, the supporting copy
+ * and availability note sit in a narrow right column closed by a hairline.
+ */
 export function About() {
   const { config } = useSiteConfig();
-  const sectionRef = useReveal();
+  const labelRef = useReveal();
   const contentRef = useReveal();
 
   return (
     <section
       id="about"
-      className="py-28 md:py-40 lg:py-48 px-6 md:px-10 lg:px-16"
+      aria-labelledby="about-heading"
+      className="px-5 py-[var(--section-y)] sm:px-6 md:px-10 lg:px-16"
     >
-      <div className="max-w-[1400px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
-          {/* Label column */}
-          <div ref={sectionRef} className="reveal lg:col-span-2">
-            <span className="text-[10px] uppercase tracking-[0.3em] font-medium">
-              About
-            </span>
-          </div>
+      <div className="mx-auto max-w-[1400px]">
+        <div
+          ref={labelRef}
+          className="reveal rule flex items-baseline justify-between gap-6 pt-5"
+        >
+          <span className="eyebrow flex items-center gap-2.5">
+            <span
+              aria-hidden="true"
+              className="h-1.5 w-1.5 bg-[hsl(var(--vivid-4))]"
+            />
+            About
+          </span>
+          <span className="eyebrow hidden text-muted-foreground sm:block">
+            Est. 2019
+          </span>
+        </div>
 
-          {/* Content */}
-          <div
-            ref={contentRef}
-            className="reveal lg:col-span-8 lg:col-start-4"
+        <div
+          ref={contentRef}
+          className="reveal mt-10 grid grid-cols-1 gap-10 md:mt-14 lg:grid-cols-12 lg:gap-16"
+        >
+          <h2
+            id="about-heading"
+            className="display text-[clamp(1.7rem,4.1vw,3.2rem)] leading-[1.06] lg:col-span-7"
           >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] font-display leading-[1.15] tracking-tight mb-8 md:mb-10">
-              {config.aboutHeading}
-            </h2>
+            {config.aboutHeading}
+          </h2>
 
-            <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-[640px]">
+          <div className="flex flex-col gap-7 lg:col-span-4 lg:col-start-9 lg:pt-1.5">
+            <p className="max-w-[44ch] text-base leading-relaxed text-muted-foreground">
               {config.aboutBody}
             </p>
 
-            {/* Availability indicator */}
-            <div className="flex items-center gap-3 mt-12 md:mt-14">
-              <span className="w-1 h-1 rounded-full bg-emerald-500" />
-              <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                {config.aboutStatusText}
-              </span>
+            <div className="row-rule flex items-center gap-3 pt-5">
+              <span
+                aria-hidden="true"
+                className="h-1.5 w-1.5 bg-[hsl(var(--vivid-1))]"
+              />
+              <span className="meta">{config.aboutStatusText}</span>
             </div>
           </div>
         </div>

@@ -1,86 +1,90 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useReveal } from "@/hooks/use-reveal";
+import { ArrowUpRight } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
+import { useReveal } from "@/hooks/use-reveal";
+import { DitherImage } from "@/components/dither-image";
 
+/**
+ * Selected Highlights.
+ *
+ * The archive index as a contact sheet: every row leads with a small dithered
+ * plate (the same treatment as the work cards) and opens the project.
+ */
 export function Highlights() {
   const { config } = useSiteConfig();
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const labelRef = useReveal();
-  const listRef = useReveal();
+  const headingRef = useReveal();
+  const listRef = useReveal<HTMLUListElement>();
 
-  const highlights = config.projects.filter((p) => p.highlight && !p.hidden);
+  const highlights = config.projects.filter((project) => project.highlight && !project.hidden);
   if (highlights.length === 0) return null;
 
+
   return (
-    <section className="py-28 md:py-40 lg:py-48 px-6 md:px-10 lg:px-16">
-      <div className="max-w-[1400px] mx-auto">
-        {/* Header */}
-        <div className="mb-16 md:mb-20 lg:mb-24">
-          <h2
-            ref={labelRef}
-            className="reveal text-[10px] uppercase tracking-[0.3em] font-medium"
-          >
+    <section
+      id="highlights"
+      aria-labelledby="highlights-heading"
+      className="px-5 py-[var(--section-y)] sm:px-6 md:px-10 lg:px-16"
+    >
+      <div className="mx-auto max-w-[1400px]">
+        <div className="rule mb-8 flex items-baseline justify-between gap-6 pt-5 md:mb-12">
+          <h2 id="highlights-heading" ref={headingRef} className="reveal eyebrow">
             {config.highlightsHeading}
           </h2>
+          <span className="eyebrow text-muted-foreground">Archive index</span>
         </div>
 
-        {/* Highlights List */}
-        <div
+        <ul
           ref={listRef}
-          className="reveal border-t border-foreground/10"
+          className="reveal [border-top:var(--hairline)_solid_hsl(var(--border))]"
         >
           {highlights.map((project, index) => (
-            <Link
-              key={project.slug}
-              href={project.href ?? `/work/${project.slug}`}
-              className="group block"
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            >
-              <div className="grid grid-cols-12 gap-4 py-5 md:py-6 border-b border-foreground/10 transition-all duration-300">
-                {/* Number */}
-                <div className="col-span-2 md:col-span-1">
-                  <span className="text-[10px] tracking-[0.2em] text-muted-foreground group-hover:text-foreground/50 transition-colors duration-300">
-                    {project.number}
-                  </span>
-                </div>
+            <li key={project.slug}>
+              <Link
+                href={project.href ?? `/work/${project.slug}`}
+                className="group grid grid-cols-12 items-center gap-x-4 gap-y-3 py-5 transition-colors duration-500 hover:bg-card/60 md:gap-x-6 md:py-6 [border-bottom:var(--hairline)_solid_hsl(var(--border))]"
+              >
+                <span className="col-span-3 flex items-center md:col-span-1">
+                  <DitherImage
+                    src={project.image}
+                    alt={`${project.title} artwork`}
+                    fit="cover"
+                    cell={3}
+                    maxPixels={120}
+                    touchToggle={false}
+                    className="h-14 w-14 md:h-16 md:w-16"
+                    sizes="80px"
+                  />
+                </span>
 
-                {/* Title */}
-                <div className="col-span-10 md:col-span-5">
-                  <h3 className="text-lg md:text-xl lg:text-2xl font-display tracking-tight group-hover:translate-x-2 transition-transform duration-500">
-                    {project.title}
-                  </h3>
-                </div>
+                <span className="meta col-span-2 tabular-nums md:col-span-1">
+                  {project.number}
+                </span>
 
-                {/* Category */}
-                <div className="col-span-8 md:col-span-3 hidden md:block">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                    {project.category}
-                  </p>
-                </div>
+                <h3 className="col-span-7 text-lg uppercase tracking-[-0.02em] transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5 md:col-span-5 md:text-2xl font-display">
+                  {project.title}
+                </h3>
 
-                {/* Year */}
-                <div className="col-span-4 md:col-span-2 hidden md:block">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground text-right">
-                    {project.year || ""}
-                  </p>
-                </div>
+                <span className="meta col-span-6 md:col-span-3">
+                  {project.category}
+                </span>
 
-                {/* Arrow */}
-                <div className="col-span-12 md:col-span-1 flex justify-end">
-                  <span
-                    className="text-xs opacity-0 group-hover:opacity-100 translate-x-[-8px] group-hover:translate-x-0 transition-all duration-300"
-                  >
-                    →
-                  </span>
-                </div>
-              </div>
-            </Link>
+                <span className="meta col-span-4 tabular-nums md:col-span-1">
+                  {project.year}
+                </span>
+
+                <span className="col-span-2 flex justify-end md:col-span-1">
+                  <ArrowUpRight
+                    size={16}
+                    aria-hidden="true"
+                    className="text-muted-foreground opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100"
+                  />
+                </span>
+              </Link>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );

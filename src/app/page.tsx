@@ -1,6 +1,5 @@
 "use client";
 
-import { Toaster } from "@/components/ui/sonner";
 import { Navigation } from "@/components/navigation";
 import { Hero } from "@/components/hero";
 import { About } from "@/components/about";
@@ -11,6 +10,7 @@ import { HowIWork } from "@/components/how-i-work";
 import { Contact } from "@/components/contact";
 import { Footer } from "@/components/footer";
 import { ScrollRevealProvider } from "@/components/scroll-reveal";
+import { DitherCursor } from "@/components/dither-cursor";
 import { useSiteConfig } from "@/context/site-config";
 
 function PageContent() {
@@ -19,32 +19,38 @@ function PageContent() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main>
+      <main id="main">
         {config.sections
-          .filter((s) => s.visible)
+          .filter((section) => section.visible)
           .map((section) => {
-            switch (section.id) {
-              case "hero":
-                return <Hero key={section.id} />;
-              case "about":
-                return <About key={section.id} />;
-              case "services":
-                return <Services key={section.id} />;
-              case "work":
-                return <FeaturedWork key={section.id} />;
-              case "highlights":
-                return <Highlights key={section.id} />;
-              case "how-i-work":
-                return <HowIWork key={section.id} />;
-              case "contact":
-                return <Contact key={section.id} />;
-              default:
-                return null;
-            }
+            const content = (() => {
+              switch (section.id) {
+                case "hero":
+                  return <Hero />;
+                case "about":
+                  return <About />;
+                case "services":
+                  return <Services />;
+                case "work":
+                  return <FeaturedWork />;
+                case "highlights":
+                  return <Highlights />;
+                case "how-i-work":
+                  return <HowIWork />;
+                case "contact":
+                  return <Contact />;
+                default:
+                  return null;
+              }
+            })();
+
+            if (!content) return null;
+
+            return <div key={section.id}>{content}</div>;
           })}
       </main>
       <Footer />
-      <Toaster />
+      <DitherCursor />
     </div>
   );
 }

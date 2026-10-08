@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
+import { DitherImage } from "@/components/dither-image";
 import { Footer } from "@/components/footer";
 import { Navigation } from "@/components/navigation";
 import { useProjectAccent } from "@/hooks/use-project-accent";
@@ -154,13 +155,18 @@ export function ProjectPageClient({ slug }: { slug: string }) {
         {/* Hero Image — natural aspect ratio, no forced crop */}
         <div className="px-6 md:px-10 lg:px-16 mb-16 md:mb-24">
           <div className="max-w-[1600px] mx-auto">
-            <div className="border border-[color:var(--project-border)]">
-              <img
+            <div className="[border:var(--hairline)_solid_var(--project-border)]">
+              {/* Same treatment as the cards: a print by default, the
+                  photograph when you point at it. */}
+              <DitherImage
                 src={project.image}
-                alt={project.title}
-                className={`w-full h-auto ${
-                  project.fit === "cover" ? "object-cover" : "object-contain"
-                }`}
+                alt={`${project.title} — ${project.category} project by Juwain Haque`}
+                fit={project.fit === "cover" ? "cover" : "contain"}
+                cell={4}
+                maxPixels={560}
+                priority
+                className="aspect-[4/5] w-full"
+                sizes="(min-width: 1600px) 1600px, 100vw"
               />
             </div>
           </div>
@@ -173,13 +179,19 @@ export function ProjectPageClient({ slug }: { slug: string }) {
               {project.gallery.map((src, index) => {
                 const fit = project.galleryFit ?? project.fit;
                 return (
-                  <div key={index} className="border border-[color:var(--project-border)]">
-                    <img
+                  <div
+                    key={index}
+                    className="[border:var(--hairline)_solid_var(--project-border)]"
+                  >
+                    {/* Same treatment as the hero: a print until you point at it. */}
+                    <DitherImage
                       src={src}
-                      alt={`${project.title} — ${index + 2}`}
-                      className={`w-full h-auto ${
-                        fit === "cover" ? "object-cover" : "object-contain"
-                      }`}
+                      alt={`${project.title} — detail ${index + 2} by Juwain Haque`}
+                      fit={fit === "cover" ? "cover" : "contain"}
+                      cell={4}
+                      maxPixels={560}
+                      className="aspect-[4/5] w-full md:aspect-[3/2]"
+                      sizes="(min-width: 1600px) 1600px, 100vw"
                     />
                   </div>
                 );

@@ -10,44 +10,62 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
-        display: ["var(--font-space)", "system-ui", "sans-serif"],
-        mono: ["var(--font-mono)", "monospace"],
+        // Self-hosted (see src/fonts + src/app/layout.tsx)
+        sans: ["var(--font-body)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "var(--font-body)", "system-ui", "sans-serif"],
+        mono: ["var(--font-body)", "ui-monospace", "monospace"],
       },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
           DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          foreground: "hsl(var(--foreground))",
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--foreground))",
         },
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "hsl(var(--foreground))",
+          foreground: "hsl(var(--background))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "hsl(var(--card-2))",
+          foreground: "hsl(var(--foreground))",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "hsl(var(--card-2))",
+          foreground: "hsl(var(--muted))",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "hsl(var(--card-2))",
+          foreground: "hsl(var(--foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          foreground: "hsl(var(--background))",
         },
         border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
+        input: "hsl(var(--border))",
         ring: "hsl(var(--ring))",
+        // Theme-aware, AA-safe accents (text).
+        ink: {
+          1: "hsl(var(--accent-1))",
+          2: "hsl(var(--accent-2))",
+          3: "hsl(var(--accent-3))",
+          4: "hsl(var(--accent-4))",
+          5: "hsl(var(--accent-5))",
+        },
+        // Always-saturated fills (dither dots, chips, blocks).
+        vivid: {
+          1: "hsl(var(--vivid-1))",
+          2: "hsl(var(--vivid-2))",
+          3: "hsl(var(--vivid-3))",
+          4: "hsl(var(--vivid-4))",
+          5: "hsl(var(--vivid-5))",
+          ink: "hsl(var(--on-vivid))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -56,7 +74,7 @@ export default {
         none: "0",
       },
       letterSpacing: {
-        "ultra-tight": "-0.06em",
+        "ultra-tight": "-0.05em",
         "mega-tight": "-0.04em",
         "ultra-wide": "0.25em",
         "mega-wide": "0.35em",
