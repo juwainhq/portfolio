@@ -42,6 +42,8 @@ Everything lives in CSS variables in `src/app/globals.css`:
 | `--accent-1…5` | text-safe accents for the **current** theme (all ≥ 4.5:1, most ≥ 6:1) |
 | `--vivid-1…5` | always-saturated fills for dither dots and chips — always paired with `--on-vivid` ink (≥ 6.9:1) |
 | `--dither-base`, `--dither-ink`, `--dither-cell` | dither grid |
+| `--print-ink`, `--print-paper` | fixed riso pair (never themed): the hero field and the hero type plate |
+| `--hairline`, `--hairline-strong`, `--nav-h` | print chrome: 1 px rules instead of web borders |
 
 Tailwind exposes them as `bg-background`, `text-muted-foreground`, `text-ink-3`,
 `bg-vivid-2`, … (`tailwind.config.ts`).
@@ -68,8 +70,8 @@ Consumers:
 
 | Component | What it does | Cost control |
 | --- | --- | --- |
-| `dither-field.tsx` | hero: live Bayer dither of a three-wave colour field | rendered at 1 dot / 11 CSS px (≈130×75 = 9.7 k dots), `image-rendering: pixelated`, 30 fps cap, `IntersectionObserver` pause off-screen, `visibilitychange` pause in a background tab |
-| `dither-image.tsx` | project images: dithered by default, full colour on hover / keyboard focus, plus a “Colour / Dither” button on touch (`hover: none`) | processing canvas ≤ 260 px on the long edge, computed once when scrolled into view; the two layers are plain CSS opacity cross-fades |
+| `dither-field.tsx` | hero: live Bayer dither of a three-wave colour field, printed in fixed ink → violet → magenta → cyan → paper | 1 dot / 7 CSS px (≤ 200 columns), `image-rendering: pixelated`, 30 fps cap, `IntersectionObserver` pause off-screen, `visibilitychange` pause in a background tab |
+| `dither-image.tsx` | project images: dithered by default, full colour on hover / keyboard focus, plus a “Colour / Dither” button on touch (`hover: none`) | 3 px dots on a processing canvas ≤ 400 px on the long edge, auto-levelled from the photograph (2 % / 98.5 % percentiles) then gamma 0.85, computed once when scrolled into view; the two layers are plain CSS opacity cross-fades |
 | `dither-cursor.tsx` | desktop pointer trail: coarse Bayer-dithered dot spray, cyan → magenta | desktop + fine pointer only, RAM-capped wake-up loop, absent under reduced motion |
 | `theme-toggle.tsx` | dark/light switch | `next-themes`, `attribute="class"`, persisted under `juwain-theme` |
 
@@ -81,16 +83,23 @@ and neutralises reveal transitions (content is never left hidden).
 
 Playwright + puppeteer scripts used for the final pass (Chrome 153 headless):
 
-- Screenshots at **1440 / 820 / 390 px**, every section, **both themes** →
-  54 images, each checked for horizontal overflow (`scrollWidth <= clientWidth`).
+- Screenshots at **1440 / 820 / 390 px**, every section, **both themes**,
+  each checked for horizontal overflow (`scrollWidth <= clientWidth`).
 - Functional checks: theme toggle persistence, nav section highlighting, reveal
   animations, mobile menu, skip link + focus ring, contact form (validation,
   placeholder guard, real POST shape, success/error states), reduced-motion
   stillness.
+- Functional audit: **34/34 checks** on the production export — theme
+  persistence, single archive link, positional project numbering, live footer
+  year, meta/OG tags, alt text, nav highlighting, reduced-motion stillness and
+  the contact form (placeholder guard, POST shape, success/error copy).
 - Lighthouse against the production export served with gzip + long-lived
-  `/_next/static` caching (what GitHub Pages does):
-  **performance 97 mobile / 84 desktop, accessibility 100, best practices
-  96–100, SEO 100**; LCP 2.5 s mobile / 2.8 s desktop, CLS 0.
+  `/_next/static` caching (what GitHub Pages does), run with
+  `--preset=desktop` for the desktop form factor:
+  **performance 100 mobile / 100 desktop, accessibility 100 / 100,
+  best practices 96, SEO 100**; LCP 1.9 s mobile / 0.5 s desktop, CLS 0.
+  Best practices is capped by a single `errors-in-console` finding from the
+  Supabase client, which is unreachable from this network — not a site bug.
 
 `e2e-tests/portfolio.spec.ts` in this repo mirrors the functional checks:
 

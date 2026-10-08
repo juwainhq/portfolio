@@ -23,7 +23,6 @@ export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [activeId, setActiveId] = useState("");
 
-  const isProjectPage = pathname?.startsWith("/work/") ?? false;
   const navLinks = config.navLinks.filter((link) => link.showInNav);
   const emailLink = config.socials.find((social) => social.platform === "email");
 
@@ -97,7 +96,7 @@ export function Navigation() {
     <>
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:border-2 focus:border-foreground focus:bg-background focus:px-4 focus:py-2 focus:text-xs focus:uppercase focus:tracking-[0.2em]"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:[border:var(--hairline-strong)_solid_hsl(var(--foreground))] focus:bg-background focus:px-4 focus:py-2 focus:text-xs focus:uppercase focus:tracking-[0.2em]"
       >
         Skip to content
       </a>
@@ -132,9 +131,7 @@ export function Navigation() {
                   aria-current={isCurrent ? "location" : undefined}
                   target={external ? "_blank" : undefined}
                   rel={external ? "noopener noreferrer" : undefined}
-                  className={`nav-link text-[11px] font-medium uppercase tracking-[0.2em] ${
-                    isProjectPage ? "project-accent-link" : ""
-                  }`}
+                  className="nav-link text-[11px] font-medium uppercase tracking-[0.2em]"
                 >
                   {link.label}
                 </Link>
@@ -147,7 +144,7 @@ export function Navigation() {
             <button
               type="button"
               onClick={() => setIsOpen((open) => !open)}
-              className="-mr-1 inline-flex h-9 w-9 items-center justify-center border-2 border-border text-foreground transition-colors duration-200 hover:border-ink-2 hover:text-ink-2 md:hidden"
+              className="-mr-1 inline-flex h-9 w-9 items-center justify-center text-foreground [border:var(--hairline)_solid_hsl(var(--border))] transition-colors duration-200 hover:border-ink-2 hover:text-ink-2 md:hidden"
               aria-label={isOpen ? "Close menu" : "Open menu"}
               aria-expanded={isOpen}
               aria-controls="mobile-menu"
@@ -185,7 +182,7 @@ export function Navigation() {
                   onClick={close}
                   aria-current={isCurrent ? "location" : undefined}
                   style={{ "--reveal-delay": `${index * 60}ms` } as React.CSSProperties}
-                  className={`display animate-in flex items-baseline justify-between border-b-2 border-border py-4 text-[13vw] leading-[0.95] text-foreground transition-colors duration-200 active:text-ink-2 ${
+                  className={`display animate-in flex items-baseline justify-between py-4 [border-bottom:var(--hairline)_solid_hsl(var(--border))] text-[13vw] leading-[0.95] text-foreground transition-colors duration-200 active:text-ink-2 ${
                     isCurrent ? "text-ink-2" : ""
                   }`}
                 >

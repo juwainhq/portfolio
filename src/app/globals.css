@@ -45,10 +45,19 @@
     --dither-base: 42 42% 94%;
     --dither-ink: 247 21% 8%;
 
+    /* Fixed print pair. Unlike --dither-*, these never follow the theme: the
+       dither field and the hero's type plate always read as one riso print,
+       inked on warm paper. Contrast between them is 16.4:1. */
+    --print-ink: 247 21% 8%; /* #12111A */
+    --print-paper: 42 42% 94%; /* #F6F2E9 */
+
     --radius: 0px;
     /* one dither pixel = one dot of the print grid */
     --dither-cell: 6px;
-    --nav-h: 64px;
+    /* fixed hairlines: print rules, not web borders */
+    --hairline: 1px;
+    --hairline-strong: 1.5px;
+    --nav-h: 60px;
   }
 
   .dark {
@@ -132,40 +141,90 @@
 
   .display {
     @apply font-display uppercase leading-[0.84] tracking-[-0.045em];
+    text-wrap: balance;
+  }
+
+  /* ---- the hero print plate: fixed paper + ink, whatever the theme ------ */
+  .plate-print {
+    background: hsl(var(--print-paper));
+    color: hsl(var(--print-ink));
+    border: var(--hairline-strong) solid hsl(var(--print-ink));
+  }
+  .plate-print .rule-print {
+    border-top: var(--hairline) solid hsl(var(--print-ink) / 0.28);
+  }
+
+  .chip-print {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.18em];
+    border: var(--hairline) solid hsl(var(--print-ink) / 0.9);
+    background: hsl(var(--print-paper));
+    color: hsl(var(--print-ink));
+  }
+
+  .btn-print {
+    @apply inline-flex items-center justify-center gap-3 px-5 py-3 text-[11px] font-medium uppercase tracking-[0.2em] transition-[transform,box-shadow] duration-300 ease-out-expo;
+    border: var(--hairline-strong) solid hsl(var(--print-ink));
+    background: hsl(var(--print-ink));
+    color: hsl(var(--print-paper));
+    box-shadow: 3px 3px 0 0 hsl(var(--print-ink) / 0.22);
+  }
+  .btn-print:hover {
+    transform: translate(-1px, -2px);
+    box-shadow: 5px 6px 0 0 hsl(var(--vivid-3));
+  }
+  .btn-print:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 0 hsl(var(--vivid-3));
+  }
+
+  .btn-print-ghost {
+    @apply inline-flex items-center justify-center gap-3 px-5 py-3 text-[11px] font-medium uppercase tracking-[0.2em] transition-colors duration-300;
+    border: var(--hairline-strong) solid hsl(var(--print-ink) / 0.55);
+    color: hsl(var(--print-ink));
+    background: transparent;
+  }
+  .btn-print-ghost:hover {
+    border-color: hsl(var(--print-ink));
+    background: hsl(var(--print-ink) / 0.06);
+  }
+
+  /* Hairline rule that a section header can hang from. */
+  .rule {
+    border-top: var(--hairline) solid hsl(var(--border));
   }
 
   /* Chunky, paper-stamp button. */
   .btn-stamp {
-    @apply inline-flex items-center justify-center gap-3 border-2 px-6 py-3.5 text-[11px] font-medium uppercase tracking-[0.24em] transition-[transform,box-shadow,background-color,color] duration-200;
-    border-color: hsl(var(--foreground));
+    @apply inline-flex items-center justify-center gap-3 px-5 py-3 text-[11px] font-medium uppercase tracking-[0.2em] transition-[transform,box-shadow,background-color,color] duration-300 ease-out-expo;
+    border: var(--hairline-strong) solid hsl(var(--foreground));
     background: hsl(var(--foreground));
     color: hsl(var(--background));
-    box-shadow: 4px 4px 0 0 hsl(var(--accent-3));
+    box-shadow: 3px 3px 0 0 hsl(var(--accent-3));
   }
   .btn-stamp:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 7px 7px 0 0 hsl(var(--accent-2));
+    transform: translate(-1px, -2px);
+    box-shadow: 5px 6px 0 0 hsl(var(--accent-2));
   }
   .btn-stamp:active {
     transform: translate(1px, 1px);
-    box-shadow: 2px 2px 0 0 hsl(var(--accent-2));
+    box-shadow: 1px 1px 0 0 hsl(var(--accent-2));
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-3 border-2 px-6 py-3.5 text-[11px] font-medium uppercase tracking-[0.24em] transition-colors duration-200;
-    border-color: hsl(var(--border));
+    @apply inline-flex items-center justify-center gap-3 px-5 py-3 text-[11px] font-medium uppercase tracking-[0.2em] transition-colors duration-300;
+    border: var(--hairline-strong) solid hsl(var(--border));
     color: hsl(var(--foreground));
   }
   .btn-ghost:hover {
-    border-color: hsl(var(--accent-2));
-    color: hsl(var(--accent-2));
+    border-color: hsl(var(--foreground));
+    background: hsl(var(--card));
   }
 
   /* Solid label chip: guaranteed contrast even when it sits on the dither
      field (background vs foreground is >=16:1 in both themes). */
   .chip-outline {
-    @apply inline-flex items-center gap-2 border-2 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.2em];
-    border-color: hsl(var(--border));
+    @apply inline-flex items-center gap-2 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.18em];
+    border: var(--hairline) solid hsl(var(--border));
     background: hsl(var(--background));
     color: hsl(var(--foreground));
   }
@@ -177,14 +236,16 @@
     background: hsl(var(--vivid-2));
   }
 
-  /* Cards: ink hairline + offset dither shadow. */
+  /* Cards: a hairline plate that lifts on hover. */
   .card-stamp {
-    @apply relative border-2 transition-transform duration-300;
-    border-color: hsl(var(--border));
+    @apply relative transition-[transform,border-color,box-shadow] duration-500 ease-out-expo;
+    border: var(--hairline) solid hsl(var(--border));
     background: hsl(var(--card));
   }
   .card-stamp:hover {
-    border-color: hsl(var(--foreground));
+    border-color: hsl(var(--foreground) / 0.45);
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px -28px hsl(var(--foreground) / 0.5);
   }
 
   /* Animated underline for inline links. */
@@ -210,16 +271,21 @@
 
   /* Field styling shared by the contact form. */
   .field {
-    @apply w-full border-2 bg-transparent px-4 py-3.5 text-base transition-colors duration-200;
-    border-color: hsl(var(--border));
+    @apply w-full px-4 py-3.5 text-base transition-colors duration-300;
+    border: var(--hairline) solid hsl(var(--border));
+    background: hsl(var(--card) / 0.6);
     color: hsl(var(--foreground));
   }
   .field::placeholder {
-    color: hsl(var(--muted) / 0.7);
+    color: hsl(var(--muted) / 0.65);
+  }
+  .field:hover {
+    border-color: hsl(var(--muted) / 0.6);
   }
   .field:focus {
     outline: none;
-    border-color: hsl(var(--accent-2));
+    border-color: hsl(var(--foreground));
+    background: hsl(var(--card));
   }
 
   .pixelated {
@@ -229,8 +295,8 @@
 
   /* Frosted sticky-nav surface. */
   .nav-glass {
-    background: hsl(var(--background) / 0.86);
-    backdrop-filter: blur(10px) saturate(140%);
+    background: hsl(var(--background) / 0.72);
+    backdrop-filter: blur(14px) saturate(140%);
   }
 }
 
@@ -251,16 +317,22 @@
 .nav-link:hover {
   color: hsl(var(--foreground));
 }
+/* The nav marks the section in view with aria-current="location" (and the
+   project pages may use "page"), so style every current value, not "true". */
+.nav-link[aria-current="location"],
+.nav-link[aria-current="page"],
 .nav-link[aria-current="true"] {
   color: hsl(var(--foreground));
 }
+.nav-link[aria-current="location"]::after,
+.nav-link[aria-current="page"]::after,
 .nav-link[aria-current="true"]::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -5px;
-  height: 2px;
+  bottom: -6px;
+  height: var(--hairline);
   background-color: hsl(var(--foreground));
 }
 
@@ -269,14 +341,14 @@
 /* -------------------------------------------------------------------------- */
 
 .reveal {
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: var(--reveal-delay, 0ms);
 }
 
 html.reveal-ready .reveal:not(.active) {
   opacity: 0;
-  transform: translateY(22px);
+  transform: translateY(16px);
 }
 
 html.reveal-ready .reveal.active {
@@ -294,6 +366,26 @@ html.reveal-ready .animate-in:not(.active) {
   opacity: 0;
   transform: translateY(18px);
 }
+/* Above the fold, the entrance must not wait for hydration: the hero runs on
+   pure CSS keyframes so the type paints with the very first frame (this is
+   what keeps desktop LCP close to FCP). */
+@media (prefers-reduced-motion: no-preference) {
+  #hero .animate-in {
+    animation: hero-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--reveal-delay, 0ms);
+  }
+}
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 html.reveal-ready .animate-in.active {
   opacity: 1;
   transform: none;

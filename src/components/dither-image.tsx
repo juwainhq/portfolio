@@ -3,7 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { Grid2X2, Palette } from "lucide-react";
-import { ditherImageRamp, gridFor, parseColor, type RGB } from "@/lib/dither";
+import {
+  ditherImageRamp,
+  gridFor,
+  luminanceRange,
+  parseColor,
+  type RGB,
+} from "@/lib/dither";
 import { withBasePath } from "@/lib/utils";
 
 type Props = {
@@ -27,9 +33,13 @@ type Props = {
 };
 
 const INK: RGB = { r: 10, g: 10, b: 16 };
-// Dark → light. The ramp deliberately ends on the brightest accent so the
-// dithered state reads as a vivid tri-tone print rather than a dark texture.
-const DEFAULT_ACCENTS = [3, 2, 1];
+/**
+ * Dark → light ramp for the photo treatment: ink shadow, violet mid-tone, hot
+ * magenta, then the warm paper highlight. Four steps is what makes it read as
+ * a riso print rather than a two-colour poster; the paper at the top keeps the
+ * highlights from blowing out into a flat accent.
+ */
+const DEFAULT_ACCENTS = [5, 3];
 
 /**
  * Project imagery: dithered by default, full colour on hover / keyboard focus,
@@ -44,8 +54,8 @@ export function DitherImage({
   alt,
   className = "",
   fit = "cover",
-  cell = 5,
-  maxPixels = 260,
+  cell = 3,
+  maxPixels = 400,
   accents = DEFAULT_ACCENTS,
   touchToggle = true,
   priority = false,
@@ -71,6 +81,11 @@ export function DitherImage({
     const url = withBasePath(src);
 
     const styles = window.getComputedStyle(document.documentElement);
+    // Fixed warm paper (not --foreground, which is ink in the light theme):
+    // the card is a print either way, so the ramp always ends on paper.
+    const paper =
+      parseColor(styles.getPropertyValue("--print-paper")) ??
+      ({ r: 246, g: 242, b: 233 } as RGB);
     const ramp: RGB[] = [
       INK,
       ...accentsKey
@@ -78,6 +93,7 @@ export function DitherImage({
         .map(Number)
         .map((id) => parseColor(styles.getPropertyValue(`--vivid-${id}`)))
         .filter((c): c is RGB => c !== null),
+      paper,
     ];
 
     const render = (image: HTMLImageElement) => {
@@ -107,7 +123,14 @@ export function DitherImage({
 
       ctx.drawImage(image, sx, sy, sw, sh, 0, 0, grid.cols, grid.rows);
       const source = ctx.getImageData(0, 0, grid.cols, grid.rows);
-      ctx.putImageData(ditherImageRamp(source, ramp), 0, 0);
+      // Normalise the photo once, then dither the whole frame through the same
+      // levels so every card in the grid has matching density.
+      const levels = luminanceRange(source);
+      ctx.putImageData(
+        ditherImageRamp(source, ramp, { levels, gamma: 0.85, floor: 0.08 }),
+        0,
+        0
+      );
       ctx.imageSmoothingEnabled = false;
       setReady(true);
     };
@@ -190,7 +213,7 @@ export function DitherImage({
             setRevealed((v) => !v);
           }}
           aria-pressed={revealed}
-          className="coarse-only absolute bottom-3 right-3 z-10 items-center gap-2 border-2 border-foreground bg-background px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-[0.2em] text-foreground"
+          className="coarse-only absolute bottom-3 right-3 z-10 items-center gap-2 bg-background px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-foreground [border:var(--hairline-strong)_solid_hsl(var(--foreground))]"
         >
           {revealed ? (
             <>

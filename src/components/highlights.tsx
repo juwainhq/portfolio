@@ -20,20 +20,21 @@ export function Highlights() {
       className="px-5 py-24 sm:px-6 md:px-10 md:py-32 lg:px-16 lg:py-40"
     >
       <div className="mx-auto max-w-[1400px]">
-        <div className="mb-12 md:mb-16">
+        <div className="rule mb-10 flex items-baseline justify-between gap-6 pt-5 md:mb-14">
           <h2 id="highlights-heading" ref={headingRef} className="reveal eyebrow">
             {config.highlightsHeading}
           </h2>
+          <span className="eyebrow text-muted-foreground">Archive index</span>
         </div>
 
-        <ul ref={listRef} className="reveal border-t-2 border-border">
+        <ul ref={listRef} className="reveal [border-top:var(--hairline)_solid_hsl(var(--border))]">
           {highlights.map((project) => (
             <li key={project.slug}>
               <Link
                 href={project.href ?? `/work/${project.slug}`}
-                className="group grid grid-cols-12 items-center gap-x-4 gap-y-2 border-b-2 border-border py-5 transition-colors duration-300 hover:border-[hsl(var(--accent-2))] md:py-6"
+                className="group grid grid-cols-12 items-center gap-x-4 gap-y-2 py-5 transition-colors duration-500 hover:bg-card md:py-6 [border-bottom:var(--hairline)_solid_hsl(var(--border))]"
               >
-                <span className="col-span-2 text-[11px] tracking-[0.2em] text-muted-foreground md:col-span-1">
+                <span className="col-span-2 text-[11px] tabular-nums tracking-[0.2em] text-muted-foreground md:col-span-1">
                   {project.number}
                 </span>
 

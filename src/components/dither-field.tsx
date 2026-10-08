@@ -77,15 +77,21 @@ export function DitherField({
           b: 74 + index * 40,
         }
     );
-    // Darkest step of the ramp: the page background, so the field melts into
-    // the section instead of sitting on top of it.
-    const base: RGB =
-      parseColor(styles.getPropertyValue("--background")) ?? {
-        r: 8,
-        g: 8,
-        b: 13,
+    // The field is always a riso print: fixed ink at the dark end, warm paper
+    // at the light end, whatever theme the page is in.
+    const ink: RGB =
+      parseColor(styles.getPropertyValue("--print-ink")) ?? {
+        r: 18,
+        g: 17,
+        b: 26,
       };
-    const palette: RGB[] = [base, ...ramp];
+    const paper: RGB =
+      parseColor(styles.getPropertyValue("--print-paper")) ?? {
+        r: 246,
+        g: 242,
+        b: 233,
+      };
+    const palette: RGB[] = [ink, ...ramp, paper];
 
     let cols = 0;
     let rows = 0;

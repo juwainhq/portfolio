@@ -16,7 +16,7 @@ export function Footer() {
   const rest = config.footerCopyright.replace(/©\s*\d{4}\s*/g, "").trim();
 
   return (
-    <footer className="relative border-t-2 border-border">
+    <footer className="relative [border-top:var(--hairline)_solid_hsl(var(--border))]">
       <div className="mx-auto max-w-[1400px] px-5 py-12 sm:px-6 md:px-10 md:py-16 lg:px-16">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
           <div className="md:col-span-5">

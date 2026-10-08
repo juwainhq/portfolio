@@ -159,35 +159,88 @@ export function ditherValue(
 }
 
 /**
- * Ordered-dither a source ImageData into an RGBA buffer using a luminance
- * ramp over `palette`. Used for photographs (project cards).
+ * Auto-levels: find the luminance range that actually carries the picture and
+ * return the 2nd/98.5th percentile bounds. Photographs are usually much darker
+ * than the colour ramp, so without this the dither collapses into the bottom
+ * one or two steps. `floor` guards against near-flat images.
+ */
+export function luminanceRange(
+  source: ImageData,
+  options: { low?: number; high?: number; floor?: number } = {}
+): { lo: number; hi: number } {
+  const { data, width, height } = source;
+  const histogram = new Uint32Array(256);
+  let counted = 0;
+
+  for (let i = 0; i < width * height; i++) {
+    const p = i * 4;
+    if (data[p + 3] === 0) continue;
+    const lum =
+      0.2126 * data[p] + 0.7152 * data[p + 1] + 0.0722 * data[p + 2];
+    histogram[lum | 0]++;
+    counted++;
+  }
+  if (counted === 0) return { lo: 0, hi: 255 };
+
+  const percentile = (q: number) => {
+    const target = counted * q;
+    let acc = 0;
+    for (let v = 0; v < 256; v++) {
+      acc += histogram[v];
+      if (acc >= target) return v;
+    }
+    return 255;
+  };
+
+  const lo = percentile(options.low ?? 0.02);
+  const hi = percentile(options.high ?? 0.985);
+  return { lo, hi: Math.max(hi, lo + (options.floor ?? 24)) };
+}
+
+/**
+ * Ordered-dither a source ImageData into an RGBA buffer using a luminance ramp
+ * over `palette` — the photo treatment used by the project cards.
+ *
+ * The ramp runs dark → light, so `palette[0]` is the ink and the last entry is
+ * the paper highlight. `levels` normalises the photo first, `gamma` decides how
+ * the mid-tones are distributed across the ramp, and `floor` lifts the very
+ * darkest pixels off pure ink so detail survives in the shadows.
  */
 export function ditherImageRamp(
   source: ImageData,
   palette: RGB[],
-  options: { cutoff?: number } = {}
+  options: {
+    cutoff?: number;
+    gamma?: number;
+    floor?: number;
+    levels?: { lo: number; hi: number };
+  } = {}
 ): ImageData {
   const { data, width, height } = source;
   const out = new Uint8ClampedArray(data.length);
-  const ramp = [...palette];
-  const cutoff = options.cutoff ?? 0.02;
+  const cutoff = options.cutoff ?? 0;
+  const gamma = options.gamma ?? 0.9;
+  const floor = options.floor ?? 0.06;
+  const levels = options.levels ?? luminanceRange(source);
+  const span = Math.max(1, levels.hi - levels.lo);
+  const levels_ = 1 - floor;
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const i = (y * width + x) * 4;
-      const a = data[i + 3];
-      if (a === 0) {
-        out[i] = 0;
-        out[i + 1] = 0;
-        out[i + 2] = 0;
+      if (data[i + 3] === 0) {
         out[i + 3] = 0;
         continue;
       }
       const lum =
-        (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) / 255;
-      // Slight contrast curve keeps mid-tones from flattening into one dot row.
-      const shaped = Math.min(1, Math.max(0, (lum - cutoff) / (1 - cutoff)));
-      const c = ditherValue(shaped, bayerThreshold(x, y), ramp);
+        0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+      const normalised = Math.min(1, Math.max(0, (lum - levels.lo) / span));
+      const shaped = Math.min(
+        1,
+        Math.max(0, (normalised - cutoff) / (1 - cutoff))
+      );
+      const value = floor + levels_ * Math.pow(shaped, gamma);
+      const c = ditherValue(value, bayerThreshold(x, y), palette);
       out[i] = c.r;
       out[i + 1] = c.g;
       out[i + 2] = c.b;

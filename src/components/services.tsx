@@ -18,10 +18,13 @@ export function Services() {
       className="px-5 py-24 sm:px-6 md:px-10 md:py-32 lg:px-16 lg:py-40"
     >
       <div className="mx-auto max-w-[1400px]">
-        <div className="mb-12 md:mb-16">
+        <div className="rule mb-10 flex items-baseline justify-between gap-6 pt-5 md:mb-14">
           <h2 id="services-heading" ref={labelRef} className="reveal eyebrow">
             {config.servicesHeading}
           </h2>
+          <span className="eyebrow text-muted-foreground">
+            {String(config.services.length).padStart(2, "0")} disciplines
+          </span>
         </div>
 
         <div ref={listRef} className="reveal">
@@ -30,12 +33,12 @@ export function Services() {
             return (
               <div
                 key={`${service.number}-${service.title}`}
-                className="group grid grid-cols-12 items-baseline gap-x-4 gap-y-3 border-t-2 border-border py-7 transition-colors duration-300 hover:border-[hsl(var(--accent-2))] md:py-9"
+                className="group grid grid-cols-12 items-baseline gap-x-4 gap-y-3 py-7 transition-colors duration-500 [border-top:var(--hairline)_solid_hsl(var(--border))] hover:[border-top-color:hsl(var(--foreground)/0.4)] md:py-9"
               >
-                <span className="col-span-3 flex items-center gap-2 text-[11px] font-medium tracking-[0.2em] text-muted-foreground md:col-span-1">
+                <span className="col-span-3 flex items-center gap-2.5 text-[11px] font-medium tabular-nums tracking-[0.2em] text-muted-foreground md:col-span-1">
                   <span
                     aria-hidden="true"
-                    className="h-2.5 w-2.5 transition-transform duration-300 group-hover:scale-150"
+                    className="h-1.5 w-1.5 transition-transform duration-500 ease-out-expo group-hover:scale-[1.8]"
                     style={{ background: `hsl(var(--vivid-${accent}))` }}
                   />
                   {service.number}
@@ -59,7 +62,7 @@ export function Services() {
               </div>
             );
           })}
-          <div className="border-b-2 border-border" />
+          <div className="[border-bottom:var(--hairline)_solid_hsl(var(--border))]" />
         </div>
       </div>
     </section>

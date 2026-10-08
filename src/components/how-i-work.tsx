@@ -15,7 +15,7 @@ export function HowIWork() {
       className="px-5 py-24 sm:px-6 md:px-10 md:py-32 lg:px-16 lg:py-40"
     >
       <div className="mx-auto max-w-[1400px]">
-        <div className="mb-12 md:mb-16">
+        <div className="rule mb-10 flex items-baseline justify-between gap-6 pt-5 md:mb-14">
           <h2
             id="how-i-work-heading"
             ref={headingRef}
@@ -23,6 +23,9 @@ export function HowIWork() {
           >
             {config.howIWorkHeading}
           </h2>
+          <span className="eyebrow hidden text-muted-foreground sm:block">
+            Three steps
+          </span>
         </div>
 
         <div
@@ -32,22 +35,23 @@ export function HowIWork() {
           {config.howIWorkSteps.map((step, index) => (
             <div
               key={`${step.number}-${step.title}`}
-              className="flex flex-col gap-5 border-t-2 border-border pt-6"
+              className="group flex flex-col gap-5 p-6 transition-colors duration-500 hover:bg-card md:p-7 [border:var(--hairline)_solid_hsl(var(--border))]"
             >
-              <span
-                aria-hidden="true"
-                className="h-2.5 w-2.5 bg-[hsl(var(--vivid-5))]"
-              />
+              <div className="flex items-center justify-between">
+                <span
+                  aria-hidden="true"
+                  className="h-1.5 w-1.5 bg-[hsl(var(--vivid-5))]"
+                />
+                <span className="text-[11px] font-medium tabular-nums tracking-[0.25em] text-muted-foreground">
+                  {step.number}
+                </span>
+              </div>
 
-              <span className="text-[11px] font-medium tracking-[0.25em] text-muted-foreground">
-                {step.number}
-              </span>
-
-              <h3 className="display text-[clamp(1.7rem,4vw,2.75rem)]">
+              <h3 className="display mt-2 text-[clamp(1.6rem,3.6vw,2.5rem)]">
                 {step.title}
               </h3>
 
-              <p className="max-w-[38ch] text-sm leading-relaxed text-muted-foreground md:text-base">
+              <p className="max-w-[34ch] text-sm leading-relaxed text-muted-foreground">
                 {step.description}
               </p>
             </div>

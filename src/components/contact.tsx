@@ -126,9 +126,14 @@ export function Contact() {
       className="relative px-5 py-24 sm:px-6 md:px-10 md:py-32 lg:px-16 lg:py-40"
     >
       <div className="mx-auto max-w-[1400px]">
-        <span ref={labelRef} className="reveal eyebrow mb-12 block md:mb-16">
-          {config.contactHeading}
-        </span>
+        <div className="rule mb-10 flex items-baseline justify-between gap-6 pt-5 md:mb-14">
+          <span ref={labelRef} className="reveal eyebrow">
+            {config.contactHeading}
+          </span>
+          <span className="eyebrow hidden text-muted-foreground sm:block">
+            Dhaka · Worldwide
+          </span>
+        </div>
 
         <div ref={titleRef} className="reveal mb-16 md:mb-20">
           <h2

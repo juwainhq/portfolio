@@ -75,9 +75,9 @@ export default function WorksPage() {
                         src={project.image}
                         alt={`${project.title} — ${project.category} by Juwain Haque`}
                         fit="cover"
-                        cell={5}
-                        maxPixels={220}
-                        className={`w-full border-2 border-border ${
+                        cell={3}
+                        maxPixels={380}
+                        className={`w-full [border:var(--hairline)_solid_hsl(var(--border))] ${
                           ASPECT[project.layout] ?? "aspect-[4/3]"
                         }`}
                         sizes="(min-width: 768px) 58vw, 90vw"
@@ -126,7 +126,7 @@ export default function WorksPage() {
               ))}
             </ul>
 
-            <div className="mt-16 border-t-2 border-border pt-10 md:mt-20">
+            <div className="rule mt-16 pt-10 md:mt-20">
               <Link
                 href="/#work"
                 className="link-underline inline-flex items-center gap-3 text-sm uppercase tracking-[0.2em]"
