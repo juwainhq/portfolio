@@ -95,6 +95,12 @@ export type SiteConfig = {
   heroBottomLeft: [string, string];
   heroButtonText: string;
   heroButtonTarget: NavLink;
+  /**
+   * Optional second hero CTA (bottom row), e.g. a sister site. Empty text
+   * hides it; external targets open in a new tab.
+   */
+  heroSecondaryButtonText: string;
+  heroSecondaryButtonTarget: NavLink;
 
   // About
   aboutHeading: string;
@@ -124,6 +130,19 @@ export type SiteConfig = {
   contactSubmitText: string;
   contactSuccessMessage: string;
   contactFormRecipient: string;
+  /**
+   * Which static-friendly form relay the contact form posts to.
+   * Both work from GitHub Pages with no backend.
+   */
+  contactFormProvider: "formspree" | "web3forms";
+  /**
+   * ⚠️ REPLACE THIS with your own id before going live.
+   *   formspree → https://formspree.io/f/<id>   (id looks like "xayzbqwe")
+   *   web3forms → https://web3forms.com Access Key
+   * While it still reads the placeholder the form will not attempt a request
+   * and instead shows the email fallback.
+   */
+  contactFormId: string;
 
   // Footer
   footerTagline: string;
@@ -157,8 +176,8 @@ const defaultProjects: Project[] = [
     fit: "contain",
     featured: true,
     highlight: true,
-    image: "/work-1.jpg",
-    gallery: ["/work-4.jpg"],
+    image: "/images/work-1.jpg",
+    gallery: ["/images/work-4.jpg"],
     galleryFit: "contain",
   },
   {
@@ -174,7 +193,7 @@ const defaultProjects: Project[] = [
     fit: "contain",
     featured: true,
     highlight: true,
-    image: "/work-3.jpg",
+    image: "/images/work-3.jpg",
   },
   {
     slug: "project-03",
@@ -187,7 +206,7 @@ const defaultProjects: Project[] = [
     services: ["Brand Identity", "Visual Design"],
     layout: "portrait",
     fit: "contain",
-    image: "/work-8.jpg",
+    image: "/images/work-8.jpg",
   },
   {
     slug: "project-04",
@@ -201,7 +220,7 @@ const defaultProjects: Project[] = [
     layout: "wide",
     fit: "contain",
     featured: true,
-    image: "/work-4.jpg",
+    image: "/images/work-4.jpg",
   },
   {
     slug: "project-05",
@@ -214,7 +233,7 @@ const defaultProjects: Project[] = [
     services: ["Visual Design"],
     layout: "portrait",
     fit: "contain",
-    image: "/work-8.webp",
+    image: "/images/work-8.webp",
   },
   {
     slug: "project-06",
@@ -227,7 +246,7 @@ const defaultProjects: Project[] = [
     services: ["Visual Design"],
     layout: "square",
     fit: "contain",
-    image: "/work-9.webp",
+    image: "/images/work-9.webp",
   },
   {
     slug: "project-07",
@@ -241,8 +260,8 @@ const defaultProjects: Project[] = [
     layout: "gallery",
     fit: "contain",
     galleryFit: "contain",
-    image: "/work-1.jpg",
-    gallery: ["/work-3.jpg"],
+    image: "/images/work-1.jpg",
+    gallery: ["/images/work-3.jpg"],
   },
 ];
 
@@ -317,6 +336,12 @@ export const defaultConfig: SiteConfig = {
   heroBottomLeft: ["Selected Work 2019 — 2025", "Based in Dhaka · Working Worldwide"],
   heroButtonText: "View Work",
   heroButtonTarget: { label: "Work", kind: "section", href: "#work" },
+  heroSecondaryButtonText: "Visit Film Lab",
+  heroSecondaryButtonTarget: {
+    label: "Film Lab",
+    kind: "external",
+    href: "https://juwainhq.github.io/film-lab/",
+  },
 
   aboutHeading:
     "Graphic designer and business consultant focused on creating strong visual identities and practical strategies.",
@@ -342,16 +367,23 @@ export const defaultConfig: SiteConfig = {
   contactSubmitText: "Send Message",
   contactSuccessMessage: "Message sent. I'll be in touch soon.",
   contactFormRecipient: "hello@juwainhaque.com",
+  contactFormProvider: "formspree",
+  // ---------------------------------------------------------------------
+  // 👇 PASTE YOUR FORM ID HERE (Formspree id or Web3Forms access key).
+  //    The placeholder below is intentionally invalid: the contact form
+  //    detects it, refuses to POST, and points visitors at the email
+  //    address instead. Replace it and the form goes live.
+  // ---------------------------------------------------------------------
+  contactFormId: "YOUR_FORMSPREE_ID",
 
   footerTagline: "Graphic Designer · Business Consultant",
   footerCopyright: "© 2025 All Rights Reserved",
   footerBusinessName: "Juwain Haque",
   footerBusinessLink: "https://juwainhaque.com",
 
-  navLinks: [
-    ...defaultNavLinks,
-    { label: "Work", kind: "page", href: "/work", showInNav: true },
-  ],
+  // One entry per destination: the archive is linked once, from the
+  // Selected Work section CTA — not duplicated in the nav.
+  navLinks: defaultNavLinks,
   socials: defaultSocials,
 
   sections: [
@@ -491,7 +523,7 @@ export async function resetConfig(): Promise<{ ok: boolean; error?: string }> {
 /* -------------------------------------------------------------------------- */
 
 function mergeWithDefaults(partial: Partial<SiteConfig>): SiteConfig {
-  return {
+  return migrateLegacyImagePaths({
     ...defaultConfig,
     ...partial,
     navLinks: partial.navLinks ?? defaultConfig.navLinks,
@@ -500,6 +532,54 @@ function mergeWithDefaults(partial: Partial<SiteConfig>): SiteConfig {
     projects: partial.projects ?? defaultConfig.projects,
     howIWorkSteps: partial.howIWorkSteps ?? defaultConfig.howIWorkSteps,
     sections: partial.sections ?? defaultConfig.sections,
+    // Fields added later than some saved configs — merge defensively so a
+    // partial remote row can't drop their label/kind/href.
+    heroButtonTarget: {
+      ...defaultConfig.heroButtonTarget,
+      ...(partial.heroButtonTarget ?? {}),
+    },
+    heroSecondaryButtonTarget: {
+      ...defaultConfig.heroSecondaryButtonTarget,
+      ...(partial.heroSecondaryButtonTarget ?? {}),
+    },
+    contactFormProvider:
+      partial.contactFormProvider ?? defaultConfig.contactFormProvider,
+    contactFormId: partial.contactFormId ?? defaultConfig.contactFormId,
+  });
+}
+
+/**
+ * The bundled images live in /images/ — configs saved before that move (a
+ * Supabase row or a cached copy) still point at the public root, where the
+ * files no longer exist. Remap them on every load.
+ */
+const LEGACY_IMAGE_PATHS = [
+  "/work-1.jpg",
+  "/work-3.jpg",
+  "/work-4.jpg",
+  "/work-8.jpg",
+  "/work-8.webp",
+  "/work-9.webp",
+];
+
+function migrateLegacyImagePaths(config: SiteConfig): SiteConfig {
+  const needsMigration = config.projects.some((project) =>
+    [project.image, ...(project.gallery ?? [])].some((path) =>
+      LEGACY_IMAGE_PATHS.includes(path)
+    )
+  );
+  if (!needsMigration) return config;
+
+  const mapPath = (path: string) =>
+    LEGACY_IMAGE_PATHS.includes(path) ? `/images${path}` : path;
+
+  return {
+    ...config,
+    projects: config.projects.map((project) => ({
+      ...project,
+      image: mapPath(project.image),
+      gallery: project.gallery?.map(mapPath),
+    })),
   };
 }
 
@@ -509,7 +589,14 @@ function mergeWithDefaults(partial: Partial<SiteConfig>): SiteConfig {
  * that share the same hero image are reassigned to an unused image.
  * Gallery images are intentionally left unconstrained (they can repeat).
  */
-const ALL_IMAGES = ["/work-1.jpg", "/work-3.jpg", "/work-4.jpg", "/work-8.jpg", "/work-8.webp", "/work-9.webp"];
+const ALL_IMAGES = [
+  "/images/work-1.jpg",
+  "/images/work-3.jpg",
+  "/images/work-4.jpg",
+  "/images/work-8.jpg",
+  "/images/work-8.webp",
+  "/images/work-9.webp",
+];
 
 function deduplicateProjectImages(projects: Project[]): Project[] {
   const usedHeroImages = new Set<string>();

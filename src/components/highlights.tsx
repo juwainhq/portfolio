@@ -1,86 +1,65 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useReveal } from "@/hooks/use-reveal";
+import { ArrowUpRight } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
+import { useReveal } from "@/hooks/use-reveal";
 
 export function Highlights() {
   const { config } = useSiteConfig();
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const labelRef = useReveal();
-  const listRef = useReveal();
+  const headingRef = useReveal();
+  const listRef = useReveal<HTMLUListElement>();
 
-  const highlights = config.projects.filter((p) => p.highlight && !p.hidden);
+  const highlights = config.projects.filter((project) => project.highlight && !project.hidden);
   if (highlights.length === 0) return null;
 
   return (
-    <section className="py-28 md:py-40 lg:py-48 px-6 md:px-10 lg:px-16">
-      <div className="max-w-[1400px] mx-auto">
-        {/* Header */}
-        <div className="mb-16 md:mb-20 lg:mb-24">
-          <h2
-            ref={labelRef}
-            className="reveal text-[10px] uppercase tracking-[0.3em] font-medium"
-          >
+    <section
+      id="highlights"
+      aria-labelledby="highlights-heading"
+      className="px-5 py-24 sm:px-6 md:px-10 md:py-32 lg:px-16 lg:py-40"
+    >
+      <div className="mx-auto max-w-[1400px]">
+        <div className="mb-12 md:mb-16">
+          <h2 id="highlights-heading" ref={headingRef} className="reveal eyebrow">
             {config.highlightsHeading}
           </h2>
         </div>
 
-        {/* Highlights List */}
-        <div
-          ref={listRef}
-          className="reveal border-t border-foreground/10"
-        >
-          {highlights.map((project, index) => (
-            <Link
-              key={project.slug}
-              href={project.href ?? `/work/${project.slug}`}
-              className="group block"
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            >
-              <div className="grid grid-cols-12 gap-4 py-5 md:py-6 border-b border-foreground/10 transition-all duration-300">
-                {/* Number */}
-                <div className="col-span-2 md:col-span-1">
-                  <span className="text-[10px] tracking-[0.2em] text-muted-foreground group-hover:text-foreground/50 transition-colors duration-300">
-                    {project.number}
-                  </span>
-                </div>
+        <ul ref={listRef} className="reveal border-t-2 border-border">
+          {highlights.map((project) => (
+            <li key={project.slug}>
+              <Link
+                href={project.href ?? `/work/${project.slug}`}
+                className="group grid grid-cols-12 items-center gap-x-4 gap-y-2 border-b-2 border-border py-5 transition-colors duration-300 hover:border-[hsl(var(--accent-2))] md:py-6"
+              >
+                <span className="col-span-2 text-[11px] tracking-[0.2em] text-muted-foreground md:col-span-1">
+                  {project.number}
+                </span>
 
-                {/* Title */}
-                <div className="col-span-10 md:col-span-5">
-                  <h3 className="text-lg md:text-xl lg:text-2xl font-display tracking-tight group-hover:translate-x-2 transition-transform duration-500">
-                    {project.title}
-                  </h3>
-                </div>
+                <h3 className="col-span-10 text-lg font-display uppercase tracking-[-0.02em] transition-transform duration-500 group-hover:translate-x-2 md:col-span-5 md:text-2xl">
+                  {project.title}
+                </h3>
 
-                {/* Category */}
-                <div className="col-span-8 md:col-span-3 hidden md:block">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                    {project.category}
-                  </p>
-                </div>
+                <span className="col-span-6 text-[10px] font-medium uppercase tracking-[0.25em] text-muted-foreground md:col-span-3">
+                  {project.category}
+                </span>
 
-                {/* Year */}
-                <div className="col-span-4 md:col-span-2 hidden md:block">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground text-right">
-                    {project.year || ""}
-                  </p>
-                </div>
+                <span className="col-span-4 text-[10px] font-medium uppercase tracking-[0.25em] text-muted-foreground md:col-span-2 md:text-right">
+                  {project.year}
+                </span>
 
-                {/* Arrow */}
-                <div className="col-span-12 md:col-span-1 flex justify-end">
-                  <span
-                    className="text-xs opacity-0 group-hover:opacity-100 translate-x-[-8px] group-hover:translate-x-0 transition-all duration-300"
-                  >
-                    →
-                  </span>
-                </div>
-              </div>
-            </Link>
+                <span className="col-span-2 flex justify-end md:col-span-1">
+                  <ArrowUpRight
+                    size={16}
+                    aria-hidden="true"
+                    className="text-muted-foreground opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100"
+                  />
+                </span>
+              </Link>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );

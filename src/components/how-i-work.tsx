@@ -1,44 +1,53 @@
 "use client";
 
-import { useReveal } from "@/hooks/use-reveal";
 import { useSiteConfig } from "@/context/site-config";
+import { useReveal } from "@/hooks/use-reveal";
 
 export function HowIWork() {
   const { config } = useSiteConfig();
-  const labelRef = useReveal();
+  const headingRef = useReveal();
   const listRef = useReveal();
 
   return (
-    <section className="py-28 md:py-40 lg:py-48 px-6 md:px-10 lg:px-16">
-      <div className="max-w-[1400px] mx-auto">
-        {/* Header */}
-        <div className="mb-16 md:mb-20 lg:mb-24">
+    <section
+      id="how-i-work"
+      aria-labelledby="how-i-work-heading"
+      className="px-5 py-24 sm:px-6 md:px-10 md:py-32 lg:px-16 lg:py-40"
+    >
+      <div className="mx-auto max-w-[1400px]">
+        <div className="mb-12 md:mb-16">
           <h2
-            ref={labelRef}
-            className="reveal text-[10px] uppercase tracking-[0.3em] font-medium"
+            id="how-i-work-heading"
+            ref={headingRef}
+            className="reveal eyebrow"
           >
             {config.howIWorkHeading}
           </h2>
         </div>
 
-        {/* Steps */}
         <div
           ref={listRef}
-          className="reveal grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 lg:gap-16"
+          className="reveal grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8 lg:gap-14"
         >
           {config.howIWorkSteps.map((step, index) => (
             <div
-              key={step.number}
-              className="group border-t border-foreground/10 pt-6 md:pt-8"
-              style={{ transitionDelay: `${index * 150}ms` }}
+              key={`${step.number}-${step.title}`}
+              className="flex flex-col gap-5 border-t-2 border-border pt-6"
             >
-              <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground block mb-8 md:mb-10">
+              <span
+                aria-hidden="true"
+                className="h-2.5 w-2.5 bg-[hsl(var(--vivid-5))]"
+              />
+
+              <span className="text-[11px] font-medium tracking-[0.25em] text-muted-foreground">
                 {step.number}
               </span>
-              <h3 className="text-3xl md:text-4xl lg:text-5xl font-display tracking-tight mb-4 md:mb-5">
+
+              <h3 className="display text-[clamp(1.7rem,4vw,2.75rem)]">
                 {step.title}
               </h3>
-              <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-[320px]">
+
+              <p className="max-w-[38ch] text-sm leading-relaxed text-muted-foreground md:text-base">
                 {step.description}
               </p>
             </div>

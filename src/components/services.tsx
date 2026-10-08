@@ -1,73 +1,65 @@
 "use client";
 
-import { useState } from "react";
-import { useReveal } from "@/hooks/use-reveal";
+import { ArrowUpRight } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
+import { useReveal } from "@/hooks/use-reveal";
+
+const ACCENTS = [1, 2, 3, 4, 5];
 
 export function Services() {
   const { config } = useSiteConfig();
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const labelRef = useReveal();
-  const listRef = useReveal();
+  const listRef = useReveal<HTMLDivElement>();
 
   return (
-    <section id="services" className="py-28 md:py-40 lg:py-48 px-6 md:px-10 lg:px-16">
-      <div className="max-w-[1400px] mx-auto">
-        {/* Header */}
-        <div className="mb-16 md:mb-20 lg:mb-24">
-          <span
-            ref={labelRef}
-            className="reveal text-[10px] uppercase tracking-[0.3em] font-medium"
-          >
+    <section
+      id="services"
+      aria-labelledby="services-heading"
+      className="px-5 py-24 sm:px-6 md:px-10 md:py-32 lg:px-16 lg:py-40"
+    >
+      <div className="mx-auto max-w-[1400px]">
+        <div className="mb-12 md:mb-16">
+          <h2 id="services-heading" ref={labelRef} className="reveal eyebrow">
             {config.servicesHeading}
-          </span>
+          </h2>
         </div>
 
-        {/* Service List */}
         <div ref={listRef} className="reveal">
-          {config.services.map((service, index) => (
-            <div
-              key={service.number}
-              className={`group border-t border-foreground/10 py-8 md:py-10 transition-all duration-300 ${
-                hoveredIndex === index ? "border-foreground/20" : ""
-              }`}
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            >
-              <div className="grid grid-cols-12 gap-4 items-baseline">
-                {/* Number */}
-                <div className="col-span-3 md:col-span-1">
-                  <span className="text-[10px] md:text-[11px] tracking-[0.2em] text-muted-foreground font-medium group-hover:text-foreground/50 transition-colors duration-300">
-                    {service.number}
-                  </span>
-                </div>
-
-                {/* Title */}
-                <div className="col-span-5 md:col-span-4">
-                  <h3 className="text-xl md:text-2xl lg:text-3xl font-display tracking-tight group-hover:translate-x-1 transition-transform duration-500">
-                    {service.title}
-                  </h3>
-                </div>
-
-                {/* Description */}
-                <div className="col-span-4 md:col-span-5 md:col-start-7">
-                  <p className="text-sm md:text-base text-muted-foreground group-hover:text-foreground/60 transition-colors duration-300">
-                    {service.description}
-                  </p>
-                </div>
-
-                {/* Subtle indicator */}
-                <div className="col-span-12 md:col-span-2 md:col-start-11 flex justify-end">
+          {config.services.map((service, index) => {
+            const accent = ACCENTS[index % ACCENTS.length];
+            return (
+              <div
+                key={`${service.number}-${service.title}`}
+                className="group grid grid-cols-12 items-baseline gap-x-4 gap-y-3 border-t-2 border-border py-7 transition-colors duration-300 hover:border-[hsl(var(--accent-2))] md:py-9"
+              >
+                <span className="col-span-3 flex items-center gap-2 text-[11px] font-medium tracking-[0.2em] text-muted-foreground md:col-span-1">
                   <span
-                    className="text-[10px] md:text-[11px] tracking-[0.15em] uppercase text-muted-foreground/0 group-hover:text-foreground/40 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0 opacity-0 group-hover:opacity-100"
-                  >
-                    View
-                  </span>
-                </div>
+                    aria-hidden="true"
+                    className="h-2.5 w-2.5 transition-transform duration-300 group-hover:scale-150"
+                    style={{ background: `hsl(var(--vivid-${accent}))` }}
+                  />
+                  {service.number}
+                </span>
+
+                <h3 className="col-span-9 text-[clamp(1.35rem,3vw,2.15rem)] leading-tight md:col-span-4 font-display uppercase tracking-[-0.03em] transition-transform duration-500 group-hover:translate-x-1.5">
+                  {service.title}
+                </h3>
+
+                <p className="col-span-12 max-w-[46ch] text-sm leading-relaxed text-muted-foreground transition-colors duration-300 group-hover:text-foreground md:col-span-5 md:col-start-7 md:text-base">
+                  {service.description}
+                </p>
+
+                <span className="col-span-12 flex justify-start md:col-span-1 md:col-start-12 md:justify-end">
+                  <ArrowUpRight
+                    size={18}
+                    aria-hidden="true"
+                    className="text-muted-foreground opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100"
+                  />
+                </span>
               </div>
-            </div>
-          ))}
-          <div className="border-b border-foreground/10" />
+            );
+          })}
+          <div className="border-b-2 border-border" />
         </div>
       </div>
     </section>

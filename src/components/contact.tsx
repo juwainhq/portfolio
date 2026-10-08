@@ -1,205 +1,286 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { ArrowRight } from "lucide-react";
-import { toast } from "sonner";
-import { useReveal } from "@/hooks/use-reveal";
+import { useState } from "react";
+import { ArrowRight, Loader2, Mail } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
+import { useReveal } from "@/hooks/use-reveal";
 
-// Google Apps Script Web App /exec endpoint. Posting via a native HTML form
-// (targeted at a hidden iframe) avoids CORS entirely — the browser performs
-// a real navigation submit, so the response is loaded into the iframe and
-// the main page is never navigated away or blocked by the browser.
-const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbyX7oSqfciSJCaJWqLxLi5f86x2pO3OaKL4dvZvMTwGV6K-F2-yGVaZ1Lgb8tNDTPj1bw/exec";
+type Status = { kind: "idle" | "sending" | "success" | "error"; message: string };
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+/**
+ * Contact form.
+ *
+ * Posts straight from the browser to a form-relay service — no backend, so it
+ * keeps working on a static GitHub Pages deploy:
+ *
+ *   formspree → POST https://formspree.io/f/<FORM_ID>
+ *   web3forms → POST https://api.web3forms.com/submit   (access_key in body)
+ *
+ * ⚠️ REPLACE THE FORM ID before going live: `contactFormId` in
+ *    src/data/site-config.ts (default is the placeholder `YOUR_FORMSPREE_ID`).
+ *    Until then the form refuses to pretend it sent anything and shows the
+ *    email fallback instead.
+ */
 export function Contact() {
   const { config } = useSiteConfig();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [status, setStatus] = useState<Status>({ kind: "idle", message: "" });
   const labelRef = useReveal();
   const titleRef = useReveal();
-  const formRef = useRef<HTMLFormElement | null>(null);
-  const socialsRef = useReveal();
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const formRef = useReveal<HTMLFormElement>();
+  const sideRef = useReveal();
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const provider = config.contactFormProvider ?? "formspree";
+  const formId = (config.contactFormId ?? "").trim();
+  const isConfigured =
+    formId.length >= 6 && !/^(your|replace|placeholder)/i.test(formId);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) {
-      toast.error("Please fill in all fields.");
+  const endpoint =
+    provider === "web3forms"
+      ? "https://api.web3forms.com/submit"
+      : `https://formspree.io/f/${formId}`;
+
+  const mailto = config.contactFormRecipient
+    ? `mailto:${config.contactFormRecipient}`
+    : "#contact";
+
+  const update = (key: keyof typeof formData, value: string) =>
+    setFormData((previous) => ({ ...previous, [key]: value }));
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      setStatus({ kind: "error", message: "Please fill in every field." });
+      return;
+    }
+    if (!EMAIL_PATTERN.test(formData.email.trim())) {
+      setStatus({ kind: "error", message: "That email address looks incomplete." });
+      return;
+    }
+    if (!isConfigured) {
+      setStatus({
+        kind: "error",
+        message: `The form is not connected yet — add your ${provider} ID to continue, or email ${config.contactFormRecipient}.`,
+      });
       return;
     }
 
-    const formEl = formRef.current;
-    if (!formEl) {
-      toast.error("Failed to send message. Please try again.");
-      return;
-    }
+    setStatus({ kind: "sending", message: "Sending…" });
 
-    setIsSubmitting(true);
     try {
-      // form.submit() bypasses React's onSubmit and performs a real native
-      // browser navigation submit. With target="contact_iframe", the response
-      // is loaded into the hidden iframe — the main page never navigates,
-      // and CORS is never triggered. Apps Script's doPost(e) executes
-      // server-side, reading fields from e.parameter.*.
-      formEl.submit();
-      // We can't reliably read the cross-origin iframe response, so we
-      // assume the native submit succeeded and reset state after a short
-      // delay so the UI feels responsive.
-      window.setTimeout(() => {
-        toast.success(config.contactSuccessMessage);
-        setFormData({ name: "", email: "", message: "" });
-        setIsSubmitting(false);
-      }, 1500);
+      const payload =
+        provider === "web3forms"
+          ? {
+              access_key: formId,
+              subject: "New enquiry from the portfolio site",
+              from_name: "Juwain Haque — portfolio",
+              ...formData,
+            }
+          : {
+              ...formData,
+              _subject: "New enquiry from the portfolio site",
+            };
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = (await response.json().catch(() => null)) as
+        | { success?: boolean; error?: string; errors?: { message: string }[] }
+        | null;
+
+      const failed =
+        !response.ok ||
+        data?.success === false ||
+        Boolean(data?.error) ||
+        Boolean(data?.errors?.length);
+
+      if (failed) {
+        throw new Error(
+          data?.error ?? data?.errors?.[0]?.message ?? "Request failed"
+        );
+      }
+
+      setStatus({ kind: "success", message: config.contactSuccessMessage });
+      setFormData({ name: "", email: "", message: "" });
     } catch {
-      toast.error("Failed to send message. Please try again.");
-      setIsSubmitting(false);
+      setStatus({
+        kind: "error",
+        message: `Message could not be sent. Please try again, or email ${config.contactFormRecipient}.`,
+      });
     }
   };
 
   return (
     <section
       id="contact"
-      className="py-28 md:py-40 lg:py-48 px-6 md:px-10 lg:px-16"
+      aria-labelledby="contact-heading"
+      className="relative px-5 py-24 sm:px-6 md:px-10 md:py-32 lg:px-16 lg:py-40"
     >
-      <div className="max-w-[1400px] mx-auto">
-        {/* Label */}
-        <span
-          ref={labelRef}
-          className="reveal block text-[10px] uppercase tracking-[0.3em] font-medium mb-14 md:mb-20 lg:mb-24"
-        >
+      <div className="mx-auto max-w-[1400px]">
+        <span ref={labelRef} className="reveal eyebrow mb-12 block md:mb-16">
           {config.contactHeading}
         </span>
 
-        {/* Title - Dramatic oversized typography */}
-        <div ref={titleRef} className="reveal mb-24 md:mb-32 lg:mb-40">
-          <h2 className="text-[14vw] md:text-[11vw] lg:text-[9vw] xl:text-[7.5vw] font-display leading-[0.85] tracking-[-0.05em] uppercase font-medium">
+        <div ref={titleRef} className="reveal mb-16 md:mb-20">
+          <h2
+            id="contact-heading"
+            className="display text-[clamp(2.6rem,13vw,8rem)]"
+          >
             {config.contactTitleLine1}
           </h2>
-          <h2 className="text-[14vw] md:text-[11vw] lg:text-[9vw] xl:text-[7.5vw] font-display leading-[0.85] tracking-[-0.05em] uppercase font-medium ml-[15vw] md:ml-[20vw] lg:ml-[25vw]">
+          {/* Staggered second line — sized so it can never outgrow the
+              viewport at any width (no horizontal scroll). */}
+          <h2
+            aria-hidden="true"
+            className="display ml-[6vw] max-w-full text-[clamp(2.2rem,11.5vw,7.5rem)] text-ink-3 md:ml-[14vw]"
+          >
             {config.contactTitleLine2}
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-12">
-          {/* Hidden iframe — target of the form POST. Display:none keeps
-              the page from showing any response UI. */}
-          <iframe
-            ref={iframeRef}
-            name="contact_iframe"
-            title="contact submission target"
-            style={{ display: "none" }}
-          />
-
-          {/* Form */}
+        <div className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-12">
           <form
             ref={formRef}
-            className="reveal lg:col-span-7 space-y-8"
             onSubmit={handleSubmit}
-            action={APPS_SCRIPT_URL}
-            method="POST"
-            target="contact_iframe"
+            noValidate
+            data-form-configured={isConfigured ? "true" : "false"}
+            className="reveal flex flex-col gap-7 lg:col-span-7"
           >
-            <div>
-              <label
-                htmlFor="name"
-                className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground block mb-3"
-              >
+            <div className="flex flex-col gap-2">
+              <label htmlFor="name" className="eyebrow text-muted-foreground">
                 Name
               </label>
               <input
                 id="name"
                 name="name"
                 type="text"
+                autoComplete="name"
+                required
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className="w-full bg-transparent border-b border-foreground/20 py-3 text-base focus:outline-none focus:border-foreground transition-colors duration-300 placeholder:text-white/50"
+                onChange={(event) => update("name", event.target.value)}
+                className="field"
                 placeholder="Your name"
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="email"
-                className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground block mb-3"
-              >
+            <div className="flex flex-col gap-2">
+              <label htmlFor="email" className="eyebrow text-muted-foreground">
                 Email
               </label>
               <input
                 id="email"
                 name="email"
                 type="email"
+                autoComplete="email"
+                required
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                className="w-full bg-transparent border-b border-foreground/20 py-3 text-base focus:outline-none focus:border-foreground transition-colors duration-300 placeholder:text-white/50"
+                onChange={(event) => update("email", event.target.value)}
+                className="field"
                 placeholder="you@email.com"
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="message"
-                className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground block mb-3"
-              >
+            <div className="flex flex-col gap-2">
+              <label htmlFor="message" className="eyebrow text-muted-foreground">
                 Message
               </label>
               <textarea
                 id="message"
                 name="message"
-                value={formData.message}
-                onChange={(e) =>
-                  setFormData({ ...formData, message: e.target.value })
-                }
                 rows={5}
-                className="w-full bg-transparent border-b border-foreground/20 py-3 text-base focus:outline-none focus:border-foreground transition-colors duration-300 resize-none placeholder:text-white/50"
+                required
+                value={formData.message}
+                onChange={(event) => update("message", event.target.value)}
+                className="field resize-none"
                 placeholder="Tell me about your project"
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="group inline-flex items-center gap-4 text-sm uppercase tracking-[0.2em] font-medium pt-6 hover:opacity-50 transition-opacity duration-300 disabled:opacity-50"
-            >
-              <span>{isSubmitting ? "Sending..." : config.contactSubmitText}</span>
-              <ArrowRight
-                size={16}
-                className="group-hover:translate-x-1 transition-transform duration-300"
-              />
-            </button>
+            {/* Honeypot: bots fill this, humans never see it. */}
+            <input
+              type="text"
+              name="_gotcha"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="hidden"
+            />
+
+            <div className="flex flex-wrap items-center gap-5">
+              <button
+                type="submit"
+                className="btn-stamp disabled:opacity-60"
+                disabled={status.kind === "sending"}
+              >
+                {status.kind === "sending" ? (
+                  <>
+                    Sending
+                    <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+                  </>
+                ) : (
+                  <>
+                    {config.contactSubmitText}
+                    <ArrowRight size={14} aria-hidden="true" />
+                  </>
+                )}
+              </button>
+
+              <a
+                href={mailto}
+                className="link-underline inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground"
+              >
+                <Mail size={14} aria-hidden="true" />
+                {config.contactFormRecipient}
+              </a>
+            </div>
+
+            {/* Always-present live region so screen readers announce updates. */}
+            <div aria-live="polite" className="min-h-[1.5rem]">
+              {status.kind !== "idle" && status.kind !== "sending" ? (
+                <p
+                  className={`border-l-4 pl-4 text-sm ${
+                    status.kind === "success"
+                      ? "border-[hsl(var(--accent-1))] text-ink-1"
+                      : "border-destructive text-destructive"
+                  }`}
+                  data-form-status={status.kind}
+                >
+                  {status.message}
+                </p>
+              ) : null}
+            </div>
+
           </form>
 
-          {/* Social Links */}
-          <div
-            ref={socialsRef}
-            className="reveal lg:col-span-4 lg:col-start-9 space-y-10 pt-2"
+          <aside
+            ref={sideRef}
+            className="reveal flex flex-col gap-8 lg:col-span-4 lg:col-start-9"
           >
             {config.socials.map((social) => (
-              <div key={social.platform}>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-3">
+              <div key={social.platform} className="flex flex-col gap-2">
+                <p className="eyebrow text-muted-foreground">
                   {social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
                 </p>
                 <a
                   href={social.href}
-                  target={social.platform === "email" ? "_self" : "_blank"}
-                  rel="noopener noreferrer"
-                  className="text-base hover:opacity-50 transition-opacity duration-300"
+                  target={social.platform === "email" ? undefined : "_blank"}
+                  rel={social.platform === "email" ? undefined : "noopener noreferrer"}
+                  className="link-underline self-start text-base md:text-lg"
                 >
                   {social.label}
                 </a>
               </div>
             ))}
-          </div>
+          </aside>
         </div>
       </div>
     </section>

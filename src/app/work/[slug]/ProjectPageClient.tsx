@@ -7,6 +7,7 @@ import { useSiteConfig } from "@/context/site-config";
 import { Footer } from "@/components/footer";
 import { Navigation } from "@/components/navigation";
 import { useProjectAccent } from "@/hooks/use-project-accent";
+import { withBasePath } from "@/lib/utils";
 import { hslToRgb, type HSL } from "@/lib/color-extraction";
 
 function hslString({ h, s, l }: HSL): string {
@@ -156,7 +157,7 @@ export function ProjectPageClient({ slug }: { slug: string }) {
           <div className="max-w-[1600px] mx-auto">
             <div className="border border-[color:var(--project-border)]">
               <img
-                src={project.image}
+                src={withBasePath(project.image)}
                 alt={project.title}
                 className={`w-full h-auto ${
                   project.fit === "cover" ? "object-cover" : "object-contain"

@@ -51,19 +51,50 @@ export function SiteConfigProvider({ children }: { children: React.ReactNode }) 
   const [isHydrated, setIsHydrated] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // 1. Hydrate from Supabase on mount (runs once).
+  // 1. Hydrate from Supabase once the browser is idle.
+  //
+  // The remote sync pulls in the (large) Supabase client, so it is deferred:
+  // the first paint already shows either the cached config or the bundled
+  // defaults, and the remote copy only needs to land before the visitor
+  // starts editing — never in the critical path of the page.
   useEffect(() => {
     let cancelled = false;
 
-    loadSiteConfig().then((remote) => {
-      if (cancelled) return;
-      setConfig(remote);
-      setHasUnsavedChanges(false);
-      setIsHydrated(true);
-    });
+    const sync = () => {
+      loadSiteConfig().then((remote) => {
+        if (cancelled) return;
+        setConfig(remote);
+        setHasUnsavedChanges(false);
+        setIsHydrated(true);
+      });
+    };
+
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+
+    let idleId: number | null = null;
+    let timer: number | null = null;
+
+    // The sync is deliberately pushed past the first-paint window: it costs
+    // ~50 kB of JavaScript, and nothing on screen depends on it, so it must
+    // never sit on the critical path of the hero.
+    const schedule = () => {
+      if (typeof idleWindow.requestIdleCallback === "function") {
+        idleId = idleWindow.requestIdleCallback(sync, { timeout: 5000 });
+      } else {
+        timer = window.setTimeout(sync, 1500);
+      }
+    };
+    timer = window.setTimeout(schedule, 2500);
 
     return () => {
       cancelled = true;
+      if (idleId !== null && typeof idleWindow.cancelIdleCallback === "function") {
+        idleWindow.cancelIdleCallback(idleId);
+      }
+      if (timer !== null) window.clearTimeout(timer);
     };
   }, []);
 

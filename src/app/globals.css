@@ -2,179 +2,373 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 0%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 0%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 8%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 8%;
-    --muted-foreground: 0 0% 55%;
-    --accent: 0 0% 8%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 0% 98%;
-    --destructive-foreground: 0 0% 0%;
-    --border: 0 0% 14%;
-    --input: 0 0% 14%;
-    --ring: 0 0% 98%;
-    --radius: 0px;
-  }
-}
+/* -------------------------------------------------------------------------- */
+/*  DITHER DESIGN SYSTEM                                                      */
+/*                                                                            */
+/*  Two bases (paper / ink) + five saturated accents, exposed as HSL triplets  */
+/*  so Tailwind can keep using `hsl(var(--token))` and opacity modifiers.      */
+/*                                                                            */
+/*  Two accent sets:                                                          */
+/*    --accent-1..5  text-safe accents for the *current* theme (WCAG AA)       */
+/*    --vivid-1..5   always-saturated fills used by the dither canvases,       */
+/*                   chips and blocks (they carry dark ink, never body text)   */
+/* -------------------------------------------------------------------------- */
 
 @layer base {
+  :root {
+    /* ---- light base: warm "paper" (default when no theme class is set) ---- */
+    --background: 42 42% 94%; /* #F6F2E9 */
+    --foreground: 247 21% 8%; /* #12111A */
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-2: 41 37% 90%; /* #EFE9DC */
+    --muted: 253 10% 34%; /* #524E60 -> 7.18:1 on paper */
+    --border: 41 23% 81%; /* #DAD3C4 */
+    --ring: 200 100% 24%; /* #00527A */
+    --destructive: 356 81% 36%; /* #A8121C */
+
+    /* text-safe accents on paper */
+    --accent-1: 72 100% 18%; /* #4A5D00  6.58:1 */
+    --accent-2: 200 100% 24%; /* #00527A  7.55:1 */
+    --accent-3: 328 100% 35%; /* #B1005F  6.19:1 */
+    --accent-4: 21 100% 33%; /* #A63A00  5.83:1 */
+    --accent-5: 257 62% 40%; /* #4B27A6  8.78:1 */
+
+    /* ---- vivid fills + dither palette (identical in both themes) --------- */
+    --vivid-1: 77 100% 65%; /* #CDFF4A acid lime  */
+    --vivid-2: 193 100% 65%; /* #4FD8FF electric cyan */
+    --vivid-3: 332 100% 68%; /* #FF5CA8 hot magenta */
+    --vivid-4: 24 100% 62%; /* #FF8A3D tangerine */
+    --vivid-5: 256 100% 77%; /* #A98BFF violet */
+    --on-vivid: 240 23% 5%; /* #0A0A10 -> >=6.9:1 on every vivid colour */
+
+    /* dithered surfaces read as "ink dots on paper" with these two */
+    --dither-base: 42 42% 94%;
+    --dither-ink: 247 21% 8%;
+
+    --radius: 0px;
+    /* one dither pixel = one dot of the print grid */
+    --dither-cell: 6px;
+    --nav-h: 64px;
+  }
+
+  .dark {
+    --background: 240 24% 4%; /* #08080D */
+    --foreground: 45 35% 93%; /* #F4F1E8 -> 17.7:1 */
+    --card: 240 20% 9%; /* #12121B */
+    --card-2: 240 17% 13%; /* #1B1B26 */
+    --muted: 257 11% 67%; /* #A8A3B5 -> 8.16:1 */
+    --border: 240 14% 19%; /* #2A2A38 */
+    --ring: 193 100% 65%; /* #4FD8FF */
+    --destructive: 0 100% 71%; /* #FF6B6B */
+
+    --accent-1: 77 100% 65%; /* #CDFF4A 17.1:1 */
+    --accent-2: 193 100% 65%; /* #4FD8FF 12.0:1 */
+    --accent-3: 332 100% 68%; /* #FF5CA8  7.0:1 */
+    --accent-4: 24 100% 62%; /* #FF8A3D  8.5:1 */
+    --accent-5: 256 100% 77%; /* #A98BFF  7.5:1 */
+
+    --dither-base: 240 24% 4%;
+    --dither-ink: 45 35% 93%;
+  }
+
   * {
     @apply border-border;
   }
 
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: var(--nav-h);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* `clip` (not `hidden`) so `position: sticky` keeps working */
+    overflow-x: clip;
+  }
+
+  /* Sections land below the sticky nav when jumped to. */
+  section[id] {
+    scroll-margin-top: var(--nav-h);
   }
 
   ::selection {
-    @apply bg-foreground text-background;
+    background: hsl(var(--vivid-1));
+    color: hsl(var(--on-vivid));
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 3px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--card-2));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted) / 0.5);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted) / 0.8);
   }
 }
 
-/* Hero entrance animations */
-.animate-in {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+/* -------------------------------------------------------------------------- */
+/*  Type + layout atoms                                                       */
+/* -------------------------------------------------------------------------- */
+
+@layer components {
+  /* Small uppercase monospaced-feeling label used above every section. */
+  .eyebrow {
+    @apply text-[10px] md:text-[11px] font-medium uppercase tracking-[0.3em];
+  }
+
+  .display {
+    @apply font-display uppercase leading-[0.84] tracking-[-0.045em];
+  }
+
+  /* Chunky, paper-stamp button. */
+  .btn-stamp {
+    @apply inline-flex items-center justify-center gap-3 border-2 px-6 py-3.5 text-[11px] font-medium uppercase tracking-[0.24em] transition-[transform,box-shadow,background-color,color] duration-200;
+    border-color: hsl(var(--foreground));
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+    box-shadow: 4px 4px 0 0 hsl(var(--accent-3));
+  }
+  .btn-stamp:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 0 hsl(var(--accent-2));
+  }
+  .btn-stamp:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 0 hsl(var(--accent-2));
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-3 border-2 px-6 py-3.5 text-[11px] font-medium uppercase tracking-[0.24em] transition-colors duration-200;
+    border-color: hsl(var(--border));
+    color: hsl(var(--foreground));
+  }
+  .btn-ghost:hover {
+    border-color: hsl(var(--accent-2));
+    color: hsl(var(--accent-2));
+  }
+
+  /* Solid label chip: guaranteed contrast even when it sits on the dither
+     field (background vs foreground is >=16:1 in both themes). */
+  .chip-outline {
+    @apply inline-flex items-center gap-2 border-2 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.2em];
+    border-color: hsl(var(--border));
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  /* Vivid chip that always carries dark ink (>=6.9:1 on every vivid colour). */
+  .chip {
+    @apply inline-flex items-center gap-2 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em];
+    color: hsl(var(--on-vivid));
+    background: hsl(var(--vivid-2));
+  }
+
+  /* Cards: ink hairline + offset dither shadow. */
+  .card-stamp {
+    @apply relative border-2 transition-transform duration-300;
+    border-color: hsl(var(--border));
+    background: hsl(var(--card));
+  }
+  .card-stamp:hover {
+    border-color: hsl(var(--foreground));
+  }
+
+  /* Animated underline for inline links. */
+  .link-underline {
+    @apply relative inline-block;
+  }
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 2px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .link-underline:hover::after,
+  .link-underline:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  /* Field styling shared by the contact form. */
+  .field {
+    @apply w-full border-2 bg-transparent px-4 py-3.5 text-base transition-colors duration-200;
+    border-color: hsl(var(--border));
+    color: hsl(var(--foreground));
+  }
+  .field::placeholder {
+    color: hsl(var(--muted) / 0.7);
+  }
+  .field:focus {
+    outline: none;
+    border-color: hsl(var(--accent-2));
+  }
+
+  .pixelated {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  /* Frosted sticky-nav surface. */
+  .nav-glass {
+    background: hsl(var(--background) / 0.86);
+    backdrop-filter: blur(10px) saturate(140%);
+  }
 }
 
-.animate-in.active {
-  opacity: 1 !important;
-  transform: translateY(0);
+/* Sticky nav: sits above content, ruled by a dither hairline. */
+.site-nav {
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+.site-nav[data-scrolled="true"] {
+  border-bottom-color: hsl(var(--border));
 }
 
-/* Scroll reveal - subtle and refined */
+.nav-link {
+  position: relative;
+  color: hsl(var(--muted));
+  transition: color 0.25s ease;
+}
+.nav-link:hover {
+  color: hsl(var(--foreground));
+}
+.nav-link[aria-current="true"] {
+  color: hsl(var(--foreground));
+}
+.nav-link[aria-current="true"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 2px;
+  background-color: hsl(var(--foreground));
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Reveal on scroll (JS-gated: without JS nothing is hidden)                 */
+/* -------------------------------------------------------------------------- */
+
 .reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.reveal.active {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Stagger children */
-.stagger-children > * {
-  opacity: 0;
-  transform: translateY(16px);
   transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
 }
 
-.stagger-children.active > *:nth-child(1) { transition-delay: 0ms; opacity: 1; transform: translateY(0); }
-.stagger-children.active > *:nth-child(2) { transition-delay: 100ms; opacity: 1; transform: translateY(0); }
-.stagger-children.active > *:nth-child(3) { transition-delay: 200ms; opacity: 1; transform: translateY(0); }
-.stagger-children.active > *:nth-child(4) { transition-delay: 300ms; opacity: 1; transform: translateY(0); }
-.stagger-children.active > *:nth-child(5) { transition-delay: 400ms; opacity: 1; transform: translateY(0); }
-.stagger-children.active > *:nth-child(6) { transition-delay: 500ms; opacity: 1; transform: translateY(0); }
-
-/* Text reveal animation */
-.text-reveal {
-  clip-path: inset(0 100% 0 0);
-  transition: clip-path 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+html.reveal-ready .reveal:not(.active) {
+  opacity: 0;
+  transform: translateY(22px);
 }
 
-.text-reveal.active {
-  clip-path: inset(0 0% 0 0);
+html.reveal-ready .reveal.active {
+  opacity: 1;
+  transform: none;
 }
 
-/* Custom scrollbar - minimal */
-::-webkit-scrollbar {
-  width: 4px;
+/* Hero entrance */
+.animate-in {
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
 }
-
-::-webkit-scrollbar-track {
-  background: transparent;
+html.reveal-ready .animate-in:not(.active) {
+  opacity: 0;
+  transform: translateY(18px);
 }
-
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--foreground) / 0.2);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--foreground) / 0.4);
-}
-
-/* Focus styles */
-:focus-visible {
-  outline: none;
-  border-bottom: 1px solid currentColor;
-}
-
-/* Image hover optimization */
-img {
-  will-change: transform;
-}
-
-/* Prevent layout shift */
-@media (prefers-reduced-motion: no-preference) {
-  img {
-    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-  }
+html.reveal-ready .animate-in.active {
+  opacity: 1;
+  transform: none;
 }
 
 /* -------------------------------------------------------------------------- */
-/* Dynamic project accent (project detail pages only)                          */
+/*  Project detail pages (dynamic accent extracted from the artwork)          */
 /* -------------------------------------------------------------------------- */
 
-/*
- * Default values for the per-project theme, extracted at runtime from the
- * project's hero image by src/lib/color-extraction.ts. Pages set the real
- * values on [data-project-page] once extraction finishes; until then (or if
- * extraction is impossible) this warm gold/bronze default applies.
- *
- * The theme is ambient, not a background block: a large very-low-opacity
- * radial glow behind the whole page, plus small elegant details (hairline
- * image borders, rules, hover states). Content stays black/white for
- * readability. Scoped under [data-project-page] so the home page and
- * general layout keep their neutral monochrome palette.
- */
 [data-project-page] {
-  --project-accent: hsl(40 65% 58%); /* warm gold/bronze */
-  --project-ambient:
-    radial-gradient(1200px 600px at 18% 0%, rgba(218, 171, 78, 0.16), rgba(0, 0, 0, 0) 70%),
-    radial-gradient(1000px 700px at 85% 55%, rgba(218, 171, 78, 0.1), rgba(0, 0, 0, 0) 72%);
-  --project-border: rgba(218, 171, 78, 0.35);
-  --project-line: rgba(218, 171, 78, 0.55);
+  --project-accent: hsl(40 65% 58%);
+  --project-ambient: radial-gradient(
+      1200px 600px at 18% 0%,
+      hsl(40 65% 58% / 0.16),
+      transparent 70%
+    ),
+    radial-gradient(
+      1000px 700px at 85% 55%,
+      hsl(40 65% 58% / 0.1),
+      transparent 72%
+    );
+  --project-border: hsl(40 65% 58% / 0.35);
+  --project-line: hsl(40 65% 58% / 0.55);
 }
 
-/*
- * Navigation highlight: applied conditionally to nav links (desktop and
- * mobile menu) in navigation.tsx when on a project detail page. The accent
- * variable is inherited from the page root; other links — logo, socials —
- * keep their neutral color.
- */
 .project-accent-link {
   color: var(--project-accent, currentColor);
 }
 
-/* Mobile-specific adjustments */
+/* -------------------------------------------------------------------------- */
+/*  Motion preferences                                                        */
+/* -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  /* Never hide content waiting for an animation that will not play. */
+  html.reveal-ready .reveal:not(.active),
+  html.reveal-ready .animate-in:not(.active) {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @layer utilities {
   .safe-top {
     padding-top: env(safe-area-inset-top);
   }
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
+  }
+  /* Hide scrollbars on the horizontal project strips without losing scroll. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Touch-only UI (e.g. the card's colour/dither switch). */
+  .coarse-only {
+    display: none;
+  }
+  @media (hover: none), (pointer: coarse) {
+    .coarse-only {
+      display: inline-flex;
+    }
   }
 }
