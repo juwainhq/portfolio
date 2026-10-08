@@ -123,10 +123,10 @@ export function Contact() {
     <section
       id="contact"
       aria-labelledby="contact-heading"
-      className="relative px-5 py-24 sm:px-6 md:px-10 md:py-32 lg:px-16 lg:py-40"
+      className="relative px-5 py-[var(--section-y)] sm:px-6 md:px-10 lg:px-16"
     >
       <div className="mx-auto max-w-[1400px]">
-        <div className="rule mb-10 flex items-baseline justify-between gap-6 pt-5 md:mb-14">
+        <div className="rule mb-8 flex items-baseline justify-between gap-6 pt-5 md:mb-12">
           <span ref={labelRef} className="reveal eyebrow">
             {config.contactHeading}
           </span>
@@ -135,7 +135,7 @@ export function Contact() {
           </span>
         </div>
 
-        <div ref={titleRef} className="reveal mb-16 md:mb-20">
+        <div ref={titleRef} className="reveal mb-12 md:mb-16">
           <h2
             id="contact-heading"
             className="display text-[clamp(2.6rem,13vw,8rem)]"
@@ -252,10 +252,10 @@ export function Contact() {
             <div aria-live="polite" className="min-h-[1.5rem]">
               {status.kind !== "idle" && status.kind !== "sending" ? (
                 <p
-                  className={`border-l-4 pl-4 text-sm ${
+                  className={`px-4 py-3 text-sm [border:var(--hairline)_solid_currentColor] ${
                     status.kind === "success"
-                      ? "border-[hsl(var(--accent-1))] text-ink-1"
-                      : "border-destructive text-destructive"
+                      ? "text-ink-1"
+                      : "text-destructive"
                   }`}
                   data-form-status={status.kind}
                 >
@@ -268,18 +268,23 @@ export function Contact() {
 
           <aside
             ref={sideRef}
-            className="reveal flex flex-col gap-8 lg:col-span-4 lg:col-start-9"
+            className="reveal flex flex-col lg:col-span-4 lg:col-start-9"
           >
-            {config.socials.map((social) => (
-              <div key={social.platform} className="flex flex-col gap-2">
-                <p className="eyebrow text-muted-foreground">
+            {config.socials.map((social, index) => (
+              <div
+                key={social.platform}
+                className={`flex flex-col gap-2.5 pb-7 ${
+                  index === 0 ? "" : "row-rule pt-7"
+                }`}
+              >
+                <p className="meta">
                   {social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
                 </p>
                 <a
                   href={social.href}
                   target={social.platform === "email" ? undefined : "_blank"}
                   rel={social.platform === "email" ? undefined : "noopener noreferrer"}
-                  className="link-underline self-start text-base md:text-lg"
+                  className="link-underline self-start text-lg tracking-[-0.01em] md:text-xl"
                 >
                   {social.label}
                 </a>

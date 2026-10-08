@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { Grid2X2, Palette } from "lucide-react";
 import {
   ditherImageRamp,
+  frameFingerprint,
   gridFor,
   luminanceRange,
   parseColor,
@@ -33,6 +34,26 @@ type Props = {
 };
 
 const INK: RGB = { r: 10, g: 10, b: 16 };
+
+/**
+ * Which crop of which photograph is already on screen.
+ *
+ * The project list reuses source files, and two cards built from the same
+ * photograph look like a mistake. Each card fingerprints its cropped frame and,
+ * if another card already shows that frame, shifts to the next candidate crop —
+ * art direction instead of a duplicate.
+ */
+const claimedFrames = new Map<string, string>();
+
+type Crop = { x: number; y: number; zoom: number };
+
+/** Full frame first, then progressively tighter fields centred on it. */
+const CROP_CANDIDATES: Crop[] = [
+  { x: 0.5, y: 0.5, zoom: 1 },
+  { x: 0.5, y: 0.5, zoom: 0.78 },
+  { x: 0.42, y: 0.38, zoom: 0.62 },
+  { x: 0.6, y: 0.62, zoom: 0.62 },
+];
 /**
  * Dark → light ramp for the photo treatment: ink shadow, violet mid-tone, hot
  * magenta, then the warm paper highlight. Four steps is what makes it read as
@@ -66,6 +87,12 @@ export function DitherImage({
   const [revealed, setRevealed] = useState(false);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  // The crop actually used: the full frame, or a tighter field when the full
+  // frame is already showing elsewhere on the page.
+  const [crop, setCrop] = useState<Crop>(CROP_CANDIDATES[0]);
+  const instanceId = useRef(
+    `frame-${Math.random().toString(36).slice(2)}`
+  ).current;
   const { resolvedTheme } = useTheme();
   const accentsKey = accents.join(",");
 
@@ -106,23 +133,45 @@ export function DitherImage({
       ctx.imageSmoothingEnabled = true;
       ctx.clearRect(0, 0, grid.cols, grid.rows);
 
-      // Cover/contain crop of the source into the (low-res) dither grid.
       const sourceAspect = image.naturalWidth / image.naturalHeight;
       const targetAspect = grid.cols / grid.rows;
-      let sx = 0;
-      let sy = 0;
-      let sw = image.naturalWidth;
-      let sh = image.naturalHeight;
-      if (fit === "cover" ? sourceAspect > targetAspect : sourceAspect < targetAspect) {
-        sw = image.naturalHeight * targetAspect;
-        sx = (image.naturalWidth - sw) / 2;
-      } else {
-        sh = image.naturalWidth / targetAspect;
-        sy = (image.naturalHeight - sh) / 2;
-      }
 
-      ctx.drawImage(image, sx, sy, sw, sh, 0, 0, grid.cols, grid.rows);
-      const source = ctx.getImageData(0, 0, grid.cols, grid.rows);
+      // The window `cover`/`contain` would show (centred), plus the extra zoom
+      // window inside it that a repeated photograph falls back to.
+      const cropWith = (point: Crop) => {
+        const covers = fit === "cover" ? sourceAspect > targetAspect : sourceAspect < targetAspect;
+        let baseW = image.naturalWidth;
+        let baseH = image.naturalHeight;
+        if (covers) baseW = image.naturalHeight * targetAspect;
+        else baseH = image.naturalWidth / targetAspect;
+
+        const sw = baseW * point.zoom;
+        const sh = baseH * point.zoom;
+        const sx = (image.naturalWidth - baseW) / 2 + (baseW - sw) * point.x;
+        const sy = (image.naturalHeight - baseH) / 2 + (baseH - sh) * point.y;
+
+        ctx.clearRect(0, 0, grid.cols, grid.rows);
+        ctx.drawImage(image, sx, sy, sw, sh, 0, 0, grid.cols, grid.rows);
+        return ctx.getImageData(0, 0, grid.cols, grid.rows);
+      };
+
+      // Walk the candidate crops until one is not already on screen. `contain`
+      // never crops, so it only ever has the one frame.
+      let source = cropWith(CROP_CANDIDATES[0]);
+      let chosen = CROP_CANDIDATES[0];
+      for (const candidate of CROP_CANDIDATES) {
+        source = cropWith(candidate);
+        const owner = claimedFrames.get(frameFingerprint(source));
+        chosen = candidate;
+        if (!owner || owner === instanceId) break;
+      }
+      // Re-claim the frame under this instance (a re-render releases its old one).
+      for (const [key, owner] of claimedFrames) {
+        if (owner === instanceId) claimedFrames.delete(key);
+      }
+      claimedFrames.set(frameFingerprint(source), instanceId);
+      setCrop(chosen);
+
       // Normalise the photo once, then dither the whole frame through the same
       // levels so every card in the grid has matching density.
       const levels = luminanceRange(source);
@@ -165,6 +214,9 @@ export function DitherImage({
     return () => {
       cancelled = true;
       observer?.disconnect();
+      for (const [key, owner] of claimedFrames) {
+        if (owner === instanceId) claimedFrames.delete(key);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src, fit, cell, maxPixels, accentsKey, priority, resolvedTheme]);
@@ -196,6 +248,11 @@ export function DitherImage({
         sizes={sizes}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
+        style={{
+          objectPosition: "50% 50%",
+          transformOrigin: `${crop.x * 100}% ${crop.y * 100}%`,
+          transform: crop.zoom === 1 ? undefined : `scale(${1 / crop.zoom})`,
+        }}
         className={`absolute inset-0 h-full w-full ${
           fit === "cover" ? "object-cover" : "object-contain"
         } ${transition} ${

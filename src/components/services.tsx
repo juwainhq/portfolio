@@ -1,11 +1,17 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
 import { useSiteConfig } from "@/context/site-config";
 import { useReveal } from "@/hooks/use-reveal";
 
 const ACCENTS = [1, 2, 3, 4, 5];
 
+/**
+ * Services.
+ *
+ * An editorial index: each discipline is a hairline row with its ordinal on
+ * the left and the title + summary stacked on the right, so the entries fill
+ * the measure instead of leaving a lonely right column.
+ */
 export function Services() {
   const { config } = useSiteConfig();
   const labelRef = useReveal();
@@ -15,10 +21,10 @@ export function Services() {
     <section
       id="services"
       aria-labelledby="services-heading"
-      className="px-5 py-24 sm:px-6 md:px-10 md:py-32 lg:px-16 lg:py-40"
+      className="px-5 py-[var(--section-y)] sm:px-6 md:px-10 lg:px-16"
     >
       <div className="mx-auto max-w-[1400px]">
-        <div className="rule mb-10 flex items-baseline justify-between gap-6 pt-5 md:mb-14">
+        <div className="rule mb-8 flex items-baseline justify-between gap-6 pt-5 md:mb-12">
           <h2 id="services-heading" ref={labelRef} className="reveal eyebrow">
             {config.servicesHeading}
           </h2>
@@ -33,32 +39,25 @@ export function Services() {
             return (
               <div
                 key={`${service.number}-${service.title}`}
-                className="group grid grid-cols-12 items-baseline gap-x-4 gap-y-3 py-7 transition-colors duration-500 [border-top:var(--hairline)_solid_hsl(var(--border))] hover:[border-top-color:hsl(var(--foreground)/0.4)] md:py-9"
+                className="group row-rule grid grid-cols-12 gap-x-4 py-7 hover:bg-card/60 md:gap-x-6 md:py-9"
               >
-                <span className="col-span-3 flex items-center gap-2.5 text-[11px] font-medium tabular-nums tracking-[0.2em] text-muted-foreground md:col-span-1">
+                <span className="meta col-span-2 flex items-start gap-2.5 pt-1 tabular-nums md:col-span-1 md:pt-1.5">
                   <span
                     aria-hidden="true"
-                    className="h-1.5 w-1.5 transition-transform duration-500 ease-out-expo group-hover:scale-[1.8]"
+                    className="mt-1 h-1.5 w-1.5 shrink-0 transition-transform duration-500 ease-out-expo group-hover:scale-[1.9]"
                     style={{ background: `hsl(var(--vivid-${accent}))` }}
                   />
                   {service.number}
                 </span>
 
-                <h3 className="col-span-9 text-[clamp(1.35rem,3vw,2.15rem)] leading-tight md:col-span-4 font-display uppercase tracking-[-0.03em] transition-transform duration-500 group-hover:translate-x-1.5">
-                  {service.title}
-                </h3>
-
-                <p className="col-span-12 max-w-[46ch] text-sm leading-relaxed text-muted-foreground transition-colors duration-300 group-hover:text-foreground md:col-span-5 md:col-start-7 md:text-base">
-                  {service.description}
-                </p>
-
-                <span className="col-span-12 flex justify-start md:col-span-1 md:col-start-12 md:justify-end">
-                  <ArrowUpRight
-                    size={18}
-                    aria-hidden="true"
-                    className="text-muted-foreground opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100"
-                  />
-                </span>
+                <div className="col-span-10 md:col-span-11">
+                  <h3 className="display text-[clamp(1.5rem,3.2vw,2.4rem)] leading-[1.02] transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5">
+                    {service.title}
+                  </h3>
+                  <p className="mt-3 max-w-[62ch] text-sm leading-relaxed text-muted-foreground transition-colors duration-300 group-hover:text-foreground/85 md:mt-4 md:text-base">
+                    {service.description}
+                  </p>
+                </div>
               </div>
             );
           })}

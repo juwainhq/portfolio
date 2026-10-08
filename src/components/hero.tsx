@@ -55,7 +55,7 @@ export function Hero() {
         </span>
 
         <span
-          className="chip-print animate-in hidden sm:inline-flex"
+          className="chip-print animate-in"
           style={{ "--reveal-delay": "120ms" } as React.CSSProperties}
         >
           {config.heroTopRight[0]}
@@ -124,9 +124,7 @@ export function Hero() {
               style={{ "--reveal-delay": "320ms" } as React.CSSProperties}
             >
               <span className="eyebrow opacity-65">{bottomA}</span>
-              <span className="eyebrow hidden opacity-65 sm:block">
-                {bottomB}
-              </span>
+              <span className="eyebrow opacity-65">{bottomB}</span>
             </div>
 
             <div

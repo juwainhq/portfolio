@@ -58,6 +58,8 @@
     --hairline: 1px;
     --hairline-strong: 1.5px;
     --nav-h: 60px;
+    /* One vertical rhythm for every band of the page. */
+    --section-y: clamp(3.75rem, 6vw, 6.25rem);
   }
 
   .dark {
@@ -95,6 +97,14 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Print grain: a dot grid in the page's own ink at a few percent, so the
+       whole site reads as paper instead of flat fill. Two grids at an offset
+       keep it from looking like a screen door. */
+    background-image:
+      radial-gradient(hsl(var(--foreground) / 0.05) 0.5px, transparent 0.5px),
+      radial-gradient(hsl(var(--foreground) / 0.035) 0.5px, transparent 0.5px);
+    background-size: 6px 6px, 18px 18px;
+    background-position: 0 0, 3px 3px;
     /* `clip` (not `hidden`) so `position: sticky` keeps working */
     overflow-x: clip;
   }
@@ -191,6 +201,21 @@
   /* Hairline rule that a section header can hang from. */
   .rule {
     border-top: var(--hairline) solid hsl(var(--border));
+  }
+
+  /* Editorial list rows: one hairline between entries, nothing else. */
+  .row-rule {
+    border-top: var(--hairline) solid hsl(var(--border));
+    transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .row-rule:hover {
+    border-top-color: hsl(var(--foreground) / 0.35);
+  }
+
+  /* Small print-style label used next to a value. */
+  .meta {
+    @apply text-[10px] font-medium uppercase tracking-[0.24em] text-muted-foreground;
   }
 
   /* Chunky, paper-stamp button. */

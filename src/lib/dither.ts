@@ -351,3 +351,33 @@ export function prefersReducedMotion(): boolean {
 
 /** 30fps is plenty for a dither field and keeps phones cool. */
 export const FRAME_MS = 1000 / 30;
+
+/**
+ * Cheap average-hash of a frame, used to notice that two cards are showing
+ * the same photograph (the source files are reused) and give the later one a
+ * different crop. 8x8 cells of mean luminance, one hex digit group each.
+ */
+export function frameFingerprint(source: ImageData): string {
+  const CELLS = 8;
+  const { data, width, height } = source;
+  let hash = "";
+  for (let cy = 0; cy < CELLS; cy++) {
+    for (let cx = 0; cx < CELLS; cx++) {
+      const x0 = Math.floor((cx * width) / CELLS);
+      const x1 = Math.max(x0 + 1, Math.floor(((cx + 1) * width) / CELLS));
+      const y0 = Math.floor((cy * height) / CELLS);
+      const y1 = Math.max(y0 + 1, Math.floor(((cy + 1) * height) / CELLS));
+      let sum = 0;
+      let n = 0;
+      for (let y = y0; y < y1; y++) {
+        for (let x = x0; x < x1; x++) {
+          const i = (y * width + x) * 4;
+          sum += 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+          n++;
+        }
+      }
+      hash += Math.min(15, Math.round((sum / Math.max(1, n) / 255) * 15)).toString(16);
+    }
+  }
+  return hash;
+}

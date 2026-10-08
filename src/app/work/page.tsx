@@ -26,6 +26,7 @@ export default function WorksPage() {
 
   const allProjects = config.projects.filter((project) => !project.hidden);
 
+
   useEffect(() => {
     document.querySelectorAll(".reveal:not(.active)").forEach((el) => {
       el.classList.add("active");

@@ -44,6 +44,7 @@ Everything lives in CSS variables in `src/app/globals.css`:
 | `--dither-base`, `--dither-ink`, `--dither-cell` | dither grid |
 | `--print-ink`, `--print-paper` | fixed riso pair (never themed): the hero field and the hero type plate |
 | `--hairline`, `--hairline-strong`, `--nav-h` | print chrome: 1 px rules instead of web borders |
+| `--section-y` | one vertical rhythm for every band of the page |
 
 Tailwind exposes them as `bg-background`, `text-muted-foreground`, `text-ink-3`,
 `bg-vivid-2`, … (`tailwind.config.ts`).
@@ -72,6 +73,7 @@ Consumers:
 | --- | --- | --- |
 | `dither-field.tsx` | hero: live Bayer dither of a three-wave colour field, printed in fixed ink → violet → magenta → cyan → paper | 1 dot / 7 CSS px (≤ 200 columns), `image-rendering: pixelated`, 30 fps cap, `IntersectionObserver` pause off-screen, `visibilitychange` pause in a background tab |
 | `dither-image.tsx` | project images: dithered by default, full colour on hover / keyboard focus, plus a “Colour / Dither” button on touch (`hover: none`) | 3 px dots on a processing canvas ≤ 400 px on the long edge, auto-levelled from the photograph (2 % / 98.5 % percentiles) then gamma 0.85, computed once when scrolled into view; the two layers are plain CSS opacity cross-fades |
+| `dither-image.tsx` — auto art direction | the project list reuses source files; a card whose cropped frame is already on screen (`frameFingerprint`, 8×8 mean-luma hash) falls back to the next tighter field, so no two cards show the same photograph | one extra fingerprint per candidate crop, only while rendering |
 | `dither-cursor.tsx` | desktop pointer trail: coarse Bayer-dithered dot spray, cyan → magenta | desktop + fine pointer only, RAM-capped wake-up loop, absent under reduced motion |
 | `theme-toggle.tsx` | dark/light switch | `next-themes`, `attribute="class"`, persisted under `juwain-theme` |
 

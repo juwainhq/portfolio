@@ -30,7 +30,7 @@ export function FeaturedWork() {
     <section
       id="work"
       aria-labelledby="work-heading"
-      className="px-5 py-24 sm:px-6 md:px-10 md:py-32 lg:px-16 lg:py-40"
+      className="px-5 py-[var(--section-y)] sm:px-6 md:px-10 lg:px-16"
     >
       <div className="mx-auto max-w-[1600px]">
         <div className="rule flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3 pt-5">
@@ -42,7 +42,7 @@ export function FeaturedWork() {
           </span>
         </div>
 
-        <ul className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 lg:gap-10">
+        <ul className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 md:mt-12 lg:grid-cols-3 lg:gap-10">
           {featured.map((project, index) => (
             <li
               key={project.slug}
@@ -104,7 +104,7 @@ export function FeaturedWork() {
         </ul>
 
         {/* The one and only link to the full archive. */}
-        <div ref={ctaRef} className="reveal rule mt-16 pt-10 md:mt-24 md:pt-12">
+        <div ref={ctaRef} className="reveal rule mt-14 pt-10 md:mt-20 md:pt-12">
           <Link href="/work" className="group inline-flex flex-col gap-5">
             <span className="eyebrow text-muted-foreground">
               The full archive

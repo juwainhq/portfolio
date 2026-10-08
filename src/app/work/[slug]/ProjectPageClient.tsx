@@ -179,13 +179,19 @@ export function ProjectPageClient({ slug }: { slug: string }) {
               {project.gallery.map((src, index) => {
                 const fit = project.galleryFit ?? project.fit;
                 return (
-                  <div key={index} className="border border-[color:var(--project-border)]">
-                    <img
+                  <div
+                    key={index}
+                    className="[border:var(--hairline)_solid_var(--project-border)]"
+                  >
+                    {/* Same treatment as the hero: a print until you point at it. */}
+                    <DitherImage
                       src={src}
-                      alt={`${project.title} — ${index + 2}`}
-                      className={`w-full h-auto ${
-                        fit === "cover" ? "object-cover" : "object-contain"
-                      }`}
+                      alt={`${project.title} — detail ${index + 2} by Juwain Haque`}
+                      fit={fit === "cover" ? "cover" : "contain"}
+                      cell={4}
+                      maxPixels={560}
+                      className="aspect-[4/5] w-full md:aspect-[3/2]"
+                      sizes="(min-width: 1600px) 1600px, 100vw"
                     />
                   </div>
                 );
